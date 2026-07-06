@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SHAMANGARO — Mobile Preview iPhone 16 Pro</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 48px 24px 80px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 48px;
+      font-size: 15px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 48px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .item { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #cbd5e1;
+      letter-spacing: 0.02em;
+    }
+    .phone {
+      width: 320px;
+      height: 656px;
+      background: #1c1c1e;
+      border-radius: 52px;
+      padding: 12px;
+      box-shadow:
+        0 0 0 2px #3a3a3c,
+        0 0 0 4px #1c1c1e,
+        0 30px 80px rgba(0,0,0,0.55),
+        inset 0 0 0 1px rgba(255,255,255,0.08);
+      position: relative;
+    }
+    .phone::before {
+      content: "";
+      position: absolute;
+      right: -3px;
+      top: 140px;
+      width: 3px;
+      height: 72px;
+      background: #2c2c2e;
+      border-radius: 0 2px 2px 0;
+    }
+    .phone::after {
+      content: "";
+      position: absolute;
+      left: -3px;
+      top: 110px;
+      width: 3px;
+      height: 44px;
+      background: #2c2c2e;
+      border-radius: 2px 0 0 2px;
+      box-shadow: 0 56px 0 #2c2c2e, 0 100px 0 #2c2c2e;
+    }
+    .screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 42px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+    }
+    .island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 96px;
+      height: 28px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 10;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+    }
+    .screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+    }
+    .home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 4px;
+      background: rgba(255,255,255,0.35);
+      border-radius: 4px;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <h1>SHAMANGARO — iPhone 16 Pro Preview</h1>
+  <p class="subtitle">402 × 874 · Mobile-first · Current live website</p>
+  <div class="grid">
+    <div class="item">
+      <span class="label">1 · Hero</span>
+      <div class="phone"><div class="screen"><div class="island"></div><img src="mobile-preview-01-hero.png" alt="Hero" /><div class="home-bar"></div></div></div>
+    </div>
+    <div class="item">
+      <span class="label">2 · Product Gallery</span>
+      <div class="phone"><div class="screen"><div class="island"></div><img src="mobile-preview-02-gallery.png" alt="Gallery" /><div class="home-bar"></div></div></div>
+    </div>
+    <div class="item">
+      <span class="label">3 · Offer Selection</span>
+      <div class="phone"><div class="screen"><div class="island"></div><img src="mobile-preview-03-offers.png" alt="Offers" /><div class="home-bar"></div></div></div>
+    </div>
+    <div class="item">
+      <span class="label">4 · Order Form</span>
+      <div class="phone"><div class="screen"><div class="island"></div><img src="mobile-preview-04-order-form.png" alt="Order Form" /><div class="home-bar"></div></div></div>
+    </div>
+    <div class="item">
+      <span class="label">5 · Features</span>
+      <div class="phone"><div class="screen"><div class="island"></div><img src="mobile-preview-05-features.png" alt="Features" /><div class="home-bar"></div></div></div>
+    </div>
+    <div class="item">
+      <span class="label">6 · Reviews</span>
+      <div class="phone"><div class="screen"><div class="island"></div><img src="mobile-preview-06-reviews.png" alt="Reviews" /><div class="home-bar"></div></div></div>
+    </div>
+    <div class="item">
+      <span class="label">7 · FAQ</span>
+      <div class="phone"><div class="screen"><div class="island"></div><img src="mobile-preview-07-faq.png" alt="FAQ" /><div class="home-bar"></div></div></div>
+    </div>
+    <div class="item">
+      <span class="label">8 · Footer</span>
+      <div class="phone"><div class="screen"><div class="island"></div><img src="mobile-preview-08-footer.png" alt="Footer" /><div class="home-bar"></div></div></div>
+    </div>
+  </div>
+</body>
+</html>

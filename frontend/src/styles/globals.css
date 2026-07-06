@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #111111;
+  --color-muted: #f5f5f5;
+  --color-muted-foreground: #666666;
+  --color-border: #e5e5e5;
+  --color-input: #e5e5e5;
+  --color-ring: #111111;
+  --color-primary: #111111;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #d4a853;
+  --color-secondary-foreground: #111111;
+  --color-accent: #f5f5f5;
+  --color-accent-foreground: #111111;
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+  --color-gold: #d4a853;
+  --color-gold-light: #e3bc6a;
+  --color-navy: #111111;
+  --color-navy-light: #222222;
+  --color-cream: #fafafa;
+  --color-cream-dark: #f0f0f0;
+  --color-sand: #f9f9f9;
+  --color-ocean: #111111;
+  --color-ocean-light: #222222;
+  --color-sun: #d4a853;
+  --color-sun-light: #e3bc6a;
+  --color-nature: #d4a853;
+  --color-nature-light: #e3bc6a;
+  --font-sans: var(--font-tajawal), system-ui, sans-serif;
+  --font-display: var(--font-tajawal), system-ui, sans-serif;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    @apply text-foreground;
+  }
+
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  button:focus-visible {
+    outline: 2px solid #111111;
+    outline-offset: 2px;
+  }
+}

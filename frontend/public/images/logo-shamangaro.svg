@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 88" fill="none" role="img" aria-label="SHAMANGARO">
+  <path
+    d="M118 40 L142 16 L166 40"
+    stroke="#111111"
+    stroke-width="2.4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M142 40 L166 16 L190 40"
+    stroke="#111111"
+    stroke-width="2.4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M166 40 L190 16 L214 40"
+    stroke="#111111"
+    stroke-width="2.4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <text
+    x="190"
+    y="74"
+    text-anchor="middle"
+    fill="#111111"
+    font-family="Arial, Helvetica, system-ui, sans-serif"
+    font-size="21"
+    font-weight="600"
+    letter-spacing="0.34em"
+  >
+    SHAMANGARO
+  </text>
+</svg>
