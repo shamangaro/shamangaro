@@ -1,7 +1,6 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: shamangaro-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -20,8 +19,9 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: shamangaro-api
     restart: unless-stopped
+    expose:
+      - "8000"
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       SECRET_KEY: ${SECRET_KEY}
@@ -41,8 +41,9 @@ services:
         NEXT_PUBLIC_SOCIAL_FACEBOOK: ${NEXT_PUBLIC_SOCIAL_FACEBOOK}
         NEXT_PUBLIC_SOCIAL_TIKTOK: ${NEXT_PUBLIC_SOCIAL_TIKTOK}
         NEXT_PUBLIC_SOCIAL_YOUTUBE: ${NEXT_PUBLIC_SOCIAL_YOUTUBE}
-    container_name: shamangaro-web
     restart: unless-stopped
+    expose:
+      - "3000"
     environment:
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
@@ -59,11 +60,9 @@ services:
     build:
       context: ./docker/nginx
       dockerfile: Dockerfile
-    container_name: shamangaro-nginx
     restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
+    expose:
+      - "80"
     depends_on:
       - frontend
       - backend
