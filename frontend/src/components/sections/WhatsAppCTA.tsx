@@ -3,9 +3,11 @@
 import { motion } from "framer-motion";
 import { Container } from "@/components/shared/Container";
 import { Truck, Shield, Clock } from "lucide-react";
+import { whatsappLink } from "@/lib/whatsapp";
 
-const WHATSAPP_URL =
-  "https://wa.me/212679653509?text=%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A8%D8%BA%D9%8A%D8%AA%20%D9%86%D8%B7%D9%84%D8%A8%20Neo%20Transat%20%F0%9F%8C%B4";
+const WHATSAPP_URL = whatsappLink(
+  "سلام عليكم، بغيت نطلب Neo Transat 🌴"
+);
 
 const guarantees = [
   { icon: Truck, text: "الدفع عند الإستلام" },

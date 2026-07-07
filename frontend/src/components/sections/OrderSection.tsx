@@ -5,6 +5,11 @@ import { motion } from "framer-motion";
 import { Container } from "@/components/shared/Container";
 import { Check, Truck, Shield, Package, BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  isValidMoroccanPhone,
+  MOROCCAN_PHONE_ERROR,
+} from "@/lib/phone";
+import { whatsappLink } from "@/lib/whatsapp";
 
 interface Pack {
   id: string;
@@ -53,11 +58,19 @@ export function OrderSection() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
 
   const activePack = packs.find((p) => p.id === selected)!;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isValidMoroccanPhone(form.phone)) {
+      setPhoneError(MOROCCAN_PHONE_ERROR);
+      return;
+    }
+
+    setPhoneError("");
     setSubmitting(true);
 
     const msg = `سلام عليكم، بغيت نطلب Neo Transat 🌴
@@ -67,10 +80,7 @@ export function OrderSection() {
 📱 ${form.phone}
 📍 ${form.address}`;
 
-    window.open(
-      `https://wa.me/212679653509?text=${encodeURIComponent(msg)}`,
-      "_blank"
-    );
+    window.open(whatsappLink(msg), "_blank");
 
     setTimeout(() => {
       setSubmitting(false);
@@ -269,11 +279,21 @@ export function OrderSection() {
                   type="tel"
                   required
                   value={form.phone}
-                  onChange={(e) => set("phone", e.target.value)}
+                  onChange={(e) => {
+                    set("phone", e.target.value);
+                    if (phoneError) setPhoneError("");
+                  }}
                   placeholder="06XXXXXXXX"
                   dir="ltr"
+                  pattern="0[67][0-9]{8}"
+                  title={MOROCCAN_PHONE_ERROR}
                   className="h-12 w-full rounded-xl border-2 border-navy/15 bg-white px-4 text-base text-navy outline-none transition-all placeholder:text-navy/30 focus:border-navy focus:ring-2 focus:ring-navy/10 focus:shadow-md focus:shadow-black/5"
                 />
+                {phoneError && (
+                  <p className="mt-1.5 text-sm text-red-600" role="alert">
+                    {phoneError}
+                  </p>
+                )}
               </div>
 
               <div>

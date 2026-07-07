@@ -10,8 +10,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -28,24 +26,32 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       SECRET_KEY: ${SECRET_KEY}
       DEBUG: ${DEBUG:-false}
-    ports:
-      - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
 
   frontend:
     build:
       context: ./frontend
       dockerfile: ../docker/frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_SOCIAL_INSTAGRAM: ${NEXT_PUBLIC_SOCIAL_INSTAGRAM}
+        NEXT_PUBLIC_SOCIAL_FACEBOOK: ${NEXT_PUBLIC_SOCIAL_FACEBOOK}
+        NEXT_PUBLIC_SOCIAL_TIKTOK: ${NEXT_PUBLIC_SOCIAL_TIKTOK}
+        NEXT_PUBLIC_SOCIAL_YOUTUBE: ${NEXT_PUBLIC_SOCIAL_YOUTUBE}
     container_name: shamangaro-web
     restart: unless-stopped
     environment:
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-    ports:
-      - "3000:3000"
+      MAILCHIMP_API_KEY: ${MAILCHIMP_API_KEY}
+      MAILCHIMP_SERVER_PREFIX: ${MAILCHIMP_SERVER_PREFIX}
+      MAILCHIMP_AUDIENCE_ID: ${MAILCHIMP_AUDIENCE_ID}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL}
+      NEWSLETTER_NOTIFY_EMAIL: ${NEWSLETTER_NOTIFY_EMAIL}
     depends_on:
       - backend
 

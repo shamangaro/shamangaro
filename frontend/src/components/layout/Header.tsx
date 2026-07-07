@@ -80,7 +80,7 @@ export function Header() {
       >
         <Container>
           <div className="flex h-14 items-center justify-between">
-            <a href="#" className="inline-flex shrink-0 items-center">
+            <a href="/" className="inline-flex shrink-0 items-center">
               <img
                 src="/images/logo-shamangaro.svg"
                 alt="SHAMANGARO"

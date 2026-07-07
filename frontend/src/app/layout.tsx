@@ -15,7 +15,11 @@ export const viewport: Viewport = {
   themeColor: "#111111",
 };
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://shamangaro.com";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "SHAMANGARO | Neo Transat — كرسي الإسترخاء Premium فالمغرب",
     template: "%s | SHAMANGARO",

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Container } from "@/components/shared/Container";
+import { whatsappLink } from "@/lib/whatsapp";
 import { Check, Star, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -136,7 +137,7 @@ export function Pricing() {
               </ul>
 
               <a
-                href={`https://wa.me/212679653509?text=${encodeURIComponent(pack.whatsappMessage)}`}
+                href={whatsappLink(pack.whatsappMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={cn(
