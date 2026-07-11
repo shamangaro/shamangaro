@@ -55,6 +55,7 @@ class OrderAdminResponse(BaseModel):
     unit_price: float
     total_price: float
     status: str
+    internal_notes: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -62,7 +63,13 @@ class OrderAdminResponse(BaseModel):
 
 
 class OrderStatusUpdate(BaseModel):
-    status: Literal["NEW", "CONFIRMED", "PREPARING", "SHIPPED", "DELIVERED", "CANCELLED"]
+    status: Literal[
+        "NEW", "CONTACTED", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"
+    ]
+
+
+class OrderNotesUpdate(BaseModel):
+    internal_notes: str | None = Field(default=None, max_length=5000)
 
 
 class OrderListResponse(BaseModel):
@@ -77,7 +84,9 @@ class OrderStatsResponse(BaseModel):
     today_orders: int
     all_orders: int
     new_orders: int
+    contacted_orders: int
     confirmed_orders: int
+    shipped_orders: int
     delivered_orders: int
     cancelled_orders: int
     today_sales: float

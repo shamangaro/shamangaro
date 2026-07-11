@@ -14,6 +14,7 @@ from app.models.order import Order, OrderStatus
 from app.schemas.order import (
     OrderAdminResponse,
     OrderListResponse,
+    OrderNotesUpdate,
     OrderStatsResponse,
     OrderStatusUpdate,
 )
@@ -22,12 +23,19 @@ router = APIRouter(prefix="/admin/orders", tags=["admin-orders"])
 
 STATUS_LABELS = {
     "NEW": "جديد",
+    "CONTACTED": "تم الاتصال",
     "CONFIRMED": "مؤكد",
-    "PREPARING": "قيد التحضير",
+    "PREPARING": "تم الاتصال",
     "SHIPPED": "تم الشحن",
     "DELIVERED": "تم التوصيل",
     "CANCELLED": "ملغى",
 }
+
+
+def _normalize_status(status: OrderStatus) -> str:
+    if status == OrderStatus.PREPARING:
+        return OrderStatus.CONTACTED.value
+    return status.value
 
 
 def _order_to_admin(order: Order) -> OrderAdminResponse:
@@ -42,7 +50,8 @@ def _order_to_admin(order: Order) -> OrderAdminResponse:
         quantity=order.quantity,
         unit_price=float(order.unit_price),
         total_price=float(order.total_price),
-        status=order.status.value,
+        status=_normalize_status(order.status),
+        internal_notes=order.internal_notes,
         created_at=order.created_at,
         updated_at=order.updated_at,
     )
@@ -69,7 +78,12 @@ def _build_filters(
     if status_filter:
         try:
             status_enum = OrderStatus(status_filter)
-            conditions.append(Order.status == status_enum)
+            if status_enum == OrderStatus.CONTACTED:
+                conditions.append(
+                    Order.status.in_([OrderStatus.CONTACTED, OrderStatus.PREPARING])
+                )
+            else:
+                conditions.append(Order.status == status_enum)
         except ValueError:
             pass
 
@@ -109,8 +123,17 @@ async def get_order_stats(
     new_orders = await db.scalar(
         select(func.count(Order.id)).where(base, Order.status == OrderStatus.NEW)
     )
+    contacted_orders = await db.scalar(
+        select(func.count(Order.id)).where(
+            base,
+            Order.status.in_([OrderStatus.CONTACTED, OrderStatus.PREPARING]),
+        )
+    )
     confirmed_orders = await db.scalar(
         select(func.count(Order.id)).where(base, Order.status == OrderStatus.CONFIRMED)
+    )
+    shipped_orders = await db.scalar(
+        select(func.count(Order.id)).where(base, Order.status == OrderStatus.SHIPPED)
     )
     delivered_orders = await db.scalar(
         select(func.count(Order.id)).where(base, Order.status == OrderStatus.DELIVERED)
@@ -133,7 +156,9 @@ async def get_order_stats(
         today_orders=today_orders or 0,
         all_orders=all_orders or 0,
         new_orders=new_orders or 0,
+        contacted_orders=contacted_orders or 0,
         confirmed_orders=confirmed_orders or 0,
+        shipped_orders=shipped_orders or 0,
         delivered_orders=delivered_orders or 0,
         cancelled_orders=cancelled_orders or 0,
         today_sales=float(today_sales or 0),
@@ -205,6 +230,7 @@ async def export_orders(
             "Quantity",
             "Total (MAD)",
             "Status",
+            "Notes",
         ]
     )
     for order in orders:
@@ -218,7 +244,8 @@ async def export_orders(
                 order.offer_name,
                 order.quantity,
                 float(order.total_price),
-                STATUS_LABELS.get(order.status.value, order.status.value),
+                STATUS_LABELS.get(_normalize_status(order.status), order.status.value),
+                order.internal_notes or "",
             ]
         )
 
@@ -261,6 +288,26 @@ async def update_order_status(
         raise HTTPException(status_code=404, detail="الطلب غير موجود")
 
     order.status = OrderStatus(payload.status)
+    order.updated_at = datetime.now(timezone.utc)
+    await db.flush()
+    return _order_to_admin(order)
+
+
+@router.patch("/{order_id}/notes", response_model=OrderAdminResponse)
+async def update_order_notes(
+    order_id: int,
+    payload: OrderNotesUpdate,
+    _admin: AdminUser = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Order).where(Order.id == order_id, Order.deleted_at.is_(None))
+    )
+    order = result.scalar_one_or_none()
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+
+    order.internal_notes = payload.internal_notes
     order.updated_at = datetime.now(timezone.utc)
     await db.flush()
     return _order_to_admin(order)

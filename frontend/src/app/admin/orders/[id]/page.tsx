@@ -7,24 +7,30 @@ import {
   ArrowRight,
   Copy,
   MapPin,
+  MessageCircle,
   Package,
   Phone,
+  PhoneCall,
+  StickyNote,
   Trash2,
   User,
 } from "lucide-react";
 import {
   deleteOrder,
   getOrderAdmin,
+  normalizeOrderStatus,
+  updateOrderNotes,
   updateOrderStatus,
   type OrderAdmin,
   type OrderStatus,
 } from "@/lib/orders";
+import { phoneToTelLink, phoneToWhatsAppLink } from "@/lib/phone";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 
 const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
   { value: "NEW", label: "جديد" },
+  { value: "CONTACTED", label: "تم الاتصال" },
   { value: "CONFIRMED", label: "مؤكد" },
-  { value: "PREPARING", label: "قيد التحضير" },
   { value: "SHIPPED", label: "تم الشحن" },
   { value: "DELIVERED", label: "تم التوصيل" },
   { value: "CANCELLED", label: "ملغى" },
@@ -37,12 +43,17 @@ export default function AdminOrderDetailPage() {
   const [order, setOrder] = useState<OrderAdmin | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savingNotes, setSavingNotes] = useState(false);
+  const [notes, setNotes] = useState("");
   const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
     getOrderAdmin(orderId)
-      .then(setOrder)
+      .then((data) => {
+        setOrder(data);
+        setNotes(data.internal_notes ?? "");
+      })
       .catch(() => router.push("/admin/orders"))
       .finally(() => setLoading(false));
   }, [orderId, router]);
@@ -55,6 +66,21 @@ export default function AdminOrderDetailPage() {
       setOrder(updated);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveNotes = async () => {
+    if (!order) return;
+    setSavingNotes(true);
+    try {
+      const updated = await updateOrderNotes(
+        order.id,
+        notes.trim() ? notes.trim() : null
+      );
+      setOrder(updated);
+      setNotes(updated.internal_notes ?? "");
+    } finally {
+      setSavingNotes(false);
     }
   };
 
@@ -77,6 +103,9 @@ export default function AdminOrderDetailPage() {
   }
 
   if (!order) return null;
+
+  const currentStatus = normalizeOrderStatus(order.status);
+  const whatsappMessage = `سلام عليكم ${order.customer_name}، بخصوص طلبك ${order.order_number} من SHAMANGARO.`;
 
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleString("ar-MA", {
@@ -132,10 +161,31 @@ export default function AdminOrderDetailPage() {
               <button
                 onClick={copyPhone}
                 className="rounded-lg border border-navy/15 p-2 hover:bg-navy/5"
+                title="نسخ الهاتف"
               >
                 <Copy size={16} />
               </button>
             </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <a
+                href={phoneToTelLink(order.phone)}
+                className="flex items-center justify-center gap-2 rounded-xl bg-navy py-3 text-sm font-bold text-white transition-colors hover:bg-navy-light"
+              >
+                <PhoneCall size={18} />
+                اتصال
+              </a>
+              <a
+                href={phoneToWhatsAppLink(order.phone, whatsappMessage)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
+              >
+                <MessageCircle size={18} />
+                واتساب
+              </a>
+            </div>
+
             <div className="flex items-start gap-3">
               <MapPin size={18} className="mt-0.5 text-gold" />
               <div>
@@ -178,7 +228,7 @@ export default function AdminOrderDetailPage() {
             {STATUS_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
-                disabled={saving || order.status === opt.value}
+                disabled={saving || currentStatus === opt.value}
                 onClick={() => handleStatusChange(opt.value)}
                 className="rounded-full border border-navy/15 px-4 py-2 text-sm font-bold text-navy transition-colors hover:bg-navy hover:text-white disabled:opacity-40"
               >
@@ -186,6 +236,29 @@ export default function AdminOrderDetailPage() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="rounded-2xl border border-navy/10 bg-white p-6">
+          <div className="mb-4 flex items-center gap-2">
+            <StickyNote size={18} className="text-gold" />
+            <h2 className="text-sm font-bold text-muted-foreground">
+              ملاحظات داخلية
+            </h2>
+          </div>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={4}
+            placeholder="ملاحظات للفريق الداخلي فقط..."
+            className="w-full rounded-xl border-2 border-navy/15 bg-white px-4 py-3 text-sm text-navy outline-none transition-all focus:border-navy"
+          />
+          <button
+            onClick={handleSaveNotes}
+            disabled={savingNotes}
+            className="mt-3 w-full rounded-full bg-gold py-3 text-sm font-bold text-navy transition-colors hover:bg-gold-light disabled:opacity-60"
+          >
+            {savingNotes ? "جاري الحفظ..." : "حفظ الملاحظات"}
+          </button>
         </div>
 
         <button

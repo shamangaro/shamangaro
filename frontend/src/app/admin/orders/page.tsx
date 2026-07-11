@@ -12,6 +12,8 @@ import {
   Copy,
   Eye,
   Trash2,
+  PhoneCall,
+  MessageCircle,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -23,14 +25,15 @@ import {
   type OrderAdmin,
   type OrderStats,
 } from "@/lib/orders";
+import { phoneToTelLink, phoneToWhatsAppLink } from "@/lib/phone";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { cn } from "@/lib/utils";
 
 const STATUSES = [
   { value: "", label: "الكل" },
   { value: "NEW", label: "جديد" },
+  { value: "CONTACTED", label: "تم الاتصال" },
   { value: "CONFIRMED", label: "مؤكد" },
-  { value: "PREPARING", label: "قيد التحضير" },
   { value: "SHIPPED", label: "تم الشحن" },
   { value: "DELIVERED", label: "تم التوصيل" },
   { value: "CANCELLED", label: "ملغى" },
@@ -153,11 +156,13 @@ export default function AdminOrdersPage() {
 
       <main className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
         {stats && (
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-8">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
             <StatCard label="طلبات اليوم" value={stats.today_orders} highlight />
             <StatCard label="جميع الطلبات" value={stats.all_orders} />
-            <StatCard label="طلبات جديدة" value={stats.new_orders} />
-            <StatCard label="طلبات مؤكدة" value={stats.confirmed_orders} />
+            <StatCard label="جديد" value={stats.new_orders} />
+            <StatCard label="تم الاتصال" value={stats.contacted_orders} />
+            <StatCard label="مؤكد" value={stats.confirmed_orders} />
+            <StatCard label="تم الشحن" value={stats.shipped_orders} />
             <StatCard label="تم التوصيل" value={stats.delivered_orders} />
             <StatCard label="ملغاة" value={stats.cancelled_orders} />
             <StatCard
@@ -314,6 +319,25 @@ export default function AdminOrdersPage() {
                         </td>
                         <td className="px-3 py-3">
                           <div className="flex items-center gap-1">
+                            <a
+                              href={phoneToTelLink(order.phone)}
+                              className="rounded p-1.5 hover:bg-navy/10"
+                              title="اتصال"
+                            >
+                              <PhoneCall size={16} />
+                            </a>
+                            <a
+                              href={phoneToWhatsAppLink(
+                                order.phone,
+                                `سلام عليكم ${order.customer_name}، بخصوص طلبك ${order.order_number}`
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="rounded p-1.5 text-[#25D366] hover:bg-green-50"
+                              title="واتساب"
+                            >
+                              <MessageCircle size={16} />
+                            </a>
                             <Link
                               href={`/admin/orders/${order.id}`}
                               className="rounded p-1.5 hover:bg-navy/10"
@@ -378,6 +402,25 @@ export default function AdminOrdersPage() {
                       </p>
                     </div>
                     <div className="mt-3 flex gap-2">
+                      <a
+                        href={phoneToTelLink(order.phone)}
+                        className="rounded-lg border border-navy/20 px-3 py-2"
+                        title="اتصال"
+                      >
+                        <PhoneCall size={16} />
+                      </a>
+                      <a
+                        href={phoneToWhatsAppLink(
+                          order.phone,
+                          `سلام عليكم ${order.customer_name}، بخصوص طلبك ${order.order_number}`
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-lg border border-green-200 px-3 py-2 text-[#25D366]"
+                        title="واتساب"
+                      >
+                        <MessageCircle size={16} />
+                      </a>
                       <Link
                         href={`/admin/orders/${order.id}`}
                         className="flex-1 rounded-lg bg-navy py-2 text-center text-sm font-bold text-white"

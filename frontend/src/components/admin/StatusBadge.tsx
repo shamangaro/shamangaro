@@ -2,11 +2,12 @@ import { cn } from "@/lib/utils";
 import {
   STATUS_COLORS,
   STATUS_LABELS,
+  normalizeOrderStatus,
   type OrderStatus,
 } from "@/lib/orders";
 
 export function StatusBadge({ status }: { status: string }) {
-  const key = status as OrderStatus;
+  const key = normalizeOrderStatus(status);
   const label = STATUS_LABELS[key] ?? status;
   const color = STATUS_COLORS[key] ?? "bg-gray-100 text-gray-800";
 

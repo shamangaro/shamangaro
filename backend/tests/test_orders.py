@@ -119,3 +119,48 @@ async def test_admin_update_status(admin_client):
 
     get_res = await admin_client.get(f"/admin/orders/{order_id}")
     assert get_res.json()["order_number"] == order_number
+
+
+@pytest.mark.asyncio
+async def test_admin_update_notes(admin_client):
+    create = await admin_client.post(
+        "/orders",
+        json={
+            "customer_name": "Notes Test",
+            "phone": "0633333333",
+            "address": "Fes",
+            "offer_id": "solo",
+        },
+    )
+    list_res = await admin_client.get("/admin/orders")
+    order_id = list_res.json()["items"][0]["id"]
+
+    patch = await admin_client.patch(
+        f"/admin/orders/{order_id}/notes",
+        json={"internal_notes": "سيتصل العميل غداً"},
+    )
+    assert patch.status_code == 200
+    assert patch.json()["internal_notes"] == "سيتصل العميل غداً"
+
+
+@pytest.mark.asyncio
+async def test_admin_contacted_status(admin_client):
+    create = await admin_client.post(
+        "/orders",
+        json={
+            "customer_name": "Contact Test",
+            "phone": "0644444444",
+            "address": "Tanger",
+            "offer_id": "solo",
+        },
+    )
+    assert create.status_code == 201
+    list_res = await admin_client.get("/admin/orders")
+    order_id = list_res.json()["items"][0]["id"]
+
+    patch = await admin_client.patch(
+        f"/admin/orders/{order_id}/status",
+        json={"status": "CONTACTED"},
+    )
+    assert patch.status_code == 200
+    assert patch.json()["status"] == "CONTACTED"

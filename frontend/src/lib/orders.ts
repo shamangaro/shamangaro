@@ -35,6 +35,7 @@ export interface OrderAdmin {
   unit_price: number;
   total_price: number;
   status: string;
+  internal_notes: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -51,7 +52,9 @@ export interface OrderStats {
   today_orders: number;
   all_orders: number;
   new_orders: number;
+  contacted_orders: number;
   confirmed_orders: number;
+  shipped_orders: number;
   delivered_orders: number;
   cancelled_orders: number;
   today_sales: number;
@@ -60,16 +63,16 @@ export interface OrderStats {
 
 export type OrderStatus =
   | "NEW"
+  | "CONTACTED"
   | "CONFIRMED"
-  | "PREPARING"
   | "SHIPPED"
   | "DELIVERED"
   | "CANCELLED";
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   NEW: "جديد",
+  CONTACTED: "تم الاتصال",
   CONFIRMED: "مؤكد",
-  PREPARING: "قيد التحضير",
   SHIPPED: "تم الشحن",
   DELIVERED: "تم التوصيل",
   CANCELLED: "ملغى",
@@ -77,12 +80,20 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
 
 export const STATUS_COLORS: Record<OrderStatus, string> = {
   NEW: "bg-blue-100 text-blue-800",
+  CONTACTED: "bg-cyan-100 text-cyan-800",
   CONFIRMED: "bg-indigo-100 text-indigo-800",
-  PREPARING: "bg-amber-100 text-amber-800",
   SHIPPED: "bg-purple-100 text-purple-800",
   DELIVERED: "bg-green-100 text-green-800",
   CANCELLED: "bg-red-100 text-red-800",
 };
+
+const LEGACY_STATUS_MAP: Record<string, OrderStatus> = {
+  PREPARING: "CONTACTED",
+};
+
+export function normalizeOrderStatus(status: string): OrderStatus {
+  return LEGACY_STATUS_MAP[status] ?? (status as OrderStatus);
+}
 
 export async function createOrder(
   payload: OrderCreatePayload
@@ -151,6 +162,13 @@ export async function updateOrderStatus(id: number, status: OrderStatus) {
   return apiFetch<OrderAdmin>(`/admin/orders/${id}/status`, {
     method: "PATCH",
     body: JSON.stringify({ status }),
+  });
+}
+
+export async function updateOrderNotes(id: number, internal_notes: string | null) {
+  return apiFetch<OrderAdmin>(`/admin/orders/${id}/notes`, {
+    method: "PATCH",
+    body: JSON.stringify({ internal_notes }),
   });
 }
 

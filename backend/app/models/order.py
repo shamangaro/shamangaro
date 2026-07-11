@@ -9,11 +9,12 @@ from app.database import Base
 
 class OrderStatus(str, enum.Enum):
     NEW = "NEW"
+    CONTACTED = "CONTACTED"
     CONFIRMED = "CONFIRMED"
-    PREPARING = "PREPARING"
     SHIPPED = "SHIPPED"
     DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"
+    PREPARING = "PREPARING"  # legacy DB value, migrated to CONTACTED
 
 
 class Order(Base):
@@ -44,3 +45,4 @@ class Order(Base):
     deleted_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True, default=None
     )
+    internal_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
