@@ -4,27 +4,46 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 revision: str = "001_orders_admin"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-order_status = sa.Enum(
+ORDER_STATUS_VALUES = (
     "NEW",
     "CONFIRMED",
     "PREPARING",
     "SHIPPED",
     "DELIVERED",
     "CANCELLED",
-    name="order_status",
 )
+
+order_status = postgresql.ENUM(
+    *ORDER_STATUS_VALUES,
+    name="order_status",
+    create_type=False,
+)
+
+
+def _ensure_order_status_enum() -> None:
+    values_sql = ", ".join(f"'{value}'" for value in ORDER_STATUS_VALUES)
+    op.execute(
+        f"""
+        DO $$ BEGIN
+            CREATE TYPE order_status AS ENUM ({values_sql});
+        EXCEPTION
+            WHEN duplicate_object THEN NULL;
+        END $$;
+        """
+    )
 
 
 def upgrade() -> None:
     op.execute("CREATE SEQUENCE IF NOT EXISTS order_number_seq START 1")
 
-    order_status.create(op.get_bind(), checkfirst=True)
+    _ensure_order_status_enum()
 
     op.create_table(
         "admin_users",
@@ -46,8 +65,14 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("username"),
+        if_not_exists=True,
     )
-    op.create_index("ix_admin_users_username", "admin_users", ["username"])
+    op.create_index(
+        "ix_admin_users_username",
+        "admin_users",
+        ["username"],
+        if_not_exists=True,
+    )
 
     op.create_table(
         "orders",
@@ -82,10 +107,20 @@ def upgrade() -> None:
         sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("order_number"),
+        if_not_exists=True,
     )
-    op.create_index("ix_orders_order_number", "orders", ["order_number"])
-    op.create_index("ix_orders_phone", "orders", ["phone"])
-    op.create_index("ix_orders_status", "orders", ["status"])
+    op.create_index(
+        "ix_orders_order_number",
+        "orders",
+        ["order_number"],
+        if_not_exists=True,
+    )
+    op.create_index(
+        "ix_orders_phone", "orders", ["phone"], if_not_exists=True
+    )
+    op.create_index(
+        "ix_orders_status", "orders", ["status"], if_not_exists=True
+    )
 
 
 def downgrade() -> None:
@@ -95,5 +130,5 @@ def downgrade() -> None:
     op.drop_table("orders")
     op.drop_index("ix_admin_users_username", table_name="admin_users")
     op.drop_table("admin_users")
-    order_status.drop(op.get_bind(), checkfirst=True)
+    op.execute("DROP TYPE IF EXISTS order_status")
     op.execute("DROP SEQUENCE IF EXISTS order_number_seq")
