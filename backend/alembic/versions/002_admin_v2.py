@@ -2,7 +2,6 @@
 
 from typing import Sequence, Union
 
-import sqlalchemy as sa
 from alembic import op
 
 revision: str = "002_admin_v2"
@@ -12,25 +11,17 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.execute(
-        """
-        DO $$ BEGIN
-            IF NOT EXISTS (
-                SELECT 1
-                FROM pg_enum e
-                JOIN pg_type t ON e.enumtypid = t.oid
-                WHERE t.typname = 'order_status' AND e.enumlabel = 'CONTACTED'
-            ) THEN
-                ALTER TYPE order_status ADD VALUE 'CONTACTED';
-            END IF;
-        END $$;
-        """
-    )
+    # New enum values must be committed before use (PostgreSQL requirement).
+    with op.get_context().autocommit_block():
+        op.execute(
+            "ALTER TYPE order_status ADD VALUE IF NOT EXISTS 'CONTACTED'"
+        )
+
     op.execute(
         """
         UPDATE orders
         SET status = 'CONTACTED'
-        WHERE status::text = 'PREPARING';
+        WHERE status::text = 'PREPARING'
         """
     )
     op.execute(
