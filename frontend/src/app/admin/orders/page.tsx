@@ -27,6 +27,7 @@ import {
 } from "@/lib/orders";
 import { phoneToTelLink, phoneToWhatsAppLink } from "@/lib/phone";
 import { StatusBadge } from "@/components/admin/StatusBadge";
+import { RiskFlag } from "@/components/admin/TrustBadge";
 import { cn } from "@/lib/utils";
 
 const STATUSES = [
@@ -156,25 +157,33 @@ export default function AdminOrdersPage() {
 
       <main className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
         {stats && (
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
-            <StatCard label="طلبات اليوم" value={stats.today_orders} highlight />
-            <StatCard label="جميع الطلبات" value={stats.all_orders} />
-            <StatCard label="جديد" value={stats.new_orders} />
-            <StatCard label="تم الاتصال" value={stats.contacted_orders} />
-            <StatCard label="مؤكد" value={stats.confirmed_orders} />
-            <StatCard label="تم الشحن" value={stats.shipped_orders} />
-            <StatCard label="تم التوصيل" value={stats.delivered_orders} />
-            <StatCard label="ملغاة" value={stats.cancelled_orders} />
-            <StatCard
-              label="مبيعات اليوم"
-              value={`${stats.today_sales} د.م`}
-              highlight
-            />
-            <StatCard
-              label="إجمالي المبيعات"
-              value={`${stats.total_sales} د.م`}
-            />
-          </div>
+          <>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
+              <StatCard label="طلبات اليوم" value={stats.today_orders} highlight />
+              <StatCard label="جميع الطلبات" value={stats.all_orders} />
+              <StatCard label="جديد" value={stats.new_orders} />
+              <StatCard label="تم الاتصال" value={stats.contacted_orders} />
+              <StatCard label="مؤكد" value={stats.confirmed_orders} />
+              <StatCard label="تم الشحن" value={stats.shipped_orders} />
+              <StatCard label="تم التوصيل" value={stats.delivered_orders} />
+              <StatCard label="ملغاة" value={stats.cancelled_orders} />
+              <StatCard
+                label="مبيعات اليوم"
+                value={`${stats.today_sales} د.م`}
+                highlight
+              />
+              <StatCard
+                label="إجمالي المبيعات"
+                value={`${stats.total_sales} د.م`}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <StatCard label="🟢 Trusted Customers" value={stats.trusted_customers} />
+              <StatCard label="🟡 Warning Customers" value={stats.warning_customers} />
+              <StatCard label="🔴 High Risk Customers" value={stats.high_risk_customers} />
+              <StatCard label="🚫 Blacklisted" value={stats.blacklisted_customers} />
+            </div>
+          </>
         )}
 
         <div className="rounded-2xl border border-navy/10 bg-white p-4 md:p-6">
@@ -315,7 +324,10 @@ export default function AdminOrdersPage() {
                           {order.total_price} د.م
                         </td>
                         <td className="px-3 py-3">
-                          <StatusBadge status={order.status} />
+                          <div className="flex items-center gap-2">
+                            <StatusBadge status={order.status} />
+                            <RiskFlag isRisk={order.is_risk} />
+                          </div>
                         </td>
                         <td className="px-3 py-3">
                           <div className="flex items-center gap-1">
@@ -383,7 +395,10 @@ export default function AdminOrdersPage() {
                           {formatDate(order.created_at)}
                         </p>
                       </div>
-                      <StatusBadge status={order.status} />
+                      <div className="flex flex-col items-end gap-1">
+                        <StatusBadge status={order.status} />
+                        <RiskFlag isRisk={order.is_risk} />
+                      </div>
                     </div>
                     <div className="mt-3 space-y-1 text-sm">
                       <p>

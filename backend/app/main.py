@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import engine
-from app.routers import admin_auth, admin_orders, orders
+from app.routers import admin_auth, admin_blacklist, admin_orders, orders
 
 
 @asynccontextmanager
@@ -31,6 +31,7 @@ app.add_middleware(
 
 app.include_router(orders.router)
 app.include_router(admin_orders.router)
+app.include_router(admin_blacklist.router)
 app.include_router(admin_auth.router)
 
 

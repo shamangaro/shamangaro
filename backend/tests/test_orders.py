@@ -128,7 +128,7 @@ async def test_admin_update_notes(admin_client):
         json={
             "customer_name": "Notes Test",
             "phone": "0633333333",
-            "address": "Fes",
+            "address": "Fes centre",
             "offer_id": "solo",
         },
     )

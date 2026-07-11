@@ -1,14 +1,16 @@
 import pytest
+import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.database import Base, get_db
-from app.main import app
+import app.models  # noqa: F401 — register all models before app import
+from app.main import app as fastapi_app
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db_session():
     engine = create_async_engine(TEST_DATABASE_URL, echo=False)
     async with engine.begin() as conn:
@@ -22,7 +24,7 @@ async def db_session():
     await engine.dispose()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client(db_session: AsyncSession):
     async def override_get_db():
         try:
@@ -32,14 +34,14 @@ async def client(db_session: AsyncSession):
             await db_session.rollback()
             raise
 
-    app.dependency_overrides[get_db] = override_get_db
-    transport = ASGITransport(app=app)
+    fastapi_app.dependency_overrides[get_db] = override_get_db
+    transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
-    app.dependency_overrides.clear()
+    fastapi_app.dependency_overrides.clear()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def admin_client(client: AsyncClient, db_session: AsyncSession):
     from app.auth.password import hash_password
     from app.models.admin_user import AdminUser

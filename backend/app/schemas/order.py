@@ -56,10 +56,33 @@ class OrderAdminResponse(BaseModel):
     total_price: float
     status: str
     internal_notes: str | None = None
+    is_risk: bool = False
     created_at: datetime
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class CustomerHistoryResponse(BaseModel):
+    total_orders: int
+    delivered_count: int
+    cancelled_count: int
+    confirmed_count: int
+    last_order_date: datetime | None
+
+
+class OrderRiskResponse(BaseModel):
+    trust_score: int
+    trust_label: str
+    trust_display: str
+    warnings: list[str]
+    is_blacklisted: bool
+    blacklist_reason: str | None
+    history: CustomerHistoryResponse
+
+
+class OrderAdminDetailResponse(OrderAdminResponse):
+    risk: OrderRiskResponse | None = None
 
 
 class OrderStatusUpdate(BaseModel):
@@ -91,3 +114,7 @@ class OrderStatsResponse(BaseModel):
     cancelled_orders: int
     today_sales: float
     total_sales: float
+    trusted_customers: int = 0
+    warning_customers: int = 0
+    high_risk_customers: int = 0
+    blacklisted_customers: int = 0

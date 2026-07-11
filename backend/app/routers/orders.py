@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.order import Order, OrderStatus
 from app.schemas.order import OrderCreate, OrderCreateResponse, OrderPublicResponse
+from app.services.customer_risk import analyze_customer_risk, get_blacklist_entry
 from app.services.offers import get_offer
 from app.services.order_number import generate_order_number
 
@@ -39,6 +40,18 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
 
     order_number = await generate_order_number(db)
 
+    blacklist = await get_blacklist_entry(db, payload.phone)
+    is_risk = blacklist is not None
+    if not is_risk:
+        analysis = await analyze_customer_risk(
+            db, payload.phone, payload.customer_name, payload.address
+        )
+        is_risk = (
+            analysis.is_blacklisted
+            or analysis.trust_label == "high_risk"
+            or len(analysis.warnings) > 0
+        )
+
     order = Order(
         order_number=order_number,
         customer_name=payload.customer_name,
@@ -50,6 +63,7 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
         unit_price=offer.unit_price,
         total_price=offer.total_price,
         status=OrderStatus.NEW,
+        is_risk=is_risk,
     )
     db.add(order)
     await db.flush()

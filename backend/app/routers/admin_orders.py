@@ -12,12 +12,16 @@ from app.database import get_db
 from app.models.admin_user import AdminUser
 from app.models.order import Order, OrderStatus
 from app.schemas.order import (
+    CustomerHistoryResponse,
+    OrderAdminDetailResponse,
     OrderAdminResponse,
     OrderListResponse,
     OrderNotesUpdate,
+    OrderRiskResponse,
     OrderStatsResponse,
     OrderStatusUpdate,
 )
+from app.services.customer_risk import analyze_customer_risk, count_customers_by_trust
 
 router = APIRouter(prefix="/admin/orders", tags=["admin-orders"])
 
@@ -52,8 +56,37 @@ def _order_to_admin(order: Order) -> OrderAdminResponse:
         total_price=float(order.total_price),
         status=_normalize_status(order.status),
         internal_notes=order.internal_notes,
+        is_risk=order.is_risk,
         created_at=order.created_at,
         updated_at=order.updated_at,
+    )
+
+
+async def _build_risk_response(order: Order, db: AsyncSession) -> OrderRiskResponse:
+    analysis = await analyze_customer_risk(
+        db,
+        order.phone,
+        order.customer_name,
+        order.address,
+        exclude_order_id=order.id,
+    )
+    all_history = await analyze_customer_risk(
+        db, order.phone, order.customer_name, order.address
+    )
+    return OrderRiskResponse(
+        trust_score=analysis.trust_score,
+        trust_label=analysis.trust_label,
+        trust_display=analysis.trust_display,
+        warnings=analysis.warnings,
+        is_blacklisted=analysis.is_blacklisted,
+        blacklist_reason=analysis.blacklist_reason,
+        history=CustomerHistoryResponse(
+            total_orders=all_history.history.total_orders,
+            delivered_count=all_history.history.delivered_count,
+            cancelled_count=all_history.history.cancelled_count,
+            confirmed_count=all_history.history.confirmed_count,
+            last_order_date=all_history.history.last_order_date,
+        ),
     )
 
 
@@ -152,6 +185,8 @@ async def get_order_stats(
         )
     )
 
+    trust_counts = await count_customers_by_trust(db)
+
     return OrderStatsResponse(
         today_orders=today_orders or 0,
         all_orders=all_orders or 0,
@@ -163,6 +198,10 @@ async def get_order_stats(
         cancelled_orders=cancelled_orders or 0,
         today_sales=float(today_sales or 0),
         total_sales=float(total_sales or 0),
+        trusted_customers=trust_counts["trusted_customers"],
+        warning_customers=trust_counts["warning_customers"],
+        high_risk_customers=trust_counts["high_risk_customers"],
+        blacklisted_customers=trust_counts["blacklisted_customers"],
     )
 
 
@@ -258,7 +297,7 @@ async def export_orders(
     )
 
 
-@router.get("/{order_id}", response_model=OrderAdminResponse)
+@router.get("/{order_id}", response_model=OrderAdminDetailResponse)
 async def get_order(
     order_id: int,
     _admin: AdminUser = Depends(get_current_admin),
@@ -270,7 +309,10 @@ async def get_order(
     order = result.scalar_one_or_none()
     if not order:
         raise HTTPException(status_code=404, detail="الطلب غير موجود")
-    return _order_to_admin(order)
+
+    base = _order_to_admin(order)
+    risk = await _build_risk_response(order, db)
+    return OrderAdminDetailResponse(**base.model_dump(), risk=risk)
 
 
 @router.patch("/{order_id}/status", response_model=OrderAdminResponse)

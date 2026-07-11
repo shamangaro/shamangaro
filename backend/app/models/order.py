@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, Integer, Numeric, String, Text, func
+from sqlalchemy import Boolean, DateTime, Enum, Integer, Numeric, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -46,3 +46,6 @@ class Order(Base):
         DateTime(timezone=True), nullable=True, default=None
     )
     internal_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    is_risk: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false", index=True
+    )

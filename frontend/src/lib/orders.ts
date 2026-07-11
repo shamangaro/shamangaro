@@ -36,8 +36,41 @@ export interface OrderAdmin {
   total_price: number;
   status: string;
   internal_notes: string | null;
+  is_risk: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface CustomerHistory {
+  total_orders: number;
+  delivered_count: number;
+  cancelled_count: number;
+  confirmed_count: number;
+  last_order_date: string | null;
+}
+
+export interface OrderRisk {
+  trust_score: number;
+  trust_label: "trusted" | "warning" | "high_risk";
+  trust_display: string;
+  warnings: string[];
+  is_blacklisted: boolean;
+  blacklist_reason: string | null;
+  history: CustomerHistory;
+}
+
+export interface OrderAdminDetail extends OrderAdmin {
+  risk: OrderRisk | null;
+}
+
+export interface BlacklistEntry {
+  id: number;
+  phone: string;
+  name: string | null;
+  address: string | null;
+  city: string | null;
+  reason: string;
+  created_at: string;
 }
 
 export interface OrderListResponse {
@@ -59,6 +92,10 @@ export interface OrderStats {
   cancelled_orders: number;
   today_sales: number;
   total_sales: number;
+  trusted_customers: number;
+  warning_customers: number;
+  high_risk_customers: number;
+  blacklisted_customers: number;
 }
 
 export type OrderStatus =
@@ -154,8 +191,8 @@ export async function listOrders(params: {
   return apiFetch<OrderListResponse>(`/admin/orders?${qs.toString()}`);
 }
 
-export async function getOrderAdmin(id: number): Promise<OrderAdmin> {
-  return apiFetch<OrderAdmin>(`/admin/orders/${id}`);
+export async function getOrderAdmin(id: number): Promise<OrderAdminDetail> {
+  return apiFetch<OrderAdminDetail>(`/admin/orders/${id}`);
 }
 
 export async function updateOrderStatus(id: number, status: OrderStatus) {
@@ -189,4 +226,25 @@ export function exportOrdersUrl(params: {
   if (params.date_from) qs.set("date_from", params.date_from);
   if (params.date_to) qs.set("date_to", params.date_to);
   return `${base}/admin/orders/export?${qs.toString()}`;
+}
+
+export async function addToBlacklist(payload: {
+  phone: string;
+  name?: string;
+  address?: string;
+  city?: string;
+  reason: string;
+}) {
+  return apiFetch<BlacklistEntry>("/admin/blacklist", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function listBlacklist() {
+  return apiFetch<BlacklistEntry[]>("/admin/blacklist");
+}
+
+export async function removeFromBlacklist(id: number) {
+  return apiFetch<void>(`/admin/blacklist/${id}`, { method: "DELETE" });
 }
