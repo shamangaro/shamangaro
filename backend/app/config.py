@@ -15,7 +15,12 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://localhost:8000",
+        "http://localhost:8080",
+        "https://shamangaro.com",
+        "http://shamangaro.com",
     ]
+
+    COOKIE_SECURE: bool = True
 
     class Config:
         env_file = ".env"

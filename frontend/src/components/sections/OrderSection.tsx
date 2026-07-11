@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Container } from "@/components/shared/Container";
-import { Check, Truck, Shield, Package, BadgeCheck } from "lucide-react";
+import { Truck, Shield, Package, BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   isValidMoroccanPhone,
   MOROCCAN_PHONE_ERROR,
 } from "@/lib/phone";
-import { whatsappLink } from "@/lib/whatsapp";
+import { createOrder } from "@/lib/orders";
+import { ApiError } from "@/lib/api";
 
 interface Pack {
   id: string;
@@ -50,6 +52,7 @@ const packs: Pack[] = [
 ];
 
 export function OrderSection() {
+  const router = useRouter();
   const [selected, setSelected] = useState("duo");
   const [form, setForm] = useState({
     name: "",
@@ -57,12 +60,12 @@ export function OrderSection() {
     address: "",
   });
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
   const [phoneError, setPhoneError] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   const activePack = packs.find((p) => p.id === selected)!;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isValidMoroccanPhone(form.phone)) {
@@ -71,48 +74,28 @@ export function OrderSection() {
     }
 
     setPhoneError("");
+    setSubmitError("");
     setSubmitting(true);
 
-    const msg = `سلام عليكم، بغيت نطلب Neo Transat 🌴
-
-📦 ${activePack.label} — ${activePack.total} درهم
-👤 ${form.name}
-📱 ${form.phone}
-📍 ${form.address}`;
-
-    window.open(whatsappLink(msg), "_blank");
-
-    setTimeout(() => {
+    try {
+      const result = await createOrder({
+        customer_name: form.name.trim(),
+        phone: form.phone,
+        address: form.address.trim(),
+        offer_id: selected as "solo" | "duo" | "family",
+      });
+      router.push(`/thank-you?order=${result.order_number}`);
+    } catch (err) {
       setSubmitting(false);
-      setDone(true);
-    }, 800);
+      if (err instanceof ApiError) {
+        setSubmitError(err.message);
+      } else {
+        setSubmitError("تعذر إرسال الطلب. حاول مرة أخرى.");
+      }
+    }
   };
 
   const set = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
-
-  if (done) {
-    return (
-      <section id="order" className="bg-[#f8f8f8] py-14">
-        <Container>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mx-auto max-w-lg rounded-3xl border-2 border-navy bg-white p-10 text-center"
-          >
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-navy/10">
-              <Check size={30} className="text-navy" />
-            </div>
-            <h3 className="mt-5 text-2xl font-bold text-navy">
-              تم إرسال طلبك بنجاح! 🎉
-            </h3>
-            <p className="mt-3 text-base text-muted-foreground">
-              غادي نتواصلو معاك عبر واتساب خلال ساعات لتأكيد الطلب و التوصيل.
-            </p>
-          </motion.div>
-        </Container>
-      </section>
-    );
-  }
 
   return (
     <section id="order" className="bg-[#f8f8f8] py-10 md:py-14">
@@ -295,6 +278,12 @@ export function OrderSection() {
                   </p>
                 )}
               </div>
+
+              {submitError && (
+                <p className="text-sm text-red-600" role="alert">
+                  {submitError}
+                </p>
+              )}
 
               <div>
                 <label className="mb-1.5 block text-sm font-bold text-navy">
