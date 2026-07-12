@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/shared/Container";
+import { Logo } from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 
 const announcements = [
@@ -80,17 +81,13 @@ export function Header() {
       >
         <Container>
           <div className="flex h-14 items-center justify-between">
-            <a href="/" className="inline-flex shrink-0 items-center">
-              <img
-                src="/images/logo-shamangaro.svg"
-                alt="SHAMANGARO"
-                width={380}
-                height={88}
-                className="block h-9 w-auto md:h-10"
-                fetchPriority="high"
-                decoding="async"
-              />
-            </a>
+            <Logo size="sm" href="/" priority className="md:hidden" />
+            <Logo
+              size="md"
+              href="/"
+              priority
+              className="hidden md:inline-flex"
+            />
 
             <a
               href="#order"

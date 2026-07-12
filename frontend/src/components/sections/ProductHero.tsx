@@ -1,32 +1,61 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/shared/Container";
 import { Star, ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const AUTOPLAY_MS = 4500;
+
 const images = [
-  { src: "/images/neo-transat-lifestyle-duo.png", alt: "Neo Transat — راحة لزوجين" },
-  { src: "/images/neo-transat-lifestyle-beach.png", alt: "Neo Transat على الشاطئ" },
-  { src: "/images/neo-transat-studio.png", alt: "Neo Transat — Bleu Marine" },
-  { src: "/images/neo-transat-open.png", alt: "Neo Transat مفتوحة — التصميم" },
-  { src: "/images/neo-transat-folded.png", alt: "Neo Transat مطوية — خفيفة" },
+  {
+    src: "/images/neo-transat-casablanca-duo.png",
+    alt: "Neo Transat — راحة لزوجين في الدار البيضاء",
+  },
+  {
+    src: "/images/neo-transat-lake-relax.png",
+    alt: "Neo Transat — إسترخاء على ضفاف البحيرة",
+  },
+  {
+    src: "/images/neo-transat-lifestyle-carry.png",
+    alt: "Neo Transat — سهلة الحمل",
+  },
+  {
+    src: "/images/neo-transat-open.png",
+    alt: "Neo Transat مفتوحة — التصميم",
+  },
 ];
 
 export function ProductHero() {
   const [current, setCurrent] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const galleryRef = useRef<HTMLDivElement>(null);
 
-  const next = useCallback(() => setCurrent((c) => (c + 1) % images.length), []);
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + images.length) % images.length), []);
+  const next = useCallback(
+    () => setCurrent((c) => (c + 1) % images.length),
+    []
+  );
+  const prev = useCallback(
+    () => setCurrent((c) => (c - 1 + images.length) % images.length),
+    []
+  );
+
+  useEffect(() => {
+    if (reduceMotion || zoomed || paused) return;
+
+    const id = window.setInterval(next, AUTOPLAY_MS);
+    return () => window.clearInterval(id);
+  }, [next, paused, reduceMotion, zoomed]);
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#f5f5f5] via-white to-[#fafafa]">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -right-40 -top-20 h-[400px] w-[400px] rounded-full bg-black/[0.03] blur-[100px]" />
-        <div className="absolute -left-32 bottom-20 h-[300px] w-[300px] rounded-full bg-gold/5 blur-[80px]" />
+        <div className="absolute -bottom-32 -left-32 h-[300px] w-[300px] rounded-full bg-gold/5 blur-[80px]" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
 
@@ -48,21 +77,23 @@ export function ProductHero() {
             </h1>
 
             <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground">
-              Neo Transat خفيف، قوي، كيتحل فـ30 ثانية، ومصمم للبحر، التراس،
-              الكامبينغ، الحديقة وأي لحظة باغي فيها ترتاح.
+              <span className="font-semibold text-fabric">Neo Transat</span> خفيف،
+              قوي، كيتحل فـ30 ثانية، ومصمم للبحر، التراس، الكامبينغ، الحديقة وأي
+              لحظة باغي فيها ترتاح.
             </p>
 
             <div className="mt-4 rounded-xl border border-navy/10 bg-navy/[0.03] px-4 py-3">
               <p className="text-sm font-medium text-navy/80">
                 🎨 اللون المتوفر حالياً:{" "}
-                <span className="font-bold text-navy">أزرق بحري غامق (Bleu Marine)</span>
+                <span className="font-bold text-fabric">
+                  أزرق بحري غامق (Bleu Marine)
+                </span>
               </p>
               <p className="mt-1 text-xs text-navy/50">
                 ألوان أخرى قريباً — أو على الطلب
               </p>
             </div>
 
-            {/* Rating */}
             <div className="mt-6 flex items-center gap-2">
               <div className="flex gap-0.5">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -77,7 +108,6 @@ export function ProductHero() {
               <span className="text-sm text-muted-foreground">(+500 تقييم)</span>
             </div>
 
-            {/* CTA */}
             <a
               href="#order"
               className="mt-8 inline-flex items-center justify-center rounded-full bg-navy px-10 py-4 text-base font-bold text-white shadow-xl shadow-navy/15 transition-all duration-300 hover:scale-[1.02] hover:bg-navy-light hover:shadow-2xl hover:shadow-navy/20"
@@ -85,7 +115,6 @@ export function ProductHero() {
               اطلب دابا
             </a>
 
-            {/* Trust */}
             <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 lg:justify-start">
               {[
                 "الدفع عند الإستلام",
@@ -111,24 +140,28 @@ export function ProductHero() {
             className="order-1 lg:order-2"
           >
             <h2 className="mb-5 text-center text-2xl font-extrabold leading-snug text-navy sm:text-3xl md:text-4xl lg:text-start">
-              مع كرسي الراحة <span className="text-navy/60">Neo Transat</span>
+              مع كرسي الراحة <span className="text-fabric">Neo Transat</span>
               <br />
               غاتلقى راحتك فين ما مشيتي
             </h2>
 
-            {/* Main Image */}
             <div
+              ref={galleryRef}
               className="group relative cursor-zoom-in"
+              onMouseEnter={() => setPaused(true)}
+              onMouseLeave={() => setPaused(false)}
+              onTouchStart={() => setPaused(true)}
+              onTouchEnd={() => setPaused(false)}
               onClick={() => setZoomed(true)}
             >
-              <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] md:aspect-square">
-                <AnimatePresence mode="wait">
+              <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:aspect-square">
+                <AnimatePresence mode="wait" initial={false}>
                   <motion.div
                     key={current}
-                    initial={{ opacity: 0, scale: 1.02 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    initial={{ opacity: 0, x: 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -24 }}
+                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                     className="absolute inset-0 flex items-center justify-center p-4 md:p-6"
                   >
                     <Image
@@ -143,28 +176,31 @@ export function ProductHero() {
                   </motion.div>
                 </AnimatePresence>
 
-                {/* Zoom hint */}
                 <div className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-sm opacity-0 transition-opacity group-hover:opacity-100">
                   <ZoomIn size={13} />
                   إضغط للتكبير
                 </div>
 
-                {/* Counter */}
                 <div className="absolute left-4 top-4 z-10 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-navy shadow-sm backdrop-blur-sm">
                   {current + 1} / {images.length}
                 </div>
               </div>
 
-              {/* Nav arrows */}
               <button
-                onClick={(e) => { e.stopPropagation(); prev(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prev();
+                }}
                 className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-md transition-all hover:bg-white hover:shadow-lg"
                 aria-label="السابق"
               >
                 <ChevronRight size={18} className="text-navy" />
               </button>
               <button
-                onClick={(e) => { e.stopPropagation(); next(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  next();
+                }}
                 className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-md transition-all hover:bg-white hover:shadow-lg"
                 aria-label="التالي"
               >
@@ -172,6 +208,23 @@ export function ProductHero() {
               </button>
             </div>
 
+            {/* Thumbnail dots */}
+            <div className="mt-4 flex items-center justify-center gap-2">
+              {images.map((img, i) => (
+                <button
+                  key={img.src}
+                  type="button"
+                  onClick={() => setCurrent(i)}
+                  aria-label={`صورة ${i + 1}`}
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-300",
+                    i === current
+                      ? "w-7 bg-navy"
+                      : "w-2 bg-navy/20 hover:bg-navy/40"
+                  )}
+                />
+              ))}
+            </div>
           </motion.div>
 
           {/* Zoom Modal */}
@@ -194,14 +247,20 @@ export function ProductHero() {
                 </button>
 
                 <button
-                  onClick={(e) => { e.stopPropagation(); prev(); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prev();
+                  }}
                   className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
                   aria-label="السابق"
                 >
                   <ChevronRight size={24} />
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); next(); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    next();
+                  }}
                   className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
                   aria-label="التالي"
                 >
@@ -226,12 +285,14 @@ export function ProductHero() {
                   />
                 </motion.div>
 
-                {/* Bottom dots */}
                 <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
                   {images.map((_, i) => (
                     <button
                       key={i}
-                      onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrent(i);
+                      }}
                       className={cn(
                         "h-2 rounded-full transition-all",
                         i === current

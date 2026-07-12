@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   LogOut,
-  Package,
   Search,
   Download,
   ChevronLeft,
@@ -28,6 +27,7 @@ import {
 import { phoneToTelLink, phoneToWhatsAppLink } from "@/lib/phone";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { RiskFlag } from "@/components/admin/TrustBadge";
+import { Logo } from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 
 const STATUSES = [
@@ -138,13 +138,12 @@ export default function AdminOrdersPage() {
     <div className="min-h-screen bg-[#f5f5f5]">
       <header className="sticky top-0 z-30 border-b border-navy/10 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-3">
-            <Package className="text-gold" size={24} />
-            <div>
-              <h1 className="text-lg font-extrabold text-navy">SHAMANGARO</h1>
-              <p className="text-xs text-muted-foreground">إدارة الطلبات</p>
-            </div>
-          </div>
+          <Logo
+            variant="wordmark"
+            size="sm"
+            href={null}
+            subtitle="إدارة الطلبات"
+          />
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-navy hover:bg-navy/5"

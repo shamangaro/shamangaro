@@ -104,7 +104,7 @@ export function OrderSection() {
           {/* Header */}
           <div className="mb-8 space-y-4">
             <div className="flex justify-center">
-              <span className="inline-flex items-center gap-2 rounded-full border-2 border-gold/40 bg-gold/15 px-6 py-3 text-lg font-extrabold text-navy shadow-sm md:px-8 md:py-3.5 md:text-xl">
+              <span className="inline-flex items-center gap-2 rounded-full border-2 border-green-500/40 bg-green-500/10 px-6 py-3 text-lg font-extrabold text-green-700 shadow-sm md:px-8 md:py-3.5 md:text-xl">
                 🔥 كلما زدتي كلما وفّرتي
               </span>
             </div>
@@ -134,16 +134,30 @@ export function OrderSection() {
                   )}
                 >
                   {pack.badge && (
-                    <span
-                      className={cn(
-                        "absolute -top-3 right-5 rounded-full px-3 py-1 text-xs font-bold",
-                        pack.id === "duo"
-                          ? "bg-gold text-white"
-                          : "bg-navy text-white"
-                      )}
-                    >
-                      {pack.badge}
-                    </span>
+                    pack.id === "family" ? (
+                      <motion.span
+                        animate={{ scale: [1, 1.06, 1] }}
+                        transition={{
+                          duration: 1.6,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                        className="absolute -top-3 right-5 rounded-full bg-gradient-to-r from-red-500 to-red-600 px-3.5 py-1 text-xs font-extrabold tracking-wide text-white shadow-lg shadow-red-500/50 ring-2 ring-red-300/60"
+                      >
+                        {pack.badge}
+                      </motion.span>
+                    ) : (
+                      <span
+                        className={cn(
+                          "absolute -top-3 right-5 rounded-full px-3 py-1 text-xs font-bold",
+                          pack.id === "duo"
+                            ? "bg-green-600 text-white shadow-sm"
+                            : "bg-navy text-white"
+                        )}
+                      >
+                        {pack.badge}
+                      </span>
+                    )
                   )}
 
                   <div className="flex items-center gap-4">
@@ -167,7 +181,8 @@ export function OrderSection() {
                         {pack.label}
                       </p>
                       <p className="mt-0.5 text-sm text-muted-foreground">
-                        {pack.subtitle}
+                        <span className="font-medium text-fabric">Neo Transat</span>
+                        {pack.subtitle.replace("Neo Transat", "")}
                       </p>
                     </div>
 
@@ -180,7 +195,7 @@ export function OrderSection() {
                         </span>
                       </p>
                       {pack.savings && (
-                        <p className="text-xs font-bold text-gold">
+                        <p className="text-sm font-extrabold text-green-700">
                           وفّر {pack.savings} درهم
                         </p>
                       )}
@@ -191,50 +206,8 @@ export function OrderSection() {
             })}
           </div>
 
-          {/* Trust Badges - Dark Section */}
-          <div className="mt-8 rounded-2xl bg-navy p-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 text-right">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
-                  <BadgeCheck size={20} className="text-gold" />
-                </div>
-                <p>
-                  <span className="block text-sm font-bold text-white">الدفع عند الإستلام</span>
-                  <span className="block text-xs text-white/60">بدون دفع مسبق</span>
-                </p>
-              </div>
-              <div className="flex items-center gap-3 text-right">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
-                  <Truck size={20} className="text-gold" />
-                </div>
-                <p>
-                  <span className="block text-sm font-bold text-white">توصيل 2-5 أيام</span>
-                  <span className="block text-xs text-white/60">لجميع المدن</span>
-                </p>
-              </div>
-              <div className="flex items-center gap-3 text-right">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
-                  <Shield size={20} className="text-gold" />
-                </div>
-                <p>
-                  <span className="block text-sm font-bold text-white">ضمان سنة</span>
-                  <span className="block text-xs text-white/60">إسترجاع كامل</span>
-                </p>
-              </div>
-              <div className="flex items-center gap-3 text-right">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
-                  <Package size={20} className="text-gold" />
-                </div>
-                <p>
-                  <span className="block text-sm font-bold text-white">جودة عالية</span>
-                  <span className="block text-xs text-white/60">خشب + قماش مقاوم</span>
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* Order Form */}
-          <div id="order-form" className="mt-10">
+          <div id="order-form" className="mt-8">
             <h3 className="mb-6 text-center text-xl font-bold text-navy">
               📦 معلومات التوصيل
             </h3>
@@ -330,6 +303,48 @@ export function OrderSection() {
                 </p>
               </div>
             </form>
+          </div>
+
+          {/* Trust Badges - Dark Section */}
+          <div className="mt-8 rounded-2xl bg-navy p-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 text-right">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/20">
+                  <BadgeCheck size={22} className="text-green-500" />
+                </div>
+                <p>
+                  <span className="block text-sm font-bold text-white">الدفع عند الإستلام</span>
+                  <span className="block text-xs text-white/60">بدون دفع مسبق</span>
+                </p>
+              </div>
+              <div className="flex items-center gap-3 text-right">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/20">
+                  <Truck size={22} className="text-green-500" />
+                </div>
+                <p>
+                  <span className="block text-sm font-bold text-white">توصيل 2-5 أيام</span>
+                  <span className="block text-xs text-white/60">لجميع المدن</span>
+                </p>
+              </div>
+              <div className="flex items-center gap-3 text-right">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/20">
+                  <Shield size={22} className="text-green-500" />
+                </div>
+                <p>
+                  <span className="block text-sm font-bold text-white">ضمان سنة</span>
+                  <span className="block text-xs text-white/60">إسترجاع كامل</span>
+                </p>
+              </div>
+              <div className="flex items-center gap-3 text-right">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/20">
+                  <Package size={22} className="text-green-500" />
+                </div>
+                <p>
+                  <span className="block text-sm font-bold text-white">جودة عالية</span>
+                  <span className="block text-xs text-white/60">خشب + قماش مقاوم</span>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </Container>

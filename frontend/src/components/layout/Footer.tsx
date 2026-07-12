@@ -12,6 +12,7 @@ import {
   Truck,
 } from "lucide-react";
 import { Container } from "@/components/shared/Container";
+import { Logo } from "@/components/shared/Logo";
 import { FooterSection } from "@/components/layout/FooterSection";
 import { FooterNewsletter } from "@/components/layout/FooterNewsletter";
 import { contactInfo } from "@/config/legal";
@@ -94,17 +95,14 @@ export function Footer() {
       <Container className="relative py-16 sm:py-20 lg:py-24">
         {/* SECTION 1 — Brand */}
         <FooterSection className="flex flex-col items-center text-center">
-          <Link href="/" className="group inline-block">
-            <img
-              src="/images/logo-shamangaro.svg"
-              alt="SHAMANGARO"
-              width={380}
-              height={88}
-              className="h-12 w-auto transition-transform duration-500 group-hover:scale-[1.02] sm:h-14 md:h-16 brightness-0 invert"
-              loading="lazy"
-              decoding="async"
+          <div className="flex justify-center">
+            <Logo
+              variant="wordmark"
+              size="xl"
+              href="/"
+              textClassName="text-white"
             />
-          </Link>
+          </div>
           <p className="mt-8 max-w-xl text-base leading-[1.9] text-white/65 sm:text-lg">
             {brandStatement}
           </p>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { adminLogin } from "@/lib/orders";
 import { ApiError } from "@/lib/api";
+import { Logo } from "@/components/shared/Logo";
 import { Lock, User } from "lucide-react";
 
 export default function AdminLoginPage() {
@@ -32,11 +33,13 @@ export default function AdminLoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f0f0f0] p-4">
       <div className="w-full max-w-md rounded-2xl border border-navy/10 bg-white p-8 shadow-xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-extrabold text-navy">SHAMANGARO</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            لوحة إدارة الطلبات
-          </p>
+        <div className="mb-8 flex flex-col items-center text-center">
+          <Logo
+            variant="wordmark"
+            size="lg"
+            href={null}
+            subtitle="لوحة إدارة الطلبات"
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">

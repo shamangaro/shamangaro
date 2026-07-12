@@ -29,6 +29,8 @@
   --color-sun-light: #e3bc6a;
   --color-nature: #d4a853;
   --color-nature-light: #e3bc6a;
+  --color-fabric: #3a6f94;
+  --color-fabric-dark: #2d5875;
   --font-sans: var(--font-tajawal), system-ui, sans-serif;
   --font-display: var(--font-tajawal), system-ui, sans-serif;
   --radius-sm: 0.25rem;

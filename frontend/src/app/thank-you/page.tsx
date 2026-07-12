@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2, Home, Package, Phone, User } from "lucide-react";
 import { Container } from "@/components/shared/Container";
+import { Logo } from "@/components/shared/Logo";
 import { getServerApiBase } from "@/lib/api-server";
 import type { OrderPublic } from "@/lib/orders";
 
@@ -32,7 +33,15 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
         <div className="mx-auto max-w-xl">
           <div className="overflow-hidden rounded-3xl border-2 border-navy/10 bg-white shadow-xl shadow-black/5">
             <div className="bg-navy px-8 py-10 text-center">
-              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gold/20">
+              <div className="flex justify-center">
+                <Logo
+                  variant="wordmark"
+                  size="md"
+                  href="/"
+                  textClassName="text-white"
+                />
+              </div>
+              <div className="mx-auto mt-6 flex h-20 w-20 items-center justify-center rounded-full bg-gold/20">
                 <CheckCircle2 size={44} className="text-gold" />
               </div>
               <h1 className="mt-6 text-3xl font-extrabold text-white">
