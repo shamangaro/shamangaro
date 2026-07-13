@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { StickyOrderCTA } from "@/components/shared/StickyOrderCTA";
+import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
 import { ProductHero } from "@/components/sections/ProductHero";
 import { ComparisonSlider } from "@/components/sections/ComparisonSlider";
 import { OrderSection } from "@/components/sections/OrderSection";
@@ -24,6 +25,7 @@ export default function Home() {
       </main>
       <Footer />
       <StickyOrderCTA />
+      <ScrollToTopButton />
     </>
   );
 }
