@@ -61,15 +61,6 @@ const socialIcons = {
   TikTok: TikTokIcon,
 } as const;
 
-const socialBrandStyles = {
-  Instagram:
-    "bg-gradient-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] shadow-lg shadow-[#dd2a7b]/25 hover:shadow-xl hover:shadow-[#dd2a7b]/40",
-  Facebook:
-    "bg-[#1877F2] shadow-lg shadow-[#1877F2]/25 hover:shadow-xl hover:shadow-[#1877F2]/40",
-  TikTok:
-    "bg-[#121212] ring-1 ring-[#00f2ea]/35 shadow-lg hover:ring-[#ff0050]/55 hover:shadow-xl hover:shadow-[#00f2ea]/15",
-} as const;
-
 export function Footer() {
   const year = new Date().getFullYear();
 
@@ -78,26 +69,26 @@ export function Footer() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(212,168,83,0.08),transparent)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
-      <Container className="relative py-16 sm:py-20 lg:py-24">
+      <Container className="relative pt-8 pb-14 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-20">
         {/* SECTION 1 — Brand */}
         <FooterSection className="flex flex-col items-center text-center">
           <div className="flex justify-center">
             <Logo
               variant="wordmark"
-              size="xl"
+              size="lg"
               href="/"
               textClassName="text-white"
             />
           </div>
-          <p className="mt-6 max-w-xl text-base leading-[1.9] text-white/65 sm:text-lg">
+          <p className="mt-4 max-w-xl text-base leading-[1.8] text-white/65 sm:text-lg">
             {brandStatement}
           </p>
-          <div className="mt-5 h-px w-16 bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
+          <div className="mt-4 h-px w-16 bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
         </FooterSection>
 
         {/* SECTION 2 — Quick links */}
-        <FooterSection delay={0.1} className="mt-8 sm:mt-10 lg:mt-12">
-          <div className="rounded-3xl border border-white/[0.08] bg-white/[0.02] px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+        <FooterSection delay={0.1} className="mt-6 sm:mt-8">
+          <div className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.02] px-4 py-5 sm:rounded-[2rem] sm:px-6 sm:py-6 lg:rounded-[2.25rem] lg:px-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6 lg:gap-10">
               <h3 className="shrink-0 text-center text-base font-bold uppercase tracking-[0.15em] text-white sm:pt-1 sm:text-start sm:text-lg">
                 روابط سريعة
@@ -220,9 +211,9 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
-                    className={`group flex h-11 w-11 items-center justify-center rounded-xl text-white transition-all duration-300 hover:-translate-y-1 hover:scale-105 sm:h-12 sm:w-12 ${socialBrandStyles[social.name]}`}
+                    className="group flex h-11 w-11 items-center justify-center rounded-xl bg-white text-navy shadow-md transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-lg sm:h-12 sm:w-12"
                   >
-                    <Icon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110 sm:h-[1.35rem] sm:w-[1.35rem]" />
+                    <Icon className="h-5 w-5 text-navy transition-transform duration-300 group-hover:scale-110 sm:h-[1.35rem] sm:w-[1.35rem]" />
                   </a>
                 );
               })}
