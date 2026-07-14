@@ -46,13 +46,13 @@ export function HowToUse() {
               transition={{ duration: 0.4, delay: i * 0.12 }}
               className="flex flex-col items-center text-center"
             >
-              <div className="relative w-full overflow-hidden rounded-2xl">
+              <div className="relative aspect-square w-full overflow-hidden rounded-3xl border-2 border-navy bg-white shadow-sm">
                 <Image
                   src={step.image}
                   alt={step.title}
-                  width={400}
-                  height={400}
-                  className="w-full object-contain"
+                  fill
+                  className="object-contain p-3 sm:p-4"
+                  sizes="(max-width: 640px) 90vw, 20rem"
                 />
               </div>
               <h3 className="mt-4 text-lg font-bold text-navy md:text-xl">

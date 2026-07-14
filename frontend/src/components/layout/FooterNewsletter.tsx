@@ -77,23 +77,23 @@ export function FooterNewsletter() {
                 placeholder="example@email.com"
                 dir="ltr"
                 disabled={status === "loading"}
-                className="h-14 flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-5 text-base text-white outline-none transition-all placeholder:text-white/30 focus:border-white/25 focus:bg-white/[0.08] focus:ring-2 focus:ring-white/10 disabled:opacity-60"
+                className="h-12 flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-white outline-none transition-all placeholder:text-white/30 focus:border-white/25 focus:bg-white/[0.08] focus:ring-2 focus:ring-white/10 disabled:opacity-60 sm:px-5 sm:text-base"
               />
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="group inline-flex h-14 shrink-0 items-center justify-center gap-2 rounded-2xl bg-white px-7 text-sm font-bold text-navy transition-all hover:bg-gold hover:text-navy active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+                className="group inline-flex h-12 shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-white px-5 text-sm font-bold text-navy transition-all hover:bg-gold hover:text-navy active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 sm:px-6"
               >
                 {status === "loading" ? (
                   <>
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader2 size={15} className="animate-spin" />
                     جاري الإرسال...
                   </>
                 ) : (
                   <>
                     اشترك
                     <ArrowLeft
-                      size={16}
+                      size={15}
                       className="transition-transform group-hover:-translate-x-1"
                     />
                   </>

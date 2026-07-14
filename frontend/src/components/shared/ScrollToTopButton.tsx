@@ -56,7 +56,7 @@ export function ScrollToTopButton() {
           onClick={scrollToTop}
           aria-label="الرجوع للأعلى"
           className={cn(
-            "fixed start-4 z-50 flex h-12 w-12 items-center justify-center rounded-full border-2 border-gold/40 bg-navy text-white shadow-xl shadow-navy/25 transition-all hover:scale-105 hover:bg-navy-light sm:start-6 sm:h-[3.25rem] sm:w-[3.25rem]",
+            "fixed start-4 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-navy/15 bg-white/20 text-navy/70 shadow-sm backdrop-blur-sm transition-all hover:scale-105 hover:border-navy hover:bg-navy hover:text-white sm:start-6 sm:h-[3.25rem] sm:w-[3.25rem]",
             stickyCtaVisible ? "bottom-28 sm:bottom-32" : "bottom-6 sm:bottom-8"
           )}
         >

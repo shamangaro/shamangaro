@@ -2,34 +2,20 @@
 
 import Link from "next/link";
 import {
-  ArrowLeft,
-  Check,
   Clock,
+  Headphones,
   Mail,
-  MessageCircle,
-  Shield,
-  Star,
-  Truck,
 } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { Logo } from "@/components/shared/Logo";
 import { FooterSection } from "@/components/layout/FooterSection";
 import { FooterNewsletter } from "@/components/layout/FooterNewsletter";
 import { contactInfo } from "@/config/legal";
-import { whatsappLink } from "@/lib/whatsapp";
 import {
   brandStatement,
-  footerQuickLinks,
-  footerTrustBadges,
+  footerQuickLinkGroups,
   socialLinks,
 } from "@/config/site";
-
-const trustIcons = {
-  check: Check,
-  truck: Truck,
-  shield: Shield,
-  star: Star,
-} as const;
 
 function TikTokIcon({ className }: { className?: string }) {
   return (
@@ -69,19 +55,19 @@ function FacebookIcon({ className }: { className?: string }) {
   );
 }
 
-function YouTubeIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M21.8 8.001a2.75 2.75 0 0 0-1.94-1.94C18.28 6 12 6 12 6s-6.28 0-7.86.061A2.75 2.75 0 0 0 2.2 8.001 28.9 28.9 0 0 0 2.14 12a28.9 28.9 0 0 0 .06 3.999 2.75 2.75 0 0 0 1.94 1.94C5.72 18 12 18 12 18s6.28 0 7.86-.061a2.75 2.75 0 0 0 1.94-1.94A28.9 28.9 0 0 0 21.86 12a28.9 28.9 0 0 0-.06-3.999zM10 15.5v-7l6 3.5-6 3.5z" />
-    </svg>
-  );
-}
-
 const socialIcons = {
   Instagram: InstagramIcon,
   Facebook: FacebookIcon,
   TikTok: TikTokIcon,
-  YouTube: YouTubeIcon,
+} as const;
+
+const socialBrandStyles = {
+  Instagram:
+    "bg-gradient-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af] shadow-lg shadow-[#dd2a7b]/25 hover:shadow-xl hover:shadow-[#dd2a7b]/40",
+  Facebook:
+    "bg-[#1877F2] shadow-lg shadow-[#1877F2]/25 hover:shadow-xl hover:shadow-[#1877F2]/40",
+  TikTok:
+    "bg-[#121212] ring-1 ring-[#00f2ea]/35 shadow-lg hover:ring-[#ff0050]/55 hover:shadow-xl hover:shadow-[#00f2ea]/15",
 } as const;
 
 export function Footer() {
@@ -103,118 +89,110 @@ export function Footer() {
               textClassName="text-white"
             />
           </div>
-          <p className="mt-8 max-w-xl text-base leading-[1.9] text-white/65 sm:text-lg">
+          <p className="mt-6 max-w-xl text-base leading-[1.9] text-white/65 sm:text-lg">
             {brandStatement}
           </p>
-          <div className="mt-8 h-px w-16 bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
+          <div className="mt-5 h-px w-16 bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
         </FooterSection>
 
-        {/* SECTION 2 — Trust badges */}
-        <FooterSection delay={0.05} className="mt-14 sm:mt-16 lg:mt-20">
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
-            {footerTrustBadges.map((badge, index) => {
-              const Icon = trustIcons[badge.icon];
-              return (
-                <div
-                  key={badge.label}
-                  className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-1 hover:border-white/15 hover:bg-white/[0.06] hover:shadow-[0_20px_50px_-16px_rgba(0,0,0,0.8)] sm:rounded-3xl sm:p-5"
-                  style={{ transitionDelay: `${index * 40}ms` }}
-                >
-                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.06] text-gold transition-colors group-hover:bg-gold/15 sm:h-11 sm:w-11">
-                    <Icon size={20} strokeWidth={1.75} />
+        {/* SECTION 2 — Quick links */}
+        <FooterSection delay={0.1} className="mt-8 sm:mt-10 lg:mt-12">
+          <div className="rounded-3xl border border-white/[0.08] bg-white/[0.02] px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6 lg:gap-10">
+              <h3 className="shrink-0 text-center text-base font-bold uppercase tracking-[0.15em] text-white sm:pt-1 sm:text-start sm:text-lg">
+                روابط سريعة
+              </h3>
+              <nav
+                aria-label="روابط سريعة"
+                className="grid w-full flex-1 grid-cols-3 gap-3 sm:gap-5 lg:gap-8"
+              >
+                {footerQuickLinkGroups.map((group) => (
+                  <div key={group.title} className="min-w-0">
+                    <p className="mb-2.5 text-xs font-bold text-gold sm:mb-3 sm:text-sm">
+                      {group.title}
+                    </p>
+                    <ul className="space-y-2 sm:space-y-2.5">
+                      {group.links.map((link) => (
+                        <li key={link.href}>
+                          <Link
+                            href={link.href}
+                            className="block text-sm font-semibold leading-snug text-white/80 transition-colors hover:text-white sm:text-[15px]"
+                          >
+                            {link.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <p className="text-sm font-semibold leading-snug text-white/90 sm:text-[0.9375rem]">
-                    {badge.label}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </FooterSection>
-
-        {/* SECTION 3 — Quick links */}
-        <FooterSection delay={0.1} className="mt-14 sm:mt-16 lg:mt-20">
-          <div className="rounded-3xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-8 lg:p-10">
-            <h3 className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.25em] text-white/45 sm:text-start">
-              روابط سريعة
-            </h3>
-            <nav
-              aria-label="روابط سريعة"
-              className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            >
-              {footerQuickLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="group flex items-center justify-between rounded-2xl border border-transparent px-4 py-3.5 text-sm font-medium text-white/70 transition-all duration-300 hover:border-white/10 hover:bg-white/[0.05] hover:pl-5 hover:text-white"
-                >
-                  <span>{link.label}</span>
-                  <ArrowLeft
-                    size={14}
-                    className="opacity-0 transition-all duration-300 group-hover:opacity-60 group-hover:-translate-x-1"
-                  />
-                </Link>
-              ))}
-            </nav>
+                ))}
+              </nav>
+            </div>
           </div>
         </FooterSection>
 
         {/* SECTION 4 + 5 — Support & Newsletter */}
         <div className="mt-14 grid gap-6 sm:mt-16 lg:mt-20 lg:grid-cols-2 lg:gap-8">
           <FooterSection delay={0.12}>
-            <div className="h-full rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] sm:p-8">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-white/45">
-                خدمة الزبناء
-              </h3>
-              <p className="mt-3 text-xl font-bold text-white sm:text-2xl">
-                نحن هنا لمساعدتك
-              </p>
+            <div className="relative h-full overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] backdrop-blur-sm sm:p-7">
+              <div className="pointer-events-none absolute -bottom-14 -right-14 h-32 w-32 rounded-full bg-gold/10 blur-3xl" />
+              <div className="relative">
+                <div className="mb-2 flex items-center gap-2">
+                  <Headphones size={15} className="text-gold" />
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">
+                    خدمة الزبناء
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold tracking-tight text-white sm:text-[1.35rem]">
+                  نحن هنا لمساعدتك
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/55">
+                  راسلنا بالبريد و غادي نجاوبوك بأسرع وقت.
+                </p>
 
-              <div className="mt-6 space-y-3">
-                <a
-                  href={whatsappLink()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 transition-all duration-300 hover:border-white/15 hover:bg-white/[0.07]"
-                >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#25D366]/15 text-[#25D366] transition-transform group-hover:scale-105">
-                    <MessageCircle size={20} />
-                  </div>
-                  <div className="min-w-0 text-start">
-                    <p className="text-xs text-white/45">واتساب</p>
-                    <p className="font-semibold text-white" dir="ltr">
-                      {contactInfo.whatsappDisplay}
-                    </p>
-                  </div>
-                </a>
+                <div className="mt-5 space-y-3">
+                  <a
+                    href={`mailto:${contactInfo.email}`}
+                    className="group flex items-center gap-3.5 rounded-xl border border-white/10 bg-white/[0.05] p-3.5 transition-all duration-300 hover:border-gold/25 hover:bg-white/[0.08] sm:p-4"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold/15 text-gold transition-transform duration-300 group-hover:scale-105">
+                      <Mail size={19} strokeWidth={1.75} />
+                    </div>
+                    <div className="min-w-0 flex-1 text-start">
+                      <p className="text-xs font-medium text-white/50">
+                        البريد الإلكتروني
+                      </p>
+                      <p
+                        className="mt-0.5 truncate text-[15px] font-bold text-white sm:text-base"
+                        dir="ltr"
+                      >
+                        {contactInfo.email}
+                      </p>
+                    </div>
+                  </a>
 
-                <a
-                  href={`mailto:${contactInfo.email}`}
-                  className="group flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 transition-all duration-300 hover:border-white/15 hover:bg-white/[0.07]"
-                >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/[0.08] text-white transition-transform group-hover:scale-105">
-                    <Mail size={20} />
-                  </div>
-                  <div className="min-w-0 text-start">
-                    <p className="text-xs text-white/45">البريد الإلكتروني</p>
-                    <p className="truncate font-semibold text-white" dir="ltr">
-                      {contactInfo.email}
-                    </p>
-                  </div>
-                </a>
-
-                <div className="flex gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/[0.08] text-gold">
-                    <Clock size={20} />
-                  </div>
-                  <div className="text-start">
-                    <p className="text-xs text-white/45">ساعات العمل</p>
-                    <p className="text-sm font-semibold text-white">
-                      {contactInfo.businessHours}
-                    </p>
-                    <p className="mt-1 text-xs text-white/50">
-                      الرد خلال {contactInfo.responseTime}
-                    </p>
+                  <div className="rounded-xl border border-white/10 bg-white/[0.05] p-3.5 sm:p-4">
+                    <div className="flex items-center gap-3.5">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.08] text-gold">
+                        <Clock size={19} strokeWidth={1.75} />
+                      </div>
+                      <div className="text-start">
+                        <p className="text-xs font-medium text-white/50">
+                          ساعات العمل
+                        </p>
+                        <p className="mt-0.5 text-[15px] font-bold text-white sm:text-base">
+                          {contactInfo.businessHours}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3.5 flex items-center gap-2 rounded-lg border border-gold/20 bg-gold/10 px-3 py-2.5">
+                      <span className="relative flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-green-400" />
+                      </span>
+                      <p className="text-sm font-semibold text-gold">
+                        الرد خلال {contactInfo.responseTime}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -228,10 +206,10 @@ export function Footer() {
 
         {/* SECTION 6 — Social */}
         <FooterSection delay={0.18} className="mt-14 sm:mt-16 lg:mt-20">
-          <div className="flex flex-col items-center gap-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/45">
+          <div className="flex flex-col items-center gap-5 sm:gap-6">
+            <h3 className="text-base font-bold text-white sm:text-lg">
               تابعنا
-            </p>
+            </h3>
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               {socialLinks.map((social) => {
                 const Icon = socialIcons[social.name];
@@ -242,9 +220,9 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
-                    className="group flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/70 shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:bg-white hover:text-navy hover:shadow-xl hover:shadow-gold/10 sm:h-14 sm:w-14"
+                    className={`group flex h-11 w-11 items-center justify-center rounded-xl text-white transition-all duration-300 hover:-translate-y-1 hover:scale-105 sm:h-12 sm:w-12 ${socialBrandStyles[social.name]}`}
                   >
-                    <Icon className="h-5 w-5 sm:h-[1.35rem] sm:w-[1.35rem]" />
+                    <Icon className="h-5 w-5 transition-transform duration-300 group-hover:scale-110 sm:h-[1.35rem] sm:w-[1.35rem]" />
                   </a>
                 );
               })}

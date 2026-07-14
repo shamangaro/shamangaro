@@ -8,15 +8,34 @@ export const footerTrustBadges = [
   { icon: "star", label: "جودة Premium" },
 ] as const;
 
-export const footerQuickLinks = [
-  { href: "/about", label: "من نحن" },
-  { href: "/contact", label: "اتصل بنا" },
-  { href: "/privacy", label: "سياسة الخصوصية" },
-  { href: "/terms", label: "الشروط والأحكام" },
-  { href: "/shipping", label: "سياسة الشحن" },
-  { href: "/returns", label: "سياسة الاسترجاع والاستبدال" },
-  { href: "/warranty", label: "سياسة الضمان" },
+export const footerQuickLinkGroups = [
+  {
+    title: "الموقع",
+    links: [
+      { href: "/about", label: "من نحن" },
+      { href: "/contact", label: "اتصل بنا" },
+    ],
+  },
+  {
+    title: "قانوني",
+    links: [
+      { href: "/privacy", label: "سياسة الخصوصية" },
+      { href: "/terms", label: "الشروط والأحكام" },
+    ],
+  },
+  {
+    title: "السياسات",
+    links: [
+      { href: "/shipping", label: "سياسة الشحن" },
+      { href: "/returns", label: "سياسة الاسترجاع والاستبدال" },
+      { href: "/warranty", label: "سياسة الضمان" },
+    ],
+  },
 ] as const;
+
+export const footerQuickLinks = footerQuickLinkGroups.flatMap((group) =>
+  group.links.map((link) => link)
+);
 
 function socialUrl(envValue: string | undefined, fallback: string): string {
   return envValue?.trim() || fallback;
@@ -46,13 +65,5 @@ export const socialLinks = [
       "https://tiktok.com/@shamangaro"
     ),
     label: "TikTok",
-  },
-  {
-    name: "YouTube" as const,
-    href: socialUrl(
-      process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE,
-      "https://youtube.com/@shamangaro"
-    ),
-    label: "YouTube",
   },
 ];

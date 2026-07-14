@@ -154,7 +154,7 @@ export function ProductHero() {
               onTouchEnd={() => setPaused(false)}
               onClick={() => setZoomed(true)}
             >
-              <div className="aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:aspect-square">
+              <div className="relative aspect-square overflow-hidden rounded-3xl border-2 border-navy bg-white shadow-sm">
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
                     key={current}
@@ -162,14 +162,13 @@ export function ProductHero() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -24 }}
                     transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute inset-0 flex items-center justify-center p-4 md:p-6"
+                    className="absolute inset-0"
                   >
                     <Image
                       src={images[current].src}
                       alt={images[current].alt}
-                      width={650}
-                      height={650}
-                      className="max-h-full w-auto object-contain transition-transform duration-500 group-hover:scale-[1.03]"
+                      fill
+                      className="object-contain p-4 transition-transform duration-500 group-hover:scale-[1.03] sm:p-6"
                       priority={current === 0}
                       sizes="(max-width: 768px) 92vw, 46vw"
                     />
