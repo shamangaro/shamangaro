@@ -12,44 +12,12 @@ import {
 } from "@/lib/phone";
 import { createOrder } from "@/lib/orders";
 import { ApiError } from "@/lib/api";
-
-interface Pack {
-  id: string;
-  label: string;
-  subtitle: string;
-  pricePerChair: number;
-  total: number;
-  badge?: string;
-  savings?: number;
-}
-
-const packs: Pack[] = [
-  {
-    id: "solo",
-    label: "كرسي واحد",
-    subtitle: "Neo Transat × 1",
-    pricePerChair: 249,
-    total: 249,
-  },
-  {
-    id: "duo",
-    label: "كرسيين",
-    subtitle: "Neo Transat × 2",
-    pricePerChair: 229,
-    total: 458,
-    badge: "الأكثر مبيعاً",
-    savings: 40,
-  },
-  {
-    id: "family",
-    label: "3 كراسي",
-    subtitle: "Neo Transat × 3",
-    pricePerChair: 219,
-    total: 657,
-    badge: "أفضل عرض",
-    savings: 90,
-  },
-];
+import {
+  BASE_PRICE_PER_CHAIR,
+  getOfferSavings,
+  getOriginalTotal,
+  productOffers,
+} from "@/lib/offers";
 
 export function OrderSection() {
   const router = useRouter();
@@ -63,7 +31,9 @@ export function OrderSection() {
   const [phoneError, setPhoneError] = useState("");
   const [submitError, setSubmitError] = useState("");
 
-  const activePack = packs.find((p) => p.id === selected)!;
+  const activePack = productOffers.find((p) => p.id === selected)!;
+  const activeOriginalTotal = getOriginalTotal(activePack.chairs);
+  const activeSavings = getOfferSavings(activePack.chairs);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,13 +68,13 @@ export function OrderSection() {
   const set = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
   return (
-    <section id="order" className="bg-[#f8f8f8] py-10 md:py-14">
+    <section id="order" className="bg-[#f8f8f8] py-10 pb-32 lg:py-14 lg:pb-14">
       <Container>
         <div className="mx-auto max-w-lg">
           {/* Header */}
           <div className="mb-8 space-y-4">
             <div className="flex justify-center">
-              <span className="inline-flex items-center gap-2 rounded-full border-2 border-green-500/40 bg-green-500/10 px-6 py-3 text-lg font-extrabold text-green-700 shadow-sm md:px-8 md:py-3.5 md:text-xl">
+              <span className="inline-flex max-w-full items-center gap-2 rounded-full border-2 border-green-500/40 bg-green-500/10 px-3 py-2.5 text-center text-sm font-extrabold leading-snug text-green-700 shadow-sm sm:px-6 sm:py-3 sm:text-lg md:px-8 md:py-3.5 md:text-xl">
                 🔥 كلما زدتي كلما وفّرتي
               </span>
             </div>
@@ -114,9 +84,11 @@ export function OrderSection() {
           </div>
 
           {/* Pack Cards */}
-          <div className="space-y-4">
-            {packs.map((pack, i) => {
+          <div className="space-y-4 pt-2">
+            {productOffers.map((pack, i) => {
               const isActive = selected === pack.id;
+              const originalTotal = getOriginalTotal(pack.chairs);
+              const savings = getOfferSavings(pack.chairs);
               return (
                 <motion.button
                   key={pack.id}
@@ -160,7 +132,7 @@ export function OrderSection() {
                     )
                   )}
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     {/* Radio */}
                     <div
                       className={cn(
@@ -176,7 +148,7 @@ export function OrderSection() {
                     </div>
 
                     {/* Info */}
-                    <div className="flex-1">
+                    <div className="min-w-0 flex-1">
                       <p className="text-base font-bold text-navy">
                         {pack.label}
                       </p>
@@ -187,18 +159,43 @@ export function OrderSection() {
                     </div>
 
                     {/* Price */}
-                    <div className="text-left">
-                      <p className="text-2xl font-black text-navy md:text-3xl">
+                    <div className="ms-auto shrink-0 text-left">
+                      <p className="text-2xl font-black leading-none text-navy md:text-3xl">
                         {pack.pricePerChair}
                         <span className="mr-1 text-sm font-bold text-navy/60">
                           د.م
                         </span>
                       </p>
-                      {pack.savings && (
-                        <p className="text-sm font-extrabold text-green-700">
-                          وفّر {pack.savings} درهم
+                      {pack.chairs > 1 ? (
+                        <p className="mt-0.5 text-xs font-semibold text-navy/60">
+                          للكرسي
                         </p>
-                      )}
+                      ) : null}
+                      {savings > 0 && pack.chairs > 1 ? (
+                        <p className="text-xs font-medium text-red-500 line-through">
+                          {BASE_PRICE_PER_CHAIR} د.م
+                        </p>
+                      ) : null}
+                      {pack.chairs > 1 ? (
+                        <p className="mt-1 text-sm font-bold text-navy">
+                          {pack.total} د.م{" "}
+                          <span className="text-xs font-medium text-navy/60">
+                            المجموع
+                          </span>
+                        </p>
+                      ) : null}
+                      {savings > 0 ? (
+                        <p className="mt-0.5 text-sm font-medium text-red-500 line-through">
+                          {pack.chairs > 1
+                            ? `${originalTotal} د.م`
+                            : `${BASE_PRICE_PER_CHAIR} د.م`}
+                        </p>
+                      ) : null}
+                      {savings > 0 ? (
+                        <p className="text-sm font-extrabold text-green-700">
+                          وفّر {savings} درهم
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                 </motion.button>
@@ -290,7 +287,7 @@ export function OrderSection() {
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
-                  className="w-full rounded-full bg-navy py-4 text-center text-lg font-bold text-white transition-all duration-300 hover:bg-navy-light disabled:opacity-60"
+                  className="min-h-12 w-full rounded-full bg-navy py-4 text-center text-base font-bold text-white transition-all duration-300 hover:bg-navy-light disabled:opacity-60 sm:text-lg"
                 >
                   <span>
                     {submitting
@@ -298,6 +295,11 @@ export function OrderSection() {
                       : `أكّد طلبي · ${activePack.total} درهم`}
                   </span>
                 </motion.button>
+                {activeSavings > 0 ? (
+                  <p className="mt-2 text-center text-sm font-medium text-red-500 line-through">
+                    {activeOriginalTotal} درهم
+                  </p>
+                ) : null}
                 <p className="mt-3 text-center text-sm font-medium text-muted-foreground">
                   💵 الدفع عند الإستلام · بدون دفع مسبق
                 </p>
@@ -306,42 +308,58 @@ export function OrderSection() {
           </div>
 
           {/* Trust Badges - Dark Section */}
-          <div className="mt-8 rounded-2xl bg-navy p-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 text-right">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/20">
-                  <BadgeCheck size={22} className="text-green-500" />
+          <div className="mt-8 rounded-2xl bg-[#1b3a4b] p-6">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
+                  <BadgeCheck size={20} className="text-[#d4a853]" />
                 </div>
-                <p>
-                  <span className="block text-sm font-bold text-white">الدفع عند الإستلام</span>
-                  <span className="block text-xs text-white/60">بدون دفع مسبق</span>
+                <p className="min-w-0 flex-1 text-right">
+                  <span className="block text-[14px] font-bold text-white">
+                    الدفع عند الإستلام
+                  </span>
+                  <span className="block text-[11px] text-white/60">
+                    بدون دفع مسبق
+                  </span>
                 </p>
               </div>
-              <div className="flex items-center gap-3 text-right">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/20">
-                  <Truck size={22} className="text-green-500" />
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
+                  <Truck size={20} className="text-[#d4a853]" />
                 </div>
-                <p>
-                  <span className="block text-sm font-bold text-white">توصيل 2-5 أيام</span>
-                  <span className="block text-xs text-white/60">لجميع المدن</span>
+                <p className="min-w-0 flex-1 text-right">
+                  <span className="block text-[14px] font-bold text-white">
+                    توصيل 2-5 أيام
+                  </span>
+                  <span className="block text-[11px] text-white/60">
+                    لجميع المدن
+                  </span>
                 </p>
               </div>
-              <div className="flex items-center gap-3 text-right">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/20">
-                  <Shield size={22} className="text-green-500" />
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
+                  <Shield size={20} className="text-[#d4a853]" />
                 </div>
-                <p>
-                  <span className="block text-sm font-bold text-white">ضمان سنة</span>
-                  <span className="block text-xs text-white/60">إسترجاع كامل</span>
+                <p className="min-w-0 flex-1 text-right">
+                  <span className="block text-[14px] font-bold text-white">
+                    ضمان سنة
+                  </span>
+                  <span className="block text-[11px] text-white/60">
+                    إسترجاع كامل
+                  </span>
                 </p>
               </div>
-              <div className="flex items-center gap-3 text-right">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-500/20">
-                  <Package size={22} className="text-green-500" />
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
+                  <Package size={20} className="text-[#d4a853]" />
                 </div>
-                <p>
-                  <span className="block text-sm font-bold text-white">جودة عالية</span>
-                  <span className="block text-xs text-white/60">خشب + قماش مقاوم</span>
+                <p className="min-w-0 flex-1 text-right">
+                  <span className="block text-[14px] font-bold text-white">
+                    جودة عالية
+                  </span>
+                  <span className="block text-[11px] text-white/60">
+                    خشب + قماش مقاوم
+                  </span>
                 </p>
               </div>
             </div>

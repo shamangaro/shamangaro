@@ -59,7 +59,7 @@ function Item({ q, a, i }: { q: string; a: string; i: number }) {
           type="button"
           onClick={() => setOpen(!open)}
           aria-expanded={open}
-          className="flex w-full items-start gap-3 p-4 text-start sm:gap-4 sm:p-5"
+          className="flex min-h-11 w-full items-start gap-3 p-4 text-start sm:gap-4 sm:p-5"
         >
           <div
             className={cn(

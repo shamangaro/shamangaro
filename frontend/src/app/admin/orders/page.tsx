@@ -59,7 +59,7 @@ function StatCard({
       )}
     >
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p className="mt-1 text-2xl font-black text-navy">{value}</p>
+      <p className="mt-1 text-xl font-black text-navy sm:text-2xl">{value}</p>
     </div>
   );
 }
@@ -135,9 +135,9 @@ export default function AdminOrdersPage() {
     });
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <div className="min-h-screen overflow-x-clip bg-[#f5f5f5]">
       <header className="sticky top-0 z-30 border-b border-navy/10 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-3 py-3 sm:px-4 sm:py-4">
           <Logo
             variant="wordmark"
             size="sm"
@@ -146,7 +146,7 @@ export default function AdminOrdersPage() {
           />
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-navy hover:bg-navy/5"
+            className="flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-navy hover:bg-navy/5"
           >
             <LogOut size={16} />
             خروج
@@ -154,10 +154,10 @@ export default function AdminOrdersPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
+      <main className="mx-auto max-w-7xl space-y-6 overflow-x-clip p-3 md:p-6">
         {stats && (
           <>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
               <StatCard label="طلبات اليوم" value={stats.today_orders} highlight />
               <StatCard label="جميع الطلبات" value={stats.all_orders} />
               <StatCard label="جديد" value={stats.new_orders} />
@@ -176,7 +176,7 @@ export default function AdminOrdersPage() {
                 value={`${stats.total_sales} د.م`}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2 md:grid-cols-4">
               <StatCard label="🟢 Trusted Customers" value={stats.trusted_customers} />
               <StatCard label="🟡 Warning Customers" value={stats.warning_customers} />
               <StatCard label="🔴 High Risk Customers" value={stats.high_risk_customers} />
@@ -204,7 +204,7 @@ export default function AdminOrdersPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="اسم، هاتف، رقم الطلب..."
-                  className="h-10 w-full rounded-lg border border-navy/15 pr-9 pl-3 text-sm outline-none focus:border-navy"
+                  className="h-11 w-full rounded-lg border border-navy/15 pr-9 pl-3 text-sm outline-none focus:border-navy"
                 />
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function AdminOrdersPage() {
                   setStatus(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 rounded-lg border border-navy/15 px-3 text-sm outline-none focus:border-navy"
+                className="h-11 w-full rounded-lg border border-navy/15 px-3 text-sm outline-none focus:border-navy"
               >
                 {STATUSES.map((s) => (
                   <option key={s.value} value={s.value}>
@@ -238,7 +238,7 @@ export default function AdminOrdersPage() {
                   setDateFrom(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 rounded-lg border border-navy/15 px-3 text-sm outline-none focus:border-navy"
+                className="h-11 w-full rounded-lg border border-navy/15 px-3 text-sm outline-none focus:border-navy"
               />
             </div>
             <div>
@@ -252,12 +252,12 @@ export default function AdminOrdersPage() {
                   setDateTo(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 rounded-lg border border-navy/15 px-3 text-sm outline-none focus:border-navy"
+                className="h-11 w-full rounded-lg border border-navy/15 px-3 text-sm outline-none focus:border-navy"
               />
             </div>
             <button
               type="submit"
-              className="h-10 rounded-lg bg-navy px-5 text-sm font-bold text-white hover:bg-navy-light"
+              className="h-11 w-full rounded-lg bg-navy px-5 text-sm font-bold text-white hover:bg-navy-light sm:w-auto"
             >
               بحث
             </button>
@@ -268,7 +268,7 @@ export default function AdminOrdersPage() {
                 date_from: dateFrom || undefined,
                 date_to: dateTo || undefined,
               })}
-              className="flex h-10 items-center gap-2 rounded-lg border border-navy/20 px-4 text-sm font-bold text-navy hover:bg-navy/5"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-navy/20 px-4 text-sm font-bold text-navy hover:bg-navy/5 sm:w-auto"
             >
               <Download size={16} />
               تصدير CSV
@@ -415,10 +415,10 @@ export default function AdminOrdersPage() {
                         {order.offer_name} — {order.total_price} د.م
                       </p>
                     </div>
-                    <div className="mt-3 flex gap-2">
+                    <div className="mt-3 flex flex-wrap gap-2">
                       <a
                         href={phoneToTelLink(order.phone)}
-                        className="rounded-lg border border-navy/20 px-3 py-2"
+                        className="flex h-11 min-w-11 items-center justify-center rounded-lg border border-navy/20 px-3"
                         title="اتصال"
                       >
                         <PhoneCall size={16} />
@@ -430,20 +430,20 @@ export default function AdminOrdersPage() {
                         )}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="rounded-lg border border-green-200 px-3 py-2 text-[#25D366]"
+                        className="flex h-11 min-w-11 items-center justify-center rounded-lg border border-green-200 px-3 text-[#25D366]"
                         title="واتساب"
                       >
                         <MessageCircle size={16} />
                       </a>
                       <Link
                         href={`/admin/orders/${order.id}`}
-                        className="flex-1 rounded-lg bg-navy py-2 text-center text-sm font-bold text-white"
+                        className="flex h-11 min-h-11 flex-1 items-center justify-center rounded-lg bg-navy text-sm font-bold text-white"
                       >
                         عرض التفاصيل
                       </Link>
                       <button
                         onClick={() => copyPhone(order.phone)}
-                        className="rounded-lg border border-navy/20 px-3 py-2"
+                        className="flex h-11 min-w-11 items-center justify-center rounded-lg border border-navy/20 px-3"
                       >
                         <Copy size={16} />
                       </button>
@@ -455,7 +455,7 @@ export default function AdminOrdersPage() {
           )}
 
           {totalPages > 1 && (
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">
                 {total} طلب — صفحة {page} من {totalPages}
               </p>
@@ -463,14 +463,14 @@ export default function AdminOrdersPage() {
                 <button
                   disabled={page <= 1}
                   onClick={() => setPage((p) => p - 1)}
-                  className="rounded-lg border border-navy/20 p-2 disabled:opacity-40"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-navy/20 disabled:opacity-40"
                 >
                   <ChevronRight size={18} />
                 </button>
                 <button
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => p + 1)}
-                  className="rounded-lg border border-navy/20 p-2 disabled:opacity-40"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-navy/20 disabled:opacity-40"
                 >
                   <ChevronLeft size={18} />
                 </button>
@@ -490,13 +490,13 @@ export default function AdminOrdersPage() {
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-1 rounded-lg border border-navy/20 py-2.5 font-bold text-navy"
+                className="flex-1 rounded-lg border border-navy/20 py-3 font-bold text-navy min-h-11"
               >
                 إلغاء
               </button>
               <button
                 onClick={confirmDelete}
-                className="flex-1 rounded-lg bg-red-600 py-2.5 font-bold text-white"
+                className="flex-1 rounded-lg bg-red-600 py-3 font-bold text-white min-h-11"
               >
                 حذف
               </button>

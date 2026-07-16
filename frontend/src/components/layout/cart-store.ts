@@ -1,41 +1,86 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import {
+  BASE_PRICE_PER_CHAIR,
+  getOfferById,
+  getOfferLabel,
+  getOfferSavings,
+  getOfferSubtitle,
+  getOfferTotal,
+  getOriginalTotal,
+  getPricePerChair,
+  productOffers,
+} from "@/lib/offers";
 
 export const CART_STORAGE_KEY = "shamangaro-cart";
+export const CART_PRODUCT_ID = "neo-transat";
 
 export interface CartItem {
-  id: string;
+  id: typeof CART_PRODUCT_ID;
   name: string;
   subtitle: string;
   thumbnail: string;
   quantity: number;
-  unitPrice: number;
+  color?: string;
 }
 
-export const cartCatalog: Omit<CartItem, "quantity">[] = [
-  {
-    id: "solo",
-    name: "Neo Transat",
-    subtitle: "كرسي واحد",
-    thumbnail: "/images/neo-transat-open.png",
-    unitPrice: 249,
-  },
-  {
-    id: "duo",
-    name: "Neo Transat",
-    subtitle: "كرسيين",
-    thumbnail: "/images/neo-transat-open.png",
-    unitPrice: 458,
-  },
-  {
-    id: "family",
-    name: "Neo Transat",
-    subtitle: "3 كراسي",
-    thumbnail: "/images/neo-transat-open.png",
-    unitPrice: 657,
-  },
-];
+export const DEFAULT_PRODUCT_COLOR = "أزرق بحري غامق (Bleu Marine)";
+
+const CART_PRODUCT = {
+  id: CART_PRODUCT_ID,
+  name: "Neo Transat",
+  thumbnail: "/images/neo-transat-open.png",
+  color: DEFAULT_PRODUCT_COLOR,
+} as const;
+
+/** Quick-add options shown when the cart is empty (matches LP packs). */
+export const cartCatalog = productOffers.map((offer) => ({
+  id: offer.id,
+  name: CART_PRODUCT.name,
+  subtitle: offer.label,
+  total: offer.total,
+  chairs: offer.chairs,
+  color: DEFAULT_PRODUCT_COLOR,
+}));
+
+type LegacyCartItem = {
+  id: string;
+  quantity: number;
+  color?: string;
+};
+
+function buildCartItem(chairCount: number, color?: string): CartItem {
+  return {
+    ...CART_PRODUCT,
+    subtitle: getOfferSubtitle(chairCount),
+    quantity: chairCount,
+    color: color ?? DEFAULT_PRODUCT_COLOR,
+  };
+}
+
+function normalizeCart(rawItems: LegacyCartItem[]): CartItem[] {
+  if (!Array.isArray(rawItems) || rawItems.length === 0) return [];
+
+  const neoItem = rawItems.find((item) => item.id === CART_PRODUCT_ID);
+  if (neoItem && typeof neoItem.quantity === "number" && neoItem.quantity > 0) {
+    return [buildCartItem(neoItem.quantity, neoItem.color)];
+  }
+
+  let chairs = 0;
+  let color = DEFAULT_PRODUCT_COLOR;
+
+  for (const item of rawItems) {
+    if (item.color) color = item.color;
+
+    if (item.id === "solo") chairs += item.quantity;
+    else if (item.id === "duo") chairs += item.quantity * 2;
+    else if (item.id === "family") chairs += item.quantity * 3;
+  }
+
+  if (chairs <= 0) return [];
+  return [buildCartItem(chairs, color)];
+}
 
 function readCart(): CartItem[] {
   if (typeof window === "undefined") return [];
@@ -43,8 +88,8 @@ function readCart(): CartItem[] {
   try {
     const raw = window.localStorage.getItem(CART_STORAGE_KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw) as CartItem[];
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = JSON.parse(raw) as LegacyCartItem[];
+    return normalizeCart(parsed);
   } catch {
     return [];
   }
@@ -61,7 +106,28 @@ export function getCartItemCount(items: CartItem[]): number {
 }
 
 export function getCartSubtotal(items: CartItem[]): number {
-  return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+  return items.reduce((sum, item) => sum + getOfferTotal(item.quantity), 0);
+}
+
+export function getCartItemColor(item: CartItem): string | undefined {
+  return item.color ?? DEFAULT_PRODUCT_COLOR;
+}
+
+export function getCartItemPricing(item: CartItem) {
+  const pricePerChair = getPricePerChair(item.quantity);
+  const lineTotal = getOfferTotal(item.quantity);
+  const originalTotal = getOriginalTotal(item.quantity);
+  const savings = getOfferSavings(item.quantity);
+
+  return {
+    pricePerChair,
+    lineTotal,
+    originalTotal,
+    originalPricePerChair: BASE_PRICE_PER_CHAIR,
+    savings,
+    label: getOfferLabel(item.quantity),
+    subtitle: getOfferSubtitle(item.quantity),
+  };
 }
 
 export function useCart() {
@@ -69,7 +135,25 @@ export function useCart() {
   const [hydrated, setHydrated] = useState(false);
 
   const sync = useCallback(() => {
-    setItems(readCart());
+    if (typeof window === "undefined") return;
+
+    try {
+      const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+      const parsed = raw ? (JSON.parse(raw) as LegacyCartItem[]) : [];
+      const normalized = normalizeCart(parsed);
+
+      if (
+        Array.isArray(parsed) &&
+        parsed.some((item) => ["solo", "duo", "family"].includes(item.id))
+      ) {
+        writeCart(normalized);
+      }
+
+      setItems(normalized);
+    } catch {
+      setItems([]);
+    }
+
     setHydrated(true);
   }, []);
 
@@ -91,60 +175,71 @@ export function useCart() {
     setItems(next);
   }, []);
 
-  const addItem = useCallback(
-    (productId: string) => {
-      const product = cartCatalog.find((entry) => entry.id === productId);
-      if (!product) return;
-
-      const current = readCart();
-      const existing = current.find((item) => item.id === productId);
-
-      if (existing) {
-        persist(
-          current.map((item) =>
-            item.id === productId
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          )
-        );
+  const setChairCount = useCallback(
+    (chairCount: number, color?: string) => {
+      if (chairCount < 1) {
+        persist([]);
         return;
       }
 
-      persist([...current, { ...product, quantity: 1 }]);
+      persist([buildCartItem(chairCount, color)]);
     },
     [persist]
   );
 
+  const addItem = useCallback(
+    (offerId: string) => {
+      const offer = getOfferById(offerId);
+      if (!offer) return;
+
+      const current = readCart();
+      const existing = current[0];
+
+      if (!existing) {
+        setChairCount(offer.chairs);
+        return;
+      }
+
+      setChairCount(existing.quantity + offer.chairs, existing.color);
+    },
+    [setChairCount]
+  );
+
   const removeItem = useCallback(
-    (productId: string) => {
-      persist(readCart().filter((item) => item.id !== productId));
+    (_productId?: string) => {
+      persist([]);
     },
     [persist]
   );
 
   const updateQuantity = useCallback(
-    (productId: string, quantity: number) => {
-      if (quantity < 1) {
-        removeItem(productId);
+    (_productId: string, chairCount: number) => {
+      if (chairCount < 1) {
+        removeItem();
         return;
       }
 
-      persist(
-        readCart().map((item) =>
-          item.id === productId ? { ...item, quantity } : item
-        )
-      );
+      const current = readCart()[0];
+      setChairCount(chairCount, current?.color);
     },
-    [persist, removeItem]
+    [removeItem, setChairCount]
   );
+
+  const chairCount = getCartItemCount(items);
+  const subtotal = getCartSubtotal(items);
+  const savings = getOfferSavings(chairCount);
 
   return {
     items,
     hydrated,
-    itemCount: getCartItemCount(items),
-    subtotal: getCartSubtotal(items),
+    itemCount: chairCount,
+    chairCount,
+    subtotal,
+    savings,
+    pricePerChair: getPricePerChair(chairCount),
     addItem,
     removeItem,
     updateQuantity,
+    getCartItemPricing,
   };
 }

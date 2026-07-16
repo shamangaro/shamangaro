@@ -32,7 +32,7 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
       <Container>
         <div className="mx-auto max-w-xl">
           <div className="overflow-hidden rounded-3xl border-2 border-navy/10 bg-white shadow-xl shadow-black/5">
-            <div className="bg-navy px-8 py-10 text-center">
+            <div className="bg-navy px-5 py-8 text-center sm:px-8 sm:py-10">
               <div className="flex justify-center">
                 <Logo
                   variant="wordmark"
@@ -44,7 +44,7 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
               <div className="mx-auto mt-6 flex h-20 w-20 items-center justify-center rounded-full bg-gold/20">
                 <CheckCircle2 size={44} className="text-gold" />
               </div>
-              <h1 className="mt-6 text-3xl font-extrabold text-white">
+              <h1 className="mt-6 text-2xl font-extrabold text-white sm:text-3xl">
                 شكراً على طلبك!
               </h1>
               <p className="mt-3 text-base text-white/80">
@@ -52,14 +52,14 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
               </p>
             </div>
 
-            <div className="space-y-6 p-8">
+            <div className="space-y-6 p-5 sm:p-8">
               {order ? (
                 <>
                   <div className="rounded-2xl border border-navy/10 bg-cream p-5">
                     <p className="text-sm font-medium text-muted-foreground">
                       رقم الطلب
                     </p>
-                    <p className="mt-1 text-2xl font-black text-navy" dir="ltr">
+                    <p className="mt-1 break-all text-2xl font-black text-navy" dir="ltr">
                       {order.order_number}
                     </p>
                   </div>
@@ -92,7 +92,7 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between rounded-2xl bg-navy p-5 text-white">
+                  <div className="flex flex-col gap-4 rounded-2xl bg-navy p-5 text-white sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <p className="text-sm text-white/70">المجموع</p>
                       <p className="text-2xl font-black">
@@ -100,7 +100,7 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
                         <span className="text-sm font-bold">د.م</span>
                       </p>
                     </div>
-                    <div className="text-left">
+                    <div className="sm:text-left">
                       <p className="text-sm text-white/70">طريقة الدفع</p>
                       <p className="font-bold">الدفع عند الاستلام</p>
                     </div>
@@ -116,7 +116,7 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
 
               <Link
                 href="/"
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-gold py-4 text-lg font-bold text-navy transition-colors hover:bg-gold-light"
+                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-gold py-4 text-base font-bold text-navy transition-colors hover:bg-gold-light sm:text-lg"
               >
                 <Home size={20} />
                 العودة إلى الصفحة الرئيسية

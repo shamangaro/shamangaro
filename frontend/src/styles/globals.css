@@ -45,8 +45,22 @@
     @apply border-border;
   }
 
+  html {
+    overflow-x: clip;
+    scroll-padding-top: 8rem;
+    scroll-padding-bottom: 6.5rem;
+  }
+
+  @media (width >= 1024px) {
+    html {
+      scroll-padding-top: 5.5rem;
+    }
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
+    overflow-x: clip;
+    min-width: 0;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

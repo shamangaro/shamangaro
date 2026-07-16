@@ -66,22 +66,23 @@ export function ComparisonSlider() {
           </p>
         </div>
 
-        <div
-          ref={containerRef}
-          className="relative mx-auto mt-8 max-w-3xl touch-none select-none overflow-hidden rounded-2xl bg-[#f0f0f0] shadow-xl shadow-black/10"
-          style={{ aspectRatio: "4 / 3" }}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={(e) => endDrag(e.currentTarget, e.pointerId)}
-          onKeyDown={onKeyDown}
-          tabIndex={0}
-          role="slider"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(position)}
-          aria-label="مقارنة الجلوس بلا و مع Neo Transat"
-        >
+        <div className="mx-auto mt-8 max-w-3xl">
+          <div
+            ref={containerRef}
+            className="relative touch-none select-none overflow-hidden rounded-2xl bg-[#f0f0f0] shadow-xl shadow-black/10"
+            style={{ aspectRatio: "4 / 3" }}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={(e) => endDrag(e.currentTarget, e.pointerId)}
+            onKeyDown={onKeyDown}
+            tabIndex={0}
+            role="slider"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(position)}
+            aria-label="مقارنة الجلوس بلا و مع Neo Transat"
+          >
           <img
             src={AFTER_IMAGE}
             alt="مع Neo Transat — راحة على الكرسي"
@@ -107,10 +108,10 @@ export function ComparisonSlider() {
             />
           </div>
 
-          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-navy/85 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+          <span className="pointer-events-none absolute left-2 top-2 z-10 rounded-full bg-navy/85 px-2 py-1 text-[10px] font-semibold text-white backdrop-blur-sm sm:left-3 sm:top-3 sm:px-3 sm:text-xs">
             بلا Neo Transat
           </span>
-          <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-navy/85 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+          <span className="pointer-events-none absolute right-2 top-2 z-10 rounded-full bg-navy/85 px-2 py-1 text-[10px] font-semibold text-white backdrop-blur-sm sm:right-3 sm:top-3 sm:px-3 sm:text-xs">
             مع Neo Transat
           </span>
 
@@ -127,7 +128,11 @@ export function ComparisonSlider() {
             </div>
           </div>
 
-          <p className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-white/90 px-3 py-1 text-[11px] font-medium text-navy/70 backdrop-blur-sm">
+          <p className="pointer-events-none absolute bottom-3 left-1/2 z-10 hidden -translate-x-1/2 rounded-full bg-white/90 px-3 py-1 text-[11px] font-medium text-navy/70 backdrop-blur-sm sm:block">
+            ← اسحب للمقارنة →
+          </p>
+          </div>
+          <p className="mt-3 text-center text-xs font-medium text-muted-foreground sm:hidden">
             ← اسحب للمقارنة →
           </p>
         </div>

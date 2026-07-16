@@ -6,7 +6,6 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { Logo } from "@/components/shared/Logo";
-import { CartDrawer } from "@/components/layout/CartDrawer";
 import { useCart } from "@/components/layout/cart-store";
 import { cn } from "@/lib/utils";
 
@@ -17,10 +16,14 @@ const announcements = [
 
 const navLinks = [
   { href: "/", label: "الرئيسية" },
-  { href: "/#order", label: "الطلب" },
+  { href: "/cart", label: "الطلب" },
   { href: "/about", label: "من نحن" },
   { href: "/contact", label: "اتصل بنا" },
 ];
+
+const logoSubtitle = "Premium Brand";
+const logoSubtitleClassName =
+  "font-semibold uppercase tracking-[0.14em] text-navy/45 text-[9px] sm:text-[10px] md:text-[11px]";
 
 function AnnouncementBar() {
   const [index, setIndex] = useState(0);
@@ -54,16 +57,16 @@ function AnnouncementBar() {
         }
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_0%,rgba(212,168,83,0.1),transparent)]" />
-        <Container className="relative flex h-8 items-center justify-center overflow-hidden sm:h-9">
+        <Container className="relative flex h-9 items-center justify-center overflow-hidden sm:h-10">
           {reduceMotion ? (
-            <p className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-white/95">
+            <p className="flex max-w-full items-center gap-1.5 px-1 text-xs font-bold tracking-wide text-white sm:gap-2 sm:text-sm">
               <span
                 aria-hidden="true"
                 className="flex h-5 w-5 items-center justify-center rounded-full bg-gold/15 text-xs"
               >
                 {active.icon}
               </span>
-              <span>{active.text}</span>
+              <span className="truncate">{active.text}</span>
             </p>
           ) : (
             <AnimatePresence mode="wait" initial={false}>
@@ -73,7 +76,7 @@ function AnnouncementBar() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: "-100%", opacity: 0 }}
                 transition={{ duration: 0.55, ease: [0.32, 0.72, 0, 1] }}
-                className="absolute inset-x-0 flex items-center justify-center gap-1.5 px-4 text-xs font-semibold tracking-wide text-white/95 sm:px-6 lg:px-8"
+                className="absolute inset-x-0 flex items-center justify-center gap-1.5 px-3 text-xs font-bold tracking-wide text-white sm:gap-2 sm:px-6 sm:text-sm lg:px-8"
               >
                 <span
                   aria-hidden="true"
@@ -81,7 +84,7 @@ function AnnouncementBar() {
                 >
                   {active.icon}
                 </span>
-                <span>{active.text}</span>
+                <span className="truncate">{active.text}</span>
               </motion.p>
             </AnimatePresence>
           )}
@@ -94,7 +97,6 @@ function AnnouncementBar() {
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
   const { itemCount, hydrated } = useCart();
 
   useEffect(() => {
@@ -103,27 +105,8 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (!cartOpen) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setCartOpen(false);
-    };
-
-    window.addEventListener("keydown", handleEscape);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleEscape);
-    };
-  }, [cartOpen]);
-
   return (
-    <>
-      <div className="sticky top-0 z-50">
+    <div className="sticky top-0 z-50">
         <header
           className={cn(
             "border-0 bg-white/95 backdrop-blur-sm transition-shadow duration-300",
@@ -131,13 +114,22 @@ export function Header() {
           )}
         >
           <Container>
-            <div className="relative flex h-11 items-center sm:h-12">
-              <Logo size="xs" href="/" priority className="md:hidden" />
+            <div className="relative flex min-h-[3.25rem] items-center gap-2.5 sm:min-h-[3.75rem]">
               <Logo
                 size="sm"
                 href="/"
                 priority
-                className="hidden md:inline-flex"
+                subtitle={logoSubtitle}
+                subtitleClassName={logoSubtitleClassName}
+                className="min-w-0 max-w-[58%] shrink md:hidden"
+              />
+              <Logo
+                size="md"
+                href="/"
+                priority
+                subtitle={logoSubtitle}
+                subtitleClassName={logoSubtitleClassName}
+                className="hidden min-w-0 md:inline-flex"
               />
 
               <nav
@@ -148,18 +140,17 @@ export function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="whitespace-nowrap text-[13px] font-semibold text-navy/75 transition-colors hover:text-navy"
+                    className="whitespace-nowrap text-sm font-semibold text-navy/75 transition-colors hover:text-navy"
                   >
                     {link.label}
                   </Link>
                 ))}
               </nav>
 
-              <button
-                type="button"
-                onClick={() => setCartOpen(true)}
-                aria-label="فتح سلة التسوق"
-                className="relative ms-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-navy transition-colors hover:bg-navy/5 sm:h-9 sm:w-9"
+              <Link
+                href="/cart"
+                aria-label="سلة التسوق"
+                className="relative ms-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-navy transition-colors hover:bg-navy/5 focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 <ShoppingCart size={18} strokeWidth={1.75} />
                 {hydrated && itemCount > 0 ? (
@@ -167,15 +158,27 @@ export function Header() {
                     {itemCount > 99 ? "99+" : itemCount}
                   </span>
                 ) : null}
-              </button>
+              </Link>
             </div>
+
+            <nav
+              aria-label="التنقل السريع"
+              className="flex items-center gap-0 overflow-x-auto border-t border-navy/[0.04] py-0 scrollbar-hide lg:hidden"
+            >
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="flex min-h-8 shrink-0 items-center rounded px-2 text-[11px] font-semibold leading-tight text-navy/65 transition-colors hover:bg-navy/5 hover:text-navy sm:min-h-9 sm:px-2.5 sm:text-xs"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
           </Container>
         </header>
 
         <AnnouncementBar />
       </div>
-
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
-    </>
   );
 }

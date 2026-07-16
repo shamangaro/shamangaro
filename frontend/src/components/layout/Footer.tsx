@@ -88,36 +88,34 @@ export function Footer() {
 
         {/* SECTION 2 — Quick links */}
         <FooterSection delay={0.1} className="mt-6 sm:mt-8">
-          <div className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.02] px-4 py-5 sm:rounded-[2rem] sm:px-6 sm:py-6 lg:rounded-[2.25rem] lg:px-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6 lg:gap-10">
-              <h3 className="shrink-0 text-center text-base font-bold uppercase tracking-[0.15em] text-white sm:pt-1 sm:text-start sm:text-lg">
-                روابط سريعة
-              </h3>
-              <nav
-                aria-label="روابط سريعة"
-                className="grid w-full flex-1 grid-cols-3 gap-3 sm:gap-5 lg:gap-8"
-              >
-                {footerQuickLinkGroups.map((group) => (
-                  <div key={group.title} className="min-w-0">
-                    <p className="mb-2.5 text-xs font-bold text-gold sm:mb-3 sm:text-sm">
-                      {group.title}
-                    </p>
-                    <ul className="space-y-2 sm:space-y-2.5">
-                      {group.links.map((link) => (
-                        <li key={link.href}>
-                          <Link
-                            href={link.href}
-                            className="block text-sm font-semibold leading-snug text-white/80 transition-colors hover:text-white sm:text-[15px]"
-                          >
-                            {link.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </nav>
-            </div>
+          <div className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.02] px-4 py-6 sm:rounded-[2rem] sm:px-7 sm:py-7 lg:rounded-[2.25rem] lg:px-10 lg:py-8">
+            <h3 className="mb-5 text-center text-lg font-bold uppercase tracking-[0.15em] text-white sm:mb-6 sm:text-xl">
+              روابط سريعة
+            </h3>
+            <nav
+              aria-label="روابط سريعة"
+              className="grid grid-cols-3 gap-3 sm:gap-8 lg:gap-12"
+            >
+              {footerQuickLinkGroups.map((group) => (
+                <div key={group.title} className="min-w-0">
+                  <p className="mb-2.5 text-xs font-bold text-gold sm:mb-3.5 sm:text-base">
+                    {group.title}
+                  </p>
+                  <ul className="space-y-2 sm:space-y-3">
+                    {group.links.map((link) => (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          className="block text-xs font-semibold leading-snug text-white/85 transition-colors hover:text-white sm:text-[15px] sm:leading-relaxed lg:text-base"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </nav>
           </div>
         </FooterSection>
 
@@ -153,7 +151,7 @@ export function Footer() {
                         البريد الإلكتروني
                       </p>
                       <p
-                        className="mt-0.5 truncate text-[15px] font-bold text-white sm:text-base"
+                        className="mt-0.5 break-all text-[15px] font-bold text-white sm:text-base"
                         dir="ltr"
                       >
                         {contactInfo.email}

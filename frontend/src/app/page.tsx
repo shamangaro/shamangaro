@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main>
+      <main className="pb-28 lg:pb-0">
         <ProductHero />
         <ComparisonSlider />
         <OrderSection />

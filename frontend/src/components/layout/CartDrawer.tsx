@@ -4,7 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
-import { cartCatalog, useCart } from "@/components/layout/cart-store";
+import {
+  cartCatalog,
+  getCartItemColor,
+  useCart,
+} from "@/components/layout/cart-store";
 import { cn } from "@/lib/utils";
 
 interface CartDrawerProps {
@@ -13,7 +17,15 @@ interface CartDrawerProps {
 }
 
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
-  const { items, subtotal, addItem, removeItem, updateQuantity } = useCart();
+  const {
+    items,
+    subtotal,
+    savings,
+    addItem,
+    removeItem,
+    updateQuantity,
+    getCartItemPricing,
+  } = useCart();
 
   return (
     <AnimatePresence>
@@ -49,7 +61,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                 type="button"
                 onClick={onClose}
                 aria-label="إغلاق"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-navy/70 transition-colors hover:bg-navy/5 hover:text-navy"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-navy/70 transition-colors hover:bg-navy/5 hover:text-navy"
               >
                 <X size={18} />
               </button>
@@ -77,11 +89,11 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                         onClick={() => addItem(product.id)}
                         className="flex w-full items-center justify-between rounded-xl border border-border bg-[#fafafa] px-4 py-3 text-start transition-colors hover:border-navy/20 hover:bg-white"
                       >
-                        <span className="text-sm font-semibold text-navy">
+                        <span className="min-w-0 flex-1 truncate text-sm font-semibold text-navy">
                           {product.name} — {product.subtitle}
                         </span>
-                        <span className="text-sm font-bold text-navy">
-                          {product.unitPrice} د.م
+                        <span className="shrink-0 text-sm font-bold text-navy">
+                          {product.total} د.م
                         </span>
                       </button>
                     ))}
@@ -89,80 +101,108 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                 </div>
               ) : (
                 <ul className="space-y-4">
-                  {items.map((item) => (
-                    <li
-                      key={item.id}
-                      className="rounded-2xl border border-border/70 bg-[#fafafa] p-4"
-                    >
-                      <div className="flex gap-3">
-                        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-white">
-                          <Image
-                            src={item.thumbnail}
-                            alt={item.name}
-                            fill
-                            className="object-cover"
-                            sizes="80px"
-                          />
-                        </div>
+                  {items.map((item) => {
+                    const pricing = getCartItemPricing(item);
+                    const color = getCartItemColor(item);
 
-                        <div className="min-w-0 flex-1">
-                          <p className="font-bold text-navy">{item.name}</p>
-                          <p className="mt-0.5 text-sm text-muted-foreground">
-                            {item.subtitle}
-                          </p>
-                          <p className="mt-2 text-sm font-semibold text-navy">
-                            {item.unitPrice} د.م / وحدة
-                          </p>
-                        </div>
+                    return (
+                      <li
+                        key={item.id}
+                        className="rounded-2xl border border-border/70 bg-[#fafafa] p-4"
+                      >
+                        <div className="flex gap-3">
+                          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-white">
+                            <Image
+                              src={item.thumbnail}
+                              alt={item.name}
+                              fill
+                              className="object-cover"
+                              sizes="80px"
+                            />
+                          </div>
 
-                        <button
-                          type="button"
-                          onClick={() => removeItem(item.id)}
-                          aria-label={`حذف ${item.name}`}
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-navy/45 transition-colors hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-bold text-navy">{item.name}</p>
+                            <p className="mt-0.5 text-sm text-muted-foreground">
+                              {pricing.subtitle}
+                            </p>
+                            {color ? (
+                              <p className="mt-1 text-xs text-fabric">
+                                {color}
+                              </p>
+                            ) : null}
+                            <p className="mt-2 text-sm font-semibold text-navy">
+                              {pricing.pricePerChair} د.م / كرسي
+                              {pricing.savings > 0 ? (
+                                <span className="ms-1.5 text-xs font-medium text-red-500 line-through">
+                                  {pricing.originalPricePerChair} د.م
+                                </span>
+                              ) : null}
+                            </p>
+                          </div>
 
-                      <div className="mt-4 flex items-center justify-between">
-                        <div className="inline-flex items-center rounded-full border border-border bg-white">
                           <button
                             type="button"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity - 1)
-                            }
-                            aria-label="نقص الكمية"
-                            className="flex h-9 w-9 items-center justify-center text-navy transition-colors hover:bg-navy/5"
+                            onClick={() => removeItem(item.id)}
+                            aria-label={`حذف ${item.name}`}
+                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-navy/45 transition-colors hover:bg-red-50 hover:text-red-600"
                           >
-                            <Minus size={16} />
-                          </button>
-                          <span className="min-w-8 text-center text-sm font-bold text-navy">
-                            {item.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
-                            aria-label="زِد الكمية"
-                            className="flex h-9 w-9 items-center justify-center text-navy transition-colors hover:bg-navy/5"
-                          >
-                            <Plus size={16} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
 
-                        <p className="text-base font-bold text-navy">
-                          {item.quantity * item.unitPrice} د.م
-                        </p>
-                      </div>
-                    </li>
-                  ))}
+                        <div className="mt-4 flex items-center justify-between">
+                          <div className="inline-flex items-center rounded-full border border-border bg-white">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity - 1)
+                              }
+                              aria-label="نقص الكمية"
+                              className="flex h-11 w-11 items-center justify-center text-navy transition-colors hover:bg-navy/5"
+                            >
+                              <Minus size={16} />
+                            </button>
+                            <span className="min-w-8 text-center text-sm font-bold text-navy">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity + 1)
+                              }
+                              aria-label="زِد الكمية"
+                              className="flex h-11 w-11 items-center justify-center text-navy transition-colors hover:bg-navy/5"
+                            >
+                              <Plus size={16} />
+                            </button>
+                          </div>
+
+                          <div className="text-end">
+                            <p className="text-base font-bold text-navy">
+                              {pricing.lineTotal} د.م
+                            </p>
+                            {pricing.savings > 0 ? (
+                              <p className="mt-0.5 text-xs font-medium text-red-500 line-through">
+                                {pricing.originalTotal} د.م
+                              </p>
+                            ) : null}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
 
             <div className="border-t border-border px-5 py-5">
+              {savings > 0 ? (
+                <div className="mb-3 flex items-center justify-between text-sm font-semibold text-green-700">
+                  <span>التوفير</span>
+                  <span>−{savings} د.م</span>
+                </div>
+              ) : null}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">
                   المجموع الفرعي
@@ -174,7 +214,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
 
               <div className="mt-4 space-y-2.5">
                 <Link
-                  href="/#order"
+                  href="/cart"
                   onClick={onClose}
                   className={cn(
                     "flex h-12 w-full items-center justify-center rounded-full bg-navy text-sm font-bold text-white transition-colors hover:bg-navy-light",

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/shared/Container";
 import { Logo } from "@/components/shared/Logo";
-import { Star, ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, X, ZoomIn, Droplets, Armchair, TreePine, BadgeCheck, Truck, Shield, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const AUTOPLAY_MS = 4500;
@@ -27,6 +27,12 @@ const images = [
     src: "/images/neo-transat-open.png",
     alt: "Neo Transat مفتوحة — التصميم",
   },
+];
+
+const heroHighlights = [
+  { icon: Droplets, label: "مقاوم للماء" },
+  { icon: Armchair, label: "راحة أفضل" },
+  { icon: TreePine, label: "خشب ممتاز" },
 ];
 
 export function ProductHero() {
@@ -69,8 +75,14 @@ export function ProductHero() {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="order-1 lg:order-2"
           >
+            <h2 className="mb-6 text-center text-2xl font-extrabold leading-snug tracking-tight text-navy sm:text-3xl md:text-4xl lg:text-start lg:text-5xl">
+              مع كرسي الراحة <span className="text-fabric">Neo Transat</span>
+              <br />
+              غاتلقى راحتك فين ما مشيتي
+            </h2>
+
             <div className="mx-auto w-full max-w-md lg:max-w-none">
-              <div className="rounded-[2rem] border-2 border-navy/20 bg-white p-3 shadow-sm sm:rounded-[2.5rem] sm:p-4 md:rounded-[3rem] md:p-5">
+              <div className="rounded-[1.5rem] border-2 border-navy/20 bg-white p-2 shadow-sm sm:rounded-[2.5rem] sm:p-4 md:rounded-[3rem] md:p-5">
                 <div
                   ref={galleryRef}
                   className="group relative cursor-zoom-in"
@@ -94,14 +106,14 @@ export function ProductHero() {
                           src={images[current].src}
                           alt={images[current].alt}
                           fill
-                          className="object-contain p-6 transition-transform duration-500 group-hover:scale-[1.02] sm:p-8"
+                          className="object-contain p-4 transition-transform duration-500 group-hover:scale-[1.02] sm:p-6 md:p-8"
                           priority={current === 0}
                           sizes="(max-width: 768px) 92vw, 46vw"
                         />
                       </motion.div>
                     </AnimatePresence>
 
-                    <div className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-md backdrop-blur-sm opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-md backdrop-blur-sm opacity-100 sm:bottom-4 sm:left-4 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
                       <ZoomIn size={13} />
                       إضغط للتكبير
                     </div>
@@ -111,7 +123,7 @@ export function ProductHero() {
                         e.stopPropagation();
                         next();
                       }}
-                      className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white/95 text-navy shadow-[0_4px_20px_-4px_rgba(17,17,17,0.15)] backdrop-blur-sm transition-all hover:border-navy hover:bg-navy hover:text-white hover:shadow-lg sm:left-4 sm:h-11 sm:w-11"
+                      className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white/95 text-navy shadow-[0_4px_20px_-4px_rgba(17,17,17,0.15)] backdrop-blur-sm transition-all hover:border-navy hover:bg-navy hover:text-white hover:shadow-lg sm:left-4"
                       aria-label="التالي"
                     >
                       <ChevronLeft size={18} strokeWidth={2} />
@@ -121,7 +133,7 @@ export function ProductHero() {
                         e.stopPropagation();
                         prev();
                       }}
-                      className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white/95 text-navy shadow-[0_4px_20px_-4px_rgba(17,17,17,0.15)] backdrop-blur-sm transition-all hover:border-navy hover:bg-navy hover:text-white hover:shadow-lg sm:right-4 sm:h-11 sm:w-11"
+                      className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white/95 text-navy shadow-[0_4px_20px_-4px_rgba(17,17,17,0.15)] backdrop-blur-sm transition-all hover:border-navy hover:bg-navy hover:text-white hover:shadow-lg sm:right-4"
                       aria-label="السابق"
                     >
                       <ChevronRight size={18} strokeWidth={2} />
@@ -139,6 +151,25 @@ export function ProductHero() {
                   />
                 </div>
               </div>
+
+              <div className="mt-4 flex flex-col gap-2 min-[400px]:grid min-[400px]:grid-cols-3 sm:mt-5 sm:gap-3">
+                {heroHighlights.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={item.label}
+                      className="group flex min-h-[3.25rem] items-center gap-2.5 rounded-xl border-2 border-navy bg-gradient-to-b from-white via-white to-navy/[0.04] px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,1),0_3px_0_#111111,0_10px_22px_-8px_rgba(17,17,17,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_5px_0_#111111,0_14px_28px_-8px_rgba(17,17,17,0.4)] sm:min-h-[3.75rem] sm:gap-2.5 sm:rounded-2xl sm:px-3 sm:py-2.5"
+                    >
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-navy/15 bg-navy text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-colors group-hover:bg-navy-light sm:h-10 sm:w-10">
+                        <Icon size={18} strokeWidth={2.25} />
+                      </div>
+                      <span className="min-w-0 flex-1 text-xs font-extrabold leading-snug text-navy sm:text-sm">
+                        {item.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </motion.div>
 
@@ -149,13 +180,7 @@ export function ProductHero() {
             transition={{ duration: 0.6 }}
             className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-start"
           >
-            <h2 className="text-2xl font-extrabold leading-snug text-navy sm:text-3xl md:text-4xl">
-              مع كرسي الراحة <span className="text-fabric">Neo Transat</span>
-              <br />
-              غاتلقى راحتك فين ما مشيتي
-            </h2>
-
-            <h1 className="mt-6 max-w-lg text-2xl font-extrabold leading-[1.35] text-navy sm:text-3xl md:text-4xl">
+            <h1 className="max-w-lg text-2xl font-extrabold leading-[1.35] text-navy sm:text-3xl md:text-4xl">
               ماشي غير كرسي...
               <br />
               <span className="text-navy/70">
@@ -197,25 +222,66 @@ export function ProductHero() {
 
             <a
               href="#order"
-              className="mt-8 inline-flex items-center justify-center rounded-full bg-navy px-10 py-4 text-base font-bold text-white shadow-xl shadow-navy/15 transition-all duration-300 hover:scale-[1.02] hover:bg-navy-light hover:shadow-2xl hover:shadow-navy/20"
+              className="mt-8 inline-flex w-full max-w-md items-center justify-center rounded-full bg-navy px-10 py-4 text-base font-bold text-white shadow-xl shadow-navy/15 transition-all duration-300 hover:scale-[1.02] hover:bg-navy-light hover:shadow-2xl hover:shadow-navy/20 sm:w-auto"
             >
               اطلب دابا
             </a>
 
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 lg:justify-start">
-              {[
-                "الدفع عند الإستلام",
-                "توصيل مجاني",
-                "ضمان الجودة",
-              ].map((t) => (
-                <span
-                  key={t}
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground"
-                >
-                  <span className="text-navy">✓</span>
-                  {t}
-                </span>
-              ))}
+            <div className="mt-5 w-full max-w-md rounded-2xl bg-[#1b3a4b] p-4 sm:p-5">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 sm:h-10 sm:w-10">
+                    <BadgeCheck size={20} className="text-[#d4a853]" />
+                  </div>
+                  <p className="min-w-0 flex-1 text-right">
+                    <span className="block text-[13px] font-bold leading-snug text-white sm:text-[14px]">
+                      الدفع عند الإستلام
+                    </span>
+                    <span className="block text-[10px] text-white/60 sm:text-[11px]">
+                      بدون دفع مسبق
+                    </span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 sm:h-10 sm:w-10">
+                    <Truck size={20} className="text-[#d4a853]" />
+                  </div>
+                  <p className="min-w-0 flex-1 text-right">
+                    <span className="block text-[13px] font-bold leading-snug text-white sm:text-[14px]">
+                      توصيل 2-5 أيام
+                    </span>
+                    <span className="block text-[10px] text-white/60 sm:text-[11px]">
+                      لجميع المدن
+                    </span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 sm:h-10 sm:w-10">
+                    <Shield size={20} className="text-[#d4a853]" />
+                  </div>
+                  <p className="min-w-0 flex-1 text-right">
+                    <span className="block text-[13px] font-bold leading-snug text-white sm:text-[14px]">
+                      ضمان سنة
+                    </span>
+                    <span className="block text-[10px] text-white/60 sm:text-[11px]">
+                      إسترجاع كامل
+                    </span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 sm:h-10 sm:w-10">
+                    <Package size={20} className="text-[#d4a853]" />
+                  </div>
+                  <p className="min-w-0 flex-1 text-right">
+                    <span className="block text-[13px] font-bold leading-snug text-white sm:text-[14px]">
+                      جودة عالية
+                    </span>
+                    <span className="block text-[10px] text-white/60 sm:text-[11px]">
+                      خشب + قماش مقاوم
+                    </span>
+                  </p>
+                </div>
+              </div>
             </div>
           </motion.div>
 
@@ -232,7 +298,7 @@ export function ProductHero() {
               >
                 <button
                   onClick={() => setZoomed(false)}
-                  className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+                  className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
                   aria-label="إغلاق"
                 >
                   <X size={22} />
@@ -285,13 +351,17 @@ export function ProductHero() {
                         e.stopPropagation();
                         setCurrent(i);
                       }}
-                      className={cn(
-                        "h-2 rounded-full transition-all",
-                        i === current
-                          ? "w-6 bg-white"
-                          : "w-2 bg-white/30 hover:bg-white/50"
-                      )}
-                    />
+                      className="flex h-11 w-11 items-center justify-center rounded-full transition-all"
+                    >
+                      <span
+                        className={cn(
+                          "block rounded-full transition-all",
+                          i === current
+                            ? "h-2.5 w-6 bg-white"
+                            : "h-2.5 w-2.5 bg-white/30"
+                        )}
+                      />
+                    </button>
                   ))}
                 </div>
               </motion.div>

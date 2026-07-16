@@ -31,8 +31,8 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f0f0f0] p-4">
-      <div className="w-full max-w-md rounded-2xl border border-navy/10 bg-white p-8 shadow-xl">
+    <main className="flex min-h-screen items-center justify-center bg-[#f0f0f0] p-3 sm:p-4">
+      <div className="w-full max-w-md rounded-2xl border border-navy/10 bg-white p-5 shadow-xl sm:p-8">
         <div className="mb-8 flex flex-col items-center text-center">
           <Logo
             variant="wordmark"
@@ -90,7 +90,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-navy py-3.5 font-bold text-white transition-colors hover:bg-navy-light disabled:opacity-60"
+            className="min-h-12 w-full rounded-full bg-navy py-3.5 font-bold text-white transition-colors hover:bg-navy-light disabled:opacity-60"
           >
             {loading ? "جاري الدخول..." : "تسجيل الدخول"}
           </button>

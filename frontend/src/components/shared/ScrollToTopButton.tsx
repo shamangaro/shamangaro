@@ -30,7 +30,7 @@ export function ScrollToTopButton() {
       ([entry]) => {
         setStickyCtaVisible(!entry.isIntersecting);
       },
-      { threshold: 0.05, rootMargin: "0px 0px -60px 0px" }
+      { threshold: 0.05, rootMargin: "0px 0px -80px 0px" }
     );
 
     observer.observe(form);
@@ -56,7 +56,7 @@ export function ScrollToTopButton() {
           onClick={scrollToTop}
           aria-label="الرجوع للأعلى"
           className={cn(
-            "fixed start-4 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-navy/15 bg-white/20 text-navy/70 shadow-sm backdrop-blur-sm transition-all hover:scale-105 hover:border-navy hover:bg-navy hover:text-white sm:start-6 sm:h-[3.25rem] sm:w-[3.25rem]",
+            "fixed start-4 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-navy/15 bg-white/20 text-navy/70 shadow-sm backdrop-blur-sm transition-all hover:scale-105 hover:border-navy hover:bg-navy hover:text-white sm:start-6 sm:h-[3.25rem] sm:w-[3.25rem] lg:hidden",
             stickyCtaVisible ? "bottom-28 sm:bottom-32" : "bottom-6 sm:bottom-8"
           )}
         >

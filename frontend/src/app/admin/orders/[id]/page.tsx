@@ -140,21 +140,24 @@ export default function AdminOrderDetailPage() {
     });
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <div className="min-h-screen overflow-x-clip bg-[#f5f5f5]">
       <header className="border-b border-navy/10 bg-white">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-3 px-4 py-4">
-          <Link href="/admin/orders" className="rounded-lg p-2 hover:bg-navy/5">
+        <div className="mx-auto flex max-w-3xl flex-col gap-3 px-3 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:px-4 sm:py-4">
+          <Link
+            href="/admin/orders"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-navy/5"
+          >
             <ArrowRight size={20} />
           </Link>
-          <div>
-            <h1 className="text-lg font-extrabold text-navy" dir="ltr">
+          <div className="min-w-0 flex-1">
+            <h1 className="break-all text-lg font-extrabold text-navy" dir="ltr">
               {order.order_number}
             </h1>
             <p className="text-xs text-muted-foreground">
               {formatDate(order.created_at)}
             </p>
           </div>
-          <div className="mr-auto flex flex-wrap items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:ms-auto sm:w-auto">
             <RiskFlag isRisk={order.is_risk} />
             <StatusBadge status={order.status} />
             {risk && (
@@ -168,7 +171,7 @@ export default function AdminOrderDetailPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl space-y-4 p-4">
+      <main className="mx-auto max-w-3xl space-y-4 overflow-x-clip p-3 sm:p-4">
         {risk?.is_blacklisted && (
           <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-4">
             <div className="flex items-start gap-3">
@@ -205,7 +208,7 @@ export default function AdminOrderDetailPage() {
         )}
 
         {risk && (
-          <div className="rounded-2xl border border-navy/10 bg-white p-6">
+          <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
             <div className="mb-4 flex items-center gap-2">
               <History size={18} className="text-gold" />
               <h2 className="text-sm font-bold text-muted-foreground">
@@ -247,7 +250,7 @@ export default function AdminOrderDetailPage() {
           </div>
         )}
 
-        <div className="rounded-2xl border border-navy/10 bg-white p-6">
+        <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
           <h2 className="mb-4 text-sm font-bold text-muted-foreground">
             معلومات العميل
           </h2>
@@ -269,7 +272,7 @@ export default function AdminOrderDetailPage() {
               </div>
               <button
                 onClick={copyPhone}
-                className="rounded-lg border border-navy/15 p-2 hover:bg-navy/5"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-navy/15 hover:bg-navy/5"
                 title="نسخ الهاتف"
               >
                 <Copy size={16} />
@@ -279,7 +282,7 @@ export default function AdminOrderDetailPage() {
             <div className="grid grid-cols-2 gap-3">
               <a
                 href={phoneToTelLink(order.phone)}
-                className="flex items-center justify-center gap-2 rounded-xl bg-navy py-3 text-sm font-bold text-white transition-colors hover:bg-navy-light"
+                className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-navy py-3 text-sm font-bold text-white transition-colors hover:bg-navy-light"
               >
                 <PhoneCall size={18} />
                 اتصال
@@ -288,7 +291,7 @@ export default function AdminOrderDetailPage() {
                 href={phoneToWhatsAppLink(order.phone, whatsappMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
+                className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
               >
                 <MessageCircle size={18} />
                 واتساب
@@ -305,7 +308,7 @@ export default function AdminOrderDetailPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-navy/10 bg-white p-6">
+        <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
           <h2 className="mb-4 text-sm font-bold text-muted-foreground">
             تفاصيل الطلب
           </h2>
@@ -326,7 +329,7 @@ export default function AdminOrderDetailPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-navy/10 bg-white p-6">
+        <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
           <h2 className="mb-4 text-sm font-bold text-muted-foreground">
             تغيير الحالة
           </h2>
@@ -336,7 +339,7 @@ export default function AdminOrderDetailPage() {
                 key={opt.value}
                 disabled={saving || currentStatus === opt.value}
                 onClick={() => handleStatusChange(opt.value)}
-                className="rounded-full border border-navy/15 px-4 py-2 text-sm font-bold text-navy transition-colors hover:bg-navy hover:text-white disabled:opacity-40"
+                className="min-h-11 rounded-full border border-navy/15 px-4 py-2.5 text-sm font-bold text-navy transition-colors hover:bg-navy hover:text-white disabled:opacity-40"
               >
                 {opt.label}
               </button>
@@ -344,7 +347,7 @@ export default function AdminOrderDetailPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-navy/10 bg-white p-6">
+        <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
           <div className="mb-4 flex items-center gap-2">
             <StickyNote size={18} className="text-gold" />
             <h2 className="text-sm font-bold text-muted-foreground">
@@ -361,7 +364,7 @@ export default function AdminOrderDetailPage() {
           <button
             onClick={handleSaveNotes}
             disabled={savingNotes}
-            className="mt-3 w-full rounded-full bg-gold py-3 text-sm font-bold text-navy transition-colors hover:bg-gold-light disabled:opacity-60"
+            className="mt-3 w-full min-h-11 rounded-full bg-gold py-3 text-sm font-bold text-navy transition-colors hover:bg-gold-light disabled:opacity-60"
           >
             {savingNotes ? "جاري الحفظ..." : "حفظ الملاحظات"}
           </button>
@@ -403,14 +406,14 @@ export default function AdminOrderDetailPage() {
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setShowBlacklist(false)}
-                className="flex-1 rounded-lg border border-navy/20 py-2.5 font-bold text-navy"
+                className="flex-1 min-h-11 rounded-lg border border-navy/20 py-3 font-bold text-navy"
               >
                 إلغاء
               </button>
               <button
                 onClick={handleBlacklist}
                 disabled={blacklisting || !blacklistReason.trim()}
-                className="flex-1 rounded-lg bg-red-600 py-2.5 font-bold text-white disabled:opacity-60"
+                className="flex-1 min-h-11 rounded-lg bg-red-600 py-3 font-bold text-white disabled:opacity-60"
               >
                 {blacklisting ? "جاري..." : "تأكيد"}
               </button>
@@ -429,13 +432,13 @@ export default function AdminOrderDetailPage() {
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setShowDelete(false)}
-                className="flex-1 rounded-lg border border-navy/20 py-2.5 font-bold text-navy"
+                className="flex-1 min-h-11 rounded-lg border border-navy/20 py-3 font-bold text-navy"
               >
                 إلغاء
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 rounded-lg bg-red-600 py-2.5 font-bold text-white"
+                className="flex-1 min-h-11 rounded-lg bg-red-600 py-3 font-bold text-white"
               >
                 حذف
               </button>
