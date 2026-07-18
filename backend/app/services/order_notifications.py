@@ -25,6 +25,8 @@ def queue_new_order_notification(order: Order) -> None:
         "order_id": order.id,
         "order_number": order.order_number,
         "customer_name": order.customer_name,
+        "offer_id": order.offer_id,
+        "offer_name": order.offer_name,
         "total_price": float(order.total_price),
         "created_at": order.created_at.isoformat()
         if order.created_at

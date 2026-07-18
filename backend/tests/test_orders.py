@@ -251,7 +251,16 @@ async def test_admin_notifications(admin_client):
     )
     res = await admin_client.get("/admin/notifications/summary")
     assert res.status_code == 200
-    assert res.json()["pending_count"] >= 0
+    data = res.json()
+    assert data["pending_count"] >= 1
+    item = next(
+        (entry for entry in data["items"] if entry["customer_name"] == "Notify Test"),
+        None,
+    )
+    assert item is not None
+    assert item["offer_id"] == "solo"
+    assert item["offer_name"] == "كرسي واحد"
+    assert item["total_price"] == 249.0
 
 
 @pytest.mark.asyncio

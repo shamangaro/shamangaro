@@ -8,6 +8,7 @@ import {
   markNotificationsSeen,
   type NotificationItem,
 } from "@/lib/orders";
+import { getOfferById } from "@/lib/offers";
 
 type StatusKind = "success" | "error" | "info";
 
@@ -49,11 +50,36 @@ function playNotificationSound() {
   }
 }
 
+function notificationCustomerName(item: NotificationItem): string {
+  return item.customer_name?.trim() || "عميل جديد";
+}
+
+function notificationOfferLabel(item: NotificationItem): string {
+  if (item.offer_name?.trim()) return item.offer_name.trim();
+  const offer = item.offer_id ? getOfferById(item.offer_id) : undefined;
+  if (offer?.label) return offer.label;
+  if (item.offer_id?.trim()) return item.offer_id.trim();
+  return "عرض";
+}
+
+function notificationTitle(item: NotificationItem): string {
+  return `طلب جديد من ${notificationCustomerName(item)}`;
+}
+
+function notificationBody(item: NotificationItem): string {
+  const offerLabel = notificationOfferLabel(item);
+  const price = item.total_price;
+  if (price != null && !Number.isNaN(Number(price))) {
+    return `العرض: ${offerLabel} — ${price} د.م`;
+  }
+  return `العرض: ${offerLabel}`;
+}
+
 function showBrowserNotification(item: NotificationItem) {
   if (typeof Notification === "undefined") return;
   if (Notification.permission === "granted") {
-    new Notification("طلب جديد — SHAMANGARO", {
-      body: `${item.customer_name} — ${item.order_number} — ${item.total_price} د.م`,
+    new Notification(notificationTitle(item), {
+      body: notificationBody(item),
       icon: "/images/logo-icon.png",
       tag: item.order_number,
     });
@@ -308,11 +334,11 @@ export function NotificationBell() {
 
       {toast && (
         <div className="fixed bottom-4 left-4 z-50 max-w-sm rounded-xl border border-red-200 bg-white p-4 shadow-2xl">
-          <p className="text-xs font-bold text-red-600">🔔 طلب جديد</p>
-          <p className="mt-1 font-mono text-sm font-bold text-navy" dir="ltr">
+          <p className="text-xs font-bold text-red-600">🔔 {notificationTitle(toast)}</p>
+          <p className="mt-1 text-sm text-navy">{notificationBody(toast)}</p>
+          <p className="mt-1 font-mono text-xs text-muted-foreground" dir="ltr">
             {toast.order_number}
           </p>
-          <p className="text-sm text-muted-foreground">{toast.customer_name}</p>
         </div>
       )}
     </>

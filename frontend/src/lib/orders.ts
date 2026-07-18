@@ -151,6 +151,8 @@ export interface NotificationItem {
   order_id: number;
   order_number: string;
   customer_name: string;
+  offer_id?: string;
+  offer_name?: string;
   total_price: number;
   created_at: string;
 }
