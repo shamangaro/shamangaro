@@ -1,4 +1,5 @@
 import { apiFetch } from "./api";
+import { getApiBase } from "./api-base";
 
 export interface OrderCreatePayload {
   customer_name: string;
@@ -332,7 +333,7 @@ export function exportOrdersUrl(params: {
   date_to?: string;
   format?: "csv" | "xlsx" | "pdf";
 }): string {
-  const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  const base = getApiBase();
   const qs = new URLSearchParams();
   if (params.search) qs.set("search", params.search);
   if (params.status) qs.set("status", params.status);

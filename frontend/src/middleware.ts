@@ -1,13 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-function getApiBase(): string {
-  return (
-    process.env.INTERNAL_API_URL ??
-    process.env.NEXT_PUBLIC_API_URL ??
-    "http://localhost:8000"
-  );
-}
+import { getApiBase } from "@/lib/api-base";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
