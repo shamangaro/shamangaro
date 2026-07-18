@@ -8,8 +8,9 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "لوحة الإدارة",
   robots: { index: false, follow: false },
-  manifest: "/admin/manifest.webmanifest",
+  manifest: "/admin-manifest.webmanifest",
   appleWebApp: {
+    capable: true,
     title: "SHAMANGARO CRM",
     statusBarStyle: "default",
   },
