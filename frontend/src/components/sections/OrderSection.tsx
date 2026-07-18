@@ -57,6 +57,9 @@ export function OrderSection() {
       router.push(`/thank-you?order=${result.order_number}`);
     } catch (err) {
       setSubmitting(false);
+      if (process.env.NODE_ENV === "development") {
+        console.error("[checkout] order submit failed:", err);
+      }
       if (err instanceof ApiError) {
         setSubmitError(err.message);
       } else {

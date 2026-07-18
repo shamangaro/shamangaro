@@ -15,28 +15,57 @@ export async function apiFetch<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${getApiBase()}${path}`;
-  const res = await fetch(url, {
-    ...options,
-    credentials: options.credentials ?? "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
+  const method = options.method ?? "GET";
+
+  if (process.env.NODE_ENV === "development") {
+    console.debug("[apiFetch]", method, url, options.body ?? "");
+  }
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...options,
+      credentials: options.credentials ?? "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
+  } catch (err) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[apiFetch] network error:", { method, url, err });
+    }
+    const message =
+      err instanceof Error ? err.message : "Network request failed";
+    throw new ApiError(message, 0);
+  }
 
   if (!res.ok) {
     let message = "حدث خطأ غير متوقع";
+    let detail: unknown;
     try {
-      const data = await res.json();
+      detail = await res.json();
+      const data = detail as { detail?: string | { msg?: string }[] };
       if (data.detail) {
         message =
           typeof data.detail === "string"
             ? data.detail
-            : data.detail[0]?.msg ?? message;
+            : (data.detail[0]?.msg ?? message);
       }
     } catch {
-      /* ignore */
+      /* ignore non-JSON error bodies */
     }
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("[apiFetch] API error:", {
+        method,
+        url,
+        status: res.status,
+        message,
+        detail,
+      });
+    }
+
     throw new ApiError(message, res.status);
   }
 
