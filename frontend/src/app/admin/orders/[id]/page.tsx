@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
@@ -20,26 +20,43 @@ import {
   User,
 } from "lucide-react";
 import {
+  addOrderNote,
   addToBlacklist,
   deleteOrder,
   getOrderAdmin,
+  logOrderCall,
   normalizeOrderStatus,
-  updateOrderNotes,
   updateOrderStatus,
+  type CallOutcome,
   type OrderAdminDetail,
   type OrderStatus,
 } from "@/lib/orders";
 import { phoneToTelLink, phoneToWhatsAppLink } from "@/lib/phone";
+import {
+  buildOrderConfirmedWhatsApp,
+  buildOrderReceivedWhatsApp,
+} from "@/lib/whatsapp";
 import { StatusBadge } from "@/components/admin/StatusBadge";
+import { OrderTimeline } from "@/components/admin/OrderTimeline";
 import { RiskFlag, TrustBadge } from "@/components/admin/TrustBadge";
 
 const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
   { value: "NEW", label: "جديد" },
-  { value: "CONTACTED", label: "تم الاتصال" },
+  { value: "WAITING_CONFIRMATION", label: "في انتظار التأكيد" },
   { value: "CONFIRMED", label: "مؤكد" },
+  { value: "PACKED", label: "تم التغليف" },
   { value: "SHIPPED", label: "تم الشحن" },
   { value: "DELIVERED", label: "تم التوصيل" },
   { value: "CANCELLED", label: "ملغى" },
+  { value: "NO_ANSWER", label: "لا رد" },
+  { value: "CALLBACK", label: "اتصل لاحقاً" },
+];
+
+const CALL_OUTCOMES: { value: CallOutcome; label: string }[] = [
+  { value: "answered", label: "ردّ العميل" },
+  { value: "no_answer", label: "لا رد" },
+  { value: "callback", label: "اتصل لاحقاً" },
+  { value: "confirmed", label: "تم التأكيد" },
 ];
 
 export default function AdminOrderDetailPage() {
@@ -49,17 +66,17 @@ export default function AdminOrderDetailPage() {
   const [order, setOrder] = useState<OrderAdminDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [savingNotes, setSavingNotes] = useState(false);
   const [blacklisting, setBlacklisting] = useState(false);
-  const [notes, setNotes] = useState("");
+  const [noteDraft, setNoteDraft] = useState("");
   const [blacklistReason, setBlacklistReason] = useState("");
   const [showDelete, setShowDelete] = useState(false);
   const [showBlacklist, setShowBlacklist] = useState(false);
+  const noteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedNoteRef = useRef("");
 
   const loadOrder = useCallback(async () => {
     const data = await getOrderAdmin(orderId);
     setOrder(data);
-    setNotes(data.internal_notes ?? "");
   }, [orderId]);
 
   useEffect(() => {
@@ -72,6 +89,7 @@ export default function AdminOrderDetailPage() {
   const handleStatusChange = async (status: OrderStatus) => {
     if (!order) return;
     setSaving(true);
+    setOrder({ ...order, status });
     try {
       await updateOrderStatus(order.id, status);
       await loadOrder();
@@ -80,16 +98,38 @@ export default function AdminOrderDetailPage() {
     }
   };
 
-  const handleSaveNotes = async () => {
+  const handleCall = async (outcome: CallOutcome) => {
     if (!order) return;
-    setSavingNotes(true);
+    setSaving(true);
     try {
-      await updateOrderNotes(order.id, notes.trim() ? notes.trim() : null);
+      await logOrderCall(order.id, outcome);
       await loadOrder();
     } finally {
-      setSavingNotes(false);
+      setSaving(false);
     }
   };
+
+  const saveNote = useCallback(
+    async (body: string) => {
+      if (!order || !body.trim() || body.trim() === lastSavedNoteRef.current) {
+        return;
+      }
+      await addOrderNote(order.id, body.trim());
+      lastSavedNoteRef.current = body.trim();
+      await loadOrder();
+      setNoteDraft("");
+    },
+    [order, loadOrder]
+  );
+
+  useEffect(() => {
+    if (!noteDraft.trim()) return;
+    if (noteTimerRef.current) clearTimeout(noteTimerRef.current);
+    noteTimerRef.current = setTimeout(() => saveNote(noteDraft), 1500);
+    return () => {
+      if (noteTimerRef.current) clearTimeout(noteTimerRef.current);
+    };
+  }, [noteDraft, saveNote]);
 
   const handleBlacklist = async () => {
     if (!order || !blacklistReason.trim()) return;
@@ -99,6 +139,7 @@ export default function AdminOrderDetailPage() {
         phone: order.phone,
         name: order.customer_name,
         address: order.address,
+        city: order.city ?? undefined,
         reason: blacklistReason.trim(),
       });
       setShowBlacklist(false);
@@ -121,9 +162,7 @@ export default function AdminOrderDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f5f5f5]">
-        <p className="text-muted-foreground">جاري التحميل...</p>
-      </div>
+      <p className="py-20 text-center text-muted-foreground">جاري التحميل...</p>
     );
   }
 
@@ -131,7 +170,12 @@ export default function AdminOrderDetailPage() {
 
   const risk = order.risk;
   const currentStatus = normalizeOrderStatus(order.status);
-  const whatsappMessage = `سلام عليكم ${order.customer_name}، بخصوص طلبك ${order.order_number} من SHAMANGARO.`;
+  const receivedWa = buildOrderReceivedWhatsApp(
+    order.customer_name,
+    order.quantity,
+    order.total_price
+  );
+  const confirmedWa = buildOrderConfirmedWhatsApp(order.customer_name);
 
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleString("ar-MA", {
@@ -140,254 +184,280 @@ export default function AdminOrderDetailPage() {
     });
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-[#f5f5f5]">
-      <header className="border-b border-navy/10 bg-white">
-        <div className="mx-auto flex max-w-3xl flex-col gap-3 px-3 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:px-4 sm:py-4">
-          <Link
-            href="/admin/orders"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-navy/5"
-          >
-            <ArrowRight size={20} />
-          </Link>
-          <div className="min-w-0 flex-1">
-            <h1 className="break-all text-lg font-extrabold text-navy" dir="ltr">
-              {order.order_number}
-            </h1>
-            <p className="text-xs text-muted-foreground">
-              {formatDate(order.created_at)}
-            </p>
-          </div>
-          <div className="flex w-full flex-wrap items-center gap-2 sm:ms-auto sm:w-auto">
-            <RiskFlag isRisk={order.is_risk} />
-            <StatusBadge status={order.status} />
-            {risk && (
-              <TrustBadge
-                label={risk.trust_label}
-                display={risk.trust_display}
-                score={risk.trust_score}
-              />
-            )}
-          </div>
+    <div className="mx-auto max-w-3xl space-y-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <Link
+          href="/admin/orders"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-navy/5"
+        >
+          <ArrowRight size={20} />
+        </Link>
+        <div className="min-w-0 flex-1">
+          <h1 className="break-all text-lg font-extrabold text-navy" dir="ltr">
+            {order.order_number}
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            {formatDate(order.created_at)}
+          </p>
         </div>
-      </header>
-
-      <main className="mx-auto max-w-3xl space-y-4 overflow-x-clip p-3 sm:p-4">
-        {risk?.is_blacklisted && (
-          <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-4">
-            <div className="flex items-start gap-3">
-              <Ban className="mt-0.5 shrink-0 text-red-600" size={22} />
-              <div>
-                <p className="font-bold text-red-800">
-                  ⚠️ THIS CUSTOMER IS BLACKLISTED
-                </p>
-                <p className="mt-1 text-sm text-red-700">
-                  السبب: {risk.blacklist_reason}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {risk && risk.warnings.length > 0 && (
-          <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4">
-            <div className="flex items-start gap-3">
-              <ShieldAlert
-                className="mt-0.5 shrink-0 text-amber-700"
-                size={22}
-              />
-              <div>
-                <p className="font-bold text-amber-900">تحذير — طلب مشبوه</p>
-                <ul className="mt-2 space-y-1 text-sm text-amber-800">
-                  {risk.warnings.map((w) => (
-                    <li key={w}>• {w}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {risk && (
-          <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
-            <div className="mb-4 flex items-center gap-2">
-              <History size={18} className="text-gold" />
-              <h2 className="text-sm font-bold text-muted-foreground">
-                سجل العميل
-              </h2>
-            </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <div className="rounded-xl bg-cream p-3 text-center">
-                <p className="text-xs text-muted-foreground">إجمالي الطلبات</p>
-                <p className="mt-1 text-xl font-black text-navy">
-                  {risk.history.total_orders}
-                </p>
-              </div>
-              <div className="rounded-xl bg-green-50 p-3 text-center">
-                <p className="text-xs text-muted-foreground">تم التوصيل</p>
-                <p className="mt-1 text-xl font-black text-green-800">
-                  {risk.history.delivered_count}
-                </p>
-              </div>
-              <div className="rounded-xl bg-indigo-50 p-3 text-center">
-                <p className="text-xs text-muted-foreground">مؤكد</p>
-                <p className="mt-1 text-xl font-black text-indigo-800">
-                  {risk.history.confirmed_count}
-                </p>
-              </div>
-              <div className="rounded-xl bg-red-50 p-3 text-center">
-                <p className="text-xs text-muted-foreground">ملغى</p>
-                <p className="mt-1 text-xl font-black text-red-800">
-                  {risk.history.cancelled_count}
-                </p>
-              </div>
-            </div>
-            {risk.history.last_order_date && (
-              <p className="mt-4 text-sm text-muted-foreground">
-                آخر طلب:{" "}
-                {new Date(risk.history.last_order_date).toLocaleString("ar-MA")}
-              </p>
-            )}
-          </div>
-        )}
-
-        <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
-          <h2 className="mb-4 text-sm font-bold text-muted-foreground">
-            معلومات العميل
-          </h2>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <User size={18} className="mt-0.5 text-gold" />
-              <div>
-                <p className="text-xs text-muted-foreground">الاسم</p>
-                <p className="font-bold text-navy">{order.customer_name}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Phone size={18} className="mt-0.5 text-gold" />
-              <div className="flex-1">
-                <p className="text-xs text-muted-foreground">الهاتف</p>
-                <p className="font-bold text-navy" dir="ltr">
-                  {order.phone}
-                </p>
-              </div>
-              <button
-                onClick={copyPhone}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-navy/15 hover:bg-navy/5"
-                title="نسخ الهاتف"
-              >
-                <Copy size={16} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <a
-                href={phoneToTelLink(order.phone)}
-                className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-navy py-3 text-sm font-bold text-white transition-colors hover:bg-navy-light"
-              >
-                <PhoneCall size={18} />
-                اتصال
-              </a>
-              <a
-                href={phoneToWhatsAppLink(order.phone, whatsappMessage)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
-              >
-                <MessageCircle size={18} />
-                واتساب
-              </a>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <MapPin size={18} className="mt-0.5 text-gold" />
-              <div>
-                <p className="text-xs text-muted-foreground">العنوان</p>
-                <p className="font-bold text-navy">{order.address}</p>
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <RiskFlag isRisk={order.is_risk} />
+          <StatusBadge status={order.status} />
+          {risk && (
+            <TrustBadge
+              label={risk.trust_label}
+              display={risk.trust_display}
+              score={risk.trust_score}
+            />
+          )}
         </div>
+      </div>
 
-        <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
-          <h2 className="mb-4 text-sm font-bold text-muted-foreground">
-            تفاصيل الطلب
-          </h2>
+      {risk?.is_blacklisted && (
+        <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-4">
           <div className="flex items-start gap-3">
-            <Package size={18} className="mt-0.5 text-gold" />
-            <div className="flex-1">
-              <p className="font-bold text-navy">
-                {order.offer_name} × {order.quantity}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {order.unit_price} د.م / وحدة
-              </p>
-              <p className="mt-3 text-2xl font-black text-navy">
-                {order.total_price}{" "}
-                <span className="text-sm font-bold">د.م</span>
+            <Ban className="mt-0.5 shrink-0 text-red-600" size={22} />
+            <div>
+              <p className="font-bold text-red-800">عميل في القائمة السوداء</p>
+              <p className="mt-1 text-sm text-red-700">
+                السبب: {risk.blacklist_reason}
               </p>
             </div>
           </div>
         </div>
+      )}
 
-        <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
-          <h2 className="mb-4 text-sm font-bold text-muted-foreground">
-            تغيير الحالة
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {STATUS_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                disabled={saving || currentStatus === opt.value}
-                onClick={() => handleStatusChange(opt.value)}
-                className="min-h-11 rounded-full border border-navy/15 px-4 py-2.5 text-sm font-bold text-navy transition-colors hover:bg-navy hover:text-white disabled:opacity-40"
-              >
-                {opt.label}
-              </button>
-            ))}
+      {risk && risk.warnings.length > 0 && (
+        <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4">
+          <div className="flex items-start gap-3">
+            <ShieldAlert className="mt-0.5 shrink-0 text-amber-700" size={22} />
+            <div>
+              <p className="font-bold text-amber-900">تحذير — طلب مشبوه</p>
+              <ul className="mt-2 space-y-1 text-sm text-amber-800">
+                {risk.warnings.map((w) => (
+                  <li key={w}>• {w}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
+      )}
 
+      <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+        <div className="grid grid-cols-2 gap-2">
+          <a
+            href={phoneToTelLink(order.phone)}
+            className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-navy text-sm font-bold text-white"
+          >
+            <PhoneCall size={18} />
+            اتصال
+          </a>
+          <a
+            href={phoneToWhatsAppLink(order.phone, receivedWa)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#25D366] text-sm font-bold text-white"
+          >
+            <MessageCircle size={18} />
+            واتساب استلام
+          </a>
+          <a
+            href={phoneToWhatsAppLink(order.phone, confirmedWa)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="col-span-2 flex min-h-11 items-center justify-center gap-2 rounded-xl border border-green-300 bg-green-50 text-sm font-bold text-green-800"
+          >
+            <MessageCircle size={18} />
+            واتساب تأكيد
+          </a>
+        </div>
+      </div>
+
+      {risk && (
         <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
           <div className="mb-4 flex items-center gap-2">
-            <StickyNote size={18} className="text-gold" />
-            <h2 className="text-sm font-bold text-muted-foreground">
-              ملاحظات داخلية
-            </h2>
+            <History size={18} className="text-gold" />
+            <h2 className="text-sm font-bold text-muted-foreground">سجل العميل</h2>
           </div>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={4}
-            placeholder="ملاحظات للفريق الداخلي فقط..."
-            className="w-full rounded-xl border-2 border-navy/15 bg-white px-4 py-3 text-sm text-navy outline-none transition-all focus:border-navy"
-          />
-          <button
-            onClick={handleSaveNotes}
-            disabled={savingNotes}
-            className="mt-3 w-full min-h-11 rounded-full bg-gold py-3 text-sm font-bold text-navy transition-colors hover:bg-gold-light disabled:opacity-60"
-          >
-            {savingNotes ? "جاري الحفظ..." : "حفظ الملاحظات"}
-          </button>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="rounded-xl bg-cream p-3 text-center">
+              <p className="text-xs text-muted-foreground">إجمالي الطلبات</p>
+              <p className="mt-1 text-xl font-black text-navy">
+                {risk.history.total_orders}
+              </p>
+            </div>
+            <div className="rounded-xl bg-green-50 p-3 text-center">
+              <p className="text-xs text-muted-foreground">تم التوصيل</p>
+              <p className="mt-1 text-xl font-black text-green-800">
+                {risk.history.delivered_count}
+              </p>
+            </div>
+            <div className="rounded-xl bg-indigo-50 p-3 text-center">
+              <p className="text-xs text-muted-foreground">مؤكد</p>
+              <p className="mt-1 text-xl font-black text-indigo-800">
+                {risk.history.confirmed_count}
+              </p>
+            </div>
+            <div className="rounded-xl bg-red-50 p-3 text-center">
+              <p className="text-xs text-muted-foreground">ملغى</p>
+              <p className="mt-1 text-xl font-black text-red-800">
+                {risk.history.cancelled_count}
+              </p>
+            </div>
+          </div>
         </div>
+      )}
 
-        {!risk?.is_blacklisted && (
-          <button
-            onClick={() => setShowBlacklist(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 py-3 text-sm font-bold text-red-700 hover:bg-red-100"
-          >
-            <Ban size={16} />
-            🚫 Add to Blacklist
-          </button>
+      <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+        <h2 className="mb-4 text-sm font-bold text-muted-foreground">
+          معلومات العميل
+        </h2>
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <User size={18} className="mt-0.5 text-gold" />
+            <div>
+              <p className="text-xs text-muted-foreground">الاسم</p>
+              <p className="font-bold text-navy">{order.customer_name}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Phone size={18} className="mt-0.5 text-gold" />
+            <div className="flex-1">
+              <p className="text-xs text-muted-foreground">الهاتف</p>
+              <p className="font-bold text-navy" dir="ltr">
+                {order.phone}
+              </p>
+            </div>
+            <button
+              onClick={copyPhone}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-navy/15 hover:bg-navy/5"
+            >
+              <Copy size={16} />
+            </button>
+          </div>
+          <div className="flex items-start gap-3">
+            <MapPin size={18} className="mt-0.5 text-gold" />
+            <div>
+              <p className="text-xs text-muted-foreground">العنوان / المدينة</p>
+              <p className="font-bold text-navy">{order.address}</p>
+              {order.city && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {order.city}
+                </p>
+              )}
+            </div>
+          </div>
+          {order.confirmation_agent && (
+            <p className="text-sm">
+              <span className="text-muted-foreground">وكيل التأكيد: </span>
+              {order.confirmation_agent}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+        <div className="flex items-start gap-3">
+          <Package size={18} className="mt-0.5 text-gold" />
+          <div>
+            <p className="font-bold text-navy">
+              {order.offer_name} × {order.quantity}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {order.unit_price} د.م / وحدة
+            </p>
+            <p className="mt-3 text-2xl font-black text-navy">
+              {order.total_price} <span className="text-sm font-bold">د.م</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+        <p className="mb-3 text-sm font-bold text-muted-foreground">نتيجة المكالمة</p>
+        <div className="flex flex-wrap gap-2">
+          {CALL_OUTCOMES.map((opt) => (
+            <button
+              key={opt.value}
+              disabled={saving}
+              onClick={() => handleCall(opt.value)}
+              className="min-h-11 rounded-full border border-navy/15 px-4 py-2.5 text-sm font-bold text-navy hover:bg-navy hover:text-white disabled:opacity-40"
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+        <h2 className="mb-4 text-sm font-bold text-muted-foreground">تغيير الحالة</h2>
+        <div className="flex flex-wrap gap-2">
+          {STATUS_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              disabled={saving || currentStatus === opt.value}
+              onClick={() => handleStatusChange(opt.value)}
+              className="min-h-11 rounded-full border border-navy/15 px-4 py-2.5 text-sm font-bold text-navy hover:bg-navy hover:text-white disabled:opacity-40"
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+        <div className="mb-4 flex items-center gap-2">
+          <StickyNote size={18} className="text-gold" />
+          <h2 className="text-sm font-bold text-muted-foreground">
+            ملاحظات داخلية (حفظ تلقائي)
+          </h2>
+        </div>
+        <textarea
+          value={noteDraft}
+          onChange={(e) => setNoteDraft(e.target.value)}
+          rows={3}
+          placeholder="اكتب ملاحظة..."
+          className="w-full rounded-xl border-2 border-navy/15 px-4 py-3 text-sm outline-none focus:border-navy"
+        />
+        {order.notes.length > 0 && (
+          <ul className="mt-4 space-y-2 border-t border-navy/10 pt-4">
+            {order.notes.map((note) => (
+              <li key={note.id} className="rounded-lg bg-cream/50 px-3 py-2 text-sm">
+                <p>{note.body}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {new Date(note.created_at).toLocaleString("ar-MA")}
+                  {note.admin_username && ` — ${note.admin_username}`}
+                </p>
+              </li>
+            ))}
+          </ul>
         )}
+      </div>
 
+      <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+        <h2 className="mb-4 text-sm font-bold text-muted-foreground">
+          الجدول الزمني
+        </h2>
+        <OrderTimeline events={order.timeline} />
+      </div>
+
+      {!risk?.is_blacklisted && (
         <button
-          onClick={() => setShowDelete(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 py-3 text-sm font-bold text-red-600 hover:bg-red-50"
+          onClick={() => setShowBlacklist(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 py-3 text-sm font-bold text-red-700"
         >
-          <Trash2 size={16} />
-          أرشفة الطلب
+          <Ban size={16} />
+          إضافة للقائمة السوداء
         </button>
-      </main>
+      )}
+
+      <button
+        onClick={() => setShowDelete(true)}
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 py-3 text-sm font-bold text-red-600"
+      >
+        <Trash2 size={16} />
+        أرشفة الطلب
+      </button>
 
       {showBlacklist && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -400,20 +470,20 @@ export default function AdminOrderDetailPage() {
               value={blacklistReason}
               onChange={(e) => setBlacklistReason(e.target.value)}
               rows={3}
-              placeholder="سبب الإضافة للقائمة السوداء..."
+              placeholder="سبب الإضافة..."
               className="w-full rounded-xl border-2 border-navy/15 px-4 py-3 text-sm outline-none focus:border-navy"
             />
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setShowBlacklist(false)}
-                className="flex-1 min-h-11 rounded-lg border border-navy/20 py-3 font-bold text-navy"
+                className="min-h-11 flex-1 rounded-lg border border-navy/20 py-3 font-bold text-navy"
               >
                 إلغاء
               </button>
               <button
                 onClick={handleBlacklist}
                 disabled={blacklisting || !blacklistReason.trim()}
-                className="flex-1 min-h-11 rounded-lg bg-red-600 py-3 font-bold text-white disabled:opacity-60"
+                className="min-h-11 flex-1 rounded-lg bg-red-600 py-3 font-bold text-white disabled:opacity-60"
               >
                 {blacklisting ? "جاري..." : "تأكيد"}
               </button>
@@ -432,13 +502,13 @@ export default function AdminOrderDetailPage() {
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setShowDelete(false)}
-                className="flex-1 min-h-11 rounded-lg border border-navy/20 py-3 font-bold text-navy"
+                className="min-h-11 flex-1 rounded-lg border border-navy/20 py-3 font-bold text-navy"
               >
                 إلغاء
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 min-h-11 rounded-lg bg-red-600 py-3 font-bold text-white"
+                className="min-h-11 flex-1 rounded-lg bg-red-600 py-3 font-bold text-white"
               >
                 حذف
               </button>

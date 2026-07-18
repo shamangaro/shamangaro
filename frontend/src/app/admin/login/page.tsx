@@ -20,7 +20,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     try {
       await adminLogin(username, password);
-      router.push("/admin/orders");
+      router.push("/admin/dashboard");
       router.refresh();
     } catch (err) {
       setLoading(false);

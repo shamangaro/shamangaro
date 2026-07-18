@@ -49,6 +49,7 @@ class OrderAdminResponse(BaseModel):
     customer_name: str
     phone: str
     address: str
+    city: str | None = None
     offer_id: str
     offer_name: str
     quantity: int
@@ -57,6 +58,7 @@ class OrderAdminResponse(BaseModel):
     status: str
     internal_notes: str | None = None
     is_risk: bool = False
+    confirmation_agent: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -81,18 +83,63 @@ class OrderRiskResponse(BaseModel):
     history: CustomerHistoryResponse
 
 
+class OrderTimelineEvent(BaseModel):
+    id: int
+    event_type: str
+    status: str | None = None
+    note: str | None = None
+    admin_username: str | None = None
+    created_at: datetime
+
+
+class OrderNoteResponse(BaseModel):
+    id: int
+    body: str
+    admin_username: str | None = None
+    created_at: datetime
+
+
+class OrderCallResponse(BaseModel):
+    id: int
+    outcome: str
+    notes: str | None = None
+    admin_username: str | None = None
+    created_at: datetime
+
+
 class OrderAdminDetailResponse(OrderAdminResponse):
     risk: OrderRiskResponse | None = None
+    timeline: list[OrderTimelineEvent] = []
+    notes: list[OrderNoteResponse] = []
+    calls: list[OrderCallResponse] = []
 
 
 class OrderStatusUpdate(BaseModel):
     status: Literal[
-        "NEW", "CONTACTED", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"
+        "NEW",
+        "WAITING_CONFIRMATION",
+        "CONTACTED",
+        "CONFIRMED",
+        "PACKED",
+        "SHIPPED",
+        "DELIVERED",
+        "CANCELLED",
+        "NO_ANSWER",
+        "CALLBACK",
     ]
 
 
 class OrderNotesUpdate(BaseModel):
     internal_notes: str | None = Field(default=None, max_length=5000)
+
+
+class OrderNoteCreate(BaseModel):
+    body: str = Field(min_length=1, max_length=5000)
+
+
+class OrderCallCreate(BaseModel):
+    outcome: Literal["answered", "no_answer", "callback", "confirmed"]
+    notes: str | None = Field(default=None, max_length=2000)
 
 
 class OrderListResponse(BaseModel):
@@ -107,14 +154,39 @@ class OrderStatsResponse(BaseModel):
     today_orders: int
     all_orders: int
     new_orders: int
+    waiting_confirmation_orders: int = 0
     contacted_orders: int
     confirmed_orders: int
+    packed_orders: int = 0
     shipped_orders: int
     delivered_orders: int
     cancelled_orders: int
+    no_answer_orders: int = 0
+    callback_orders: int = 0
     today_sales: float
+    week_sales: float = 0
+    month_sales: float = 0
     total_sales: float
     trusted_customers: int = 0
     warning_customers: int = 0
     high_risk_customers: int = 0
     blacklisted_customers: int = 0
+
+
+class AnalyticsResponse(BaseModel):
+    today_revenue: float
+    week_revenue: float
+    month_revenue: float
+    orders_by_city: list[dict]
+    revenue_by_day: list[dict]
+    revenue_by_month: list[dict]
+    conversion_rate: float
+    delivered_rate: float
+    cancelled_rate: float
+    average_basket: float
+
+
+class NotificationSummaryResponse(BaseModel):
+    pending_count: int
+    latest_order_number: str | None = None
+    items: list[dict]

@@ -3,13 +3,13 @@ import {
   STATUS_COLORS,
   STATUS_LABELS,
   normalizeOrderStatus,
-  type OrderStatus,
 } from "@/lib/orders";
 
 export function StatusBadge({ status }: { status: string }) {
   const key = normalizeOrderStatus(status);
-  const label = STATUS_LABELS[key] ?? status;
-  const color = STATUS_COLORS[key] ?? "bg-gray-100 text-gray-800";
+  const label = STATUS_LABELS[key] ?? STATUS_LABELS[status] ?? status;
+  const color =
+    STATUS_COLORS[key] ?? STATUS_COLORS[status] ?? "bg-gray-100 text-gray-800";
 
   return (
     <span

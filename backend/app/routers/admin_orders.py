@@ -2,7 +2,7 @@ import csv
 import io
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,40 +15,63 @@ from app.schemas.order import (
     CustomerHistoryResponse,
     OrderAdminDetailResponse,
     OrderAdminResponse,
+    OrderCallCreate,
+    OrderCallResponse,
     OrderListResponse,
+    OrderNoteCreate,
+    OrderNoteResponse,
     OrderNotesUpdate,
     OrderRiskResponse,
     OrderStatsResponse,
     OrderStatusUpdate,
+    OrderTimelineEvent,
 )
+from app.services.analytics import get_analytics, get_extended_stats
 from app.services.customer_risk import analyze_customer_risk, count_customers_by_trust
+from app.services.order_lifecycle import (
+    STATUS_LABELS,
+    add_order_note,
+    change_order_status,
+    get_order_calls,
+    get_order_notes,
+    get_order_timeline,
+    log_order_call,
+    public_status,
+)
+from app.services.order_notifications import enqueue_status_side_effects
 
 router = APIRouter(prefix="/admin/orders", tags=["admin-orders"])
 
-STATUS_LABELS = {
-    "NEW": "جديد",
-    "CONTACTED": "تم الاتصال",
-    "CONFIRMED": "مؤكد",
-    "PREPARING": "تم الاتصال",
-    "SHIPPED": "تم الشحن",
-    "DELIVERED": "تم التوصيل",
-    "CANCELLED": "ملغى",
+SORTABLE_COLUMNS = {
+    "created_at": Order.created_at,
+    "customer_name": Order.customer_name,
+    "total_price": Order.total_price,
+    "status": Order.status,
+    "city": Order.city,
 }
 
 
 def _normalize_status(status: OrderStatus) -> str:
-    if status == OrderStatus.PREPARING:
-        return OrderStatus.CONTACTED.value
-    return status.value
+    return public_status(status)
 
 
-def _order_to_admin(order: Order) -> OrderAdminResponse:
+async def _agent_name(db: AsyncSession, order: Order) -> str | None:
+    if not order.confirmation_agent_id:
+        return None
+    result = await db.execute(
+        select(AdminUser.username).where(AdminUser.id == order.confirmation_agent_id)
+    )
+    return result.scalar_one_or_none()
+
+
+def _order_to_admin(order: Order, agent: str | None = None) -> OrderAdminResponse:
     return OrderAdminResponse(
         id=order.id,
         order_number=order.order_number,
         customer_name=order.customer_name,
         phone=order.phone,
         address=order.address,
+        city=order.city,
         offer_id=order.offer_id,
         offer_name=order.offer_name,
         quantity=order.quantity,
@@ -57,6 +80,7 @@ def _order_to_admin(order: Order) -> OrderAdminResponse:
         status=_normalize_status(order.status),
         internal_notes=order.internal_notes,
         is_risk=order.is_risk,
+        confirmation_agent=agent,
         created_at=order.created_at,
         updated_at=order.updated_at,
     )
@@ -95,8 +119,23 @@ def _build_filters(
     status_filter: str | None,
     date_from: str | None,
     date_to: str | None,
+    confirmation_queue: bool = False,
 ):
     conditions = [Order.deleted_at.is_(None)]
+
+    if confirmation_queue:
+        conditions.append(
+            Order.status.in_(
+                [
+                    OrderStatus.NEW,
+                    OrderStatus.WAITING_CONFIRMATION,
+                    OrderStatus.CONTACTED,
+                    OrderStatus.PREPARING,
+                    OrderStatus.NO_ANSWER,
+                    OrderStatus.CALLBACK,
+                ]
+            )
+        )
 
     if search:
         term = f"%{search.strip()}%"
@@ -105,13 +144,25 @@ def _build_filters(
                 Order.customer_name.ilike(term),
                 Order.phone.ilike(term),
                 Order.order_number.ilike(term),
+                Order.city.ilike(term),
+                Order.address.ilike(term),
             )
         )
 
     if status_filter:
         try:
             status_enum = OrderStatus(status_filter)
-            if status_enum == OrderStatus.CONTACTED:
+            if status_enum == OrderStatus.WAITING_CONFIRMATION:
+                conditions.append(
+                    Order.status.in_(
+                        [
+                            OrderStatus.WAITING_CONFIRMATION,
+                            OrderStatus.CONTACTED,
+                            OrderStatus.PREPARING,
+                        ]
+                    )
+                )
+            elif status_enum == OrderStatus.CONTACTED:
                 conditions.append(
                     Order.status.in_([OrderStatus.CONTACTED, OrderStatus.PREPARING])
                 )
@@ -144,65 +195,47 @@ async def get_order_stats(
     _admin: AdminUser = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    today_start = datetime.now(timezone.utc).replace(
-        hour=0, minute=0, second=0, microsecond=0
-    )
-    base = Order.deleted_at.is_(None)
-
-    today_orders = await db.scalar(
-        select(func.count(Order.id)).where(base, Order.created_at >= today_start)
-    )
-    all_orders = await db.scalar(select(func.count(Order.id)).where(base))
-    new_orders = await db.scalar(
-        select(func.count(Order.id)).where(base, Order.status == OrderStatus.NEW)
-    )
-    contacted_orders = await db.scalar(
-        select(func.count(Order.id)).where(
-            base,
-            Order.status.in_([OrderStatus.CONTACTED, OrderStatus.PREPARING]),
-        )
-    )
-    confirmed_orders = await db.scalar(
-        select(func.count(Order.id)).where(base, Order.status == OrderStatus.CONFIRMED)
-    )
-    shipped_orders = await db.scalar(
-        select(func.count(Order.id)).where(base, Order.status == OrderStatus.SHIPPED)
-    )
-    delivered_orders = await db.scalar(
-        select(func.count(Order.id)).where(base, Order.status == OrderStatus.DELIVERED)
-    )
-    cancelled_orders = await db.scalar(
-        select(func.count(Order.id)).where(base, Order.status == OrderStatus.CANCELLED)
-    )
-    today_sales = await db.scalar(
-        select(func.coalesce(func.sum(Order.total_price), 0)).where(
-            base, Order.created_at >= today_start, Order.status != OrderStatus.CANCELLED
-        )
-    )
-    total_sales = await db.scalar(
-        select(func.coalesce(func.sum(Order.total_price), 0)).where(
-            base, Order.status != OrderStatus.CANCELLED
-        )
-    )
-
+    extended = await get_extended_stats(db)
     trust_counts = await count_customers_by_trust(db)
+    total_sales = float(
+        await db.scalar(
+            select(func.coalesce(func.sum(Order.total_price), 0)).where(
+                Order.deleted_at.is_(None), Order.status != OrderStatus.CANCELLED
+            )
+        )
+        or 0
+    )
 
     return OrderStatsResponse(
-        today_orders=today_orders or 0,
-        all_orders=all_orders or 0,
-        new_orders=new_orders or 0,
-        contacted_orders=contacted_orders or 0,
-        confirmed_orders=confirmed_orders or 0,
-        shipped_orders=shipped_orders or 0,
-        delivered_orders=delivered_orders or 0,
-        cancelled_orders=cancelled_orders or 0,
-        today_sales=float(today_sales or 0),
-        total_sales=float(total_sales or 0),
+        today_orders=extended["today_orders"],
+        all_orders=extended["all_orders"],
+        new_orders=extended["new_orders"],
+        waiting_confirmation_orders=extended["waiting_confirmation_orders"],
+        contacted_orders=extended["waiting_confirmation_orders"],
+        confirmed_orders=extended["confirmed_orders"],
+        packed_orders=extended["packed_orders"],
+        shipped_orders=extended["shipped_orders"],
+        delivered_orders=extended["delivered_orders"],
+        cancelled_orders=extended["cancelled_orders"],
+        no_answer_orders=extended["no_answer_orders"],
+        callback_orders=extended["callback_orders"],
+        today_sales=extended["today_sales"],
+        week_sales=extended["week_sales"],
+        month_sales=extended["month_sales"],
+        total_sales=total_sales,
         trusted_customers=trust_counts["trusted_customers"],
         warning_customers=trust_counts["warning_customers"],
         high_risk_customers=trust_counts["high_risk_customers"],
         blacklisted_customers=trust_counts["blacklisted_customers"],
     )
+
+
+@router.get("/analytics")
+async def analytics(
+    _admin: AdminUser = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    return await get_analytics(db)
 
 
 @router.get("", response_model=OrderListResponse)
@@ -213,31 +246,88 @@ async def list_orders(
     status_filter: str | None = Query(None, alias="status"),
     date_from: str | None = None,
     date_to: str | None = None,
+    confirmation_queue: bool = False,
+    sort_by: str = Query("created_at"),
+    sort_dir: str = Query("desc"),
     _admin: AdminUser = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    filters = _build_filters(search, status_filter, date_from, date_to)
+    filters = _build_filters(
+        search, status_filter, date_from, date_to, confirmation_queue
+    )
 
     total = await db.scalar(select(func.count(Order.id)).where(filters)) or 0
     total_pages = max(1, (total + page_size - 1) // page_size)
     offset = (page - 1) * page_size
 
+    sort_column = SORTABLE_COLUMNS.get(sort_by, Order.created_at)
+    order_clause = sort_column.desc() if sort_dir.lower() == "desc" else sort_column.asc()
+
     result = await db.execute(
-        select(Order)
-        .where(filters)
-        .order_by(Order.created_at.desc())
-        .offset(offset)
-        .limit(page_size)
+        select(Order).where(filters).order_by(order_clause).offset(offset).limit(page_size)
     )
     orders = result.scalars().all()
+    items = []
+    for order in orders:
+        agent = await _agent_name(db, order)
+        items.append(_order_to_admin(order, agent))
 
     return OrderListResponse(
-        items=[_order_to_admin(o) for o in orders],
+        items=items,
         total=total,
         page=page,
         page_size=page_size,
         total_pages=total_pages,
     )
+
+
+async def _fetch_orders_for_export(db: AsyncSession, filters):
+    result = await db.execute(
+        select(Order).where(filters).order_by(Order.created_at.desc())
+    )
+    return result.scalars().all()
+
+
+def _export_headers():
+    return [
+        "Order ID",
+        "Date",
+        "Customer Name",
+        "Phone",
+        "City",
+        "Address",
+        "Quantity",
+        "Unit Price",
+        "Total",
+        "Status",
+        "Confirmation Agent",
+        "Notes",
+        "Last Update",
+    ]
+
+
+async def _export_rows(db: AsyncSession, orders: list[Order]):
+    rows = []
+    for order in orders:
+        agent = await _agent_name(db, order)
+        rows.append(
+            [
+                order.order_number,
+                order.created_at.isoformat() if order.created_at else "",
+                order.customer_name,
+                order.phone,
+                order.city or "",
+                order.address,
+                order.quantity,
+                float(order.unit_price),
+                float(order.total_price),
+                STATUS_LABELS.get(_normalize_status(order.status), order.status.value),
+                agent or "",
+                order.internal_notes or "",
+                order.updated_at.isoformat() if order.updated_at else "",
+            ]
+        )
+    return rows
 
 
 @router.get("/export")
@@ -246,48 +336,64 @@ async def export_orders(
     status_filter: str | None = Query(None, alias="status"),
     date_from: str | None = None,
     date_to: str | None = None,
+    format: str = Query("csv", alias="format"),
     _admin: AdminUser = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ):
     filters = _build_filters(search, status_filter, date_from, date_to)
+    orders = await _fetch_orders_for_export(db, filters)
+    headers = _export_headers()
+    rows = await _export_rows(db, orders)
 
-    result = await db.execute(
-        select(Order).where(filters).order_by(Order.created_at.desc())
-    )
-    orders = result.scalars().all()
+    if format == "xlsx":
+        from openpyxl import Workbook
+
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = "Orders"
+        sheet.append(headers)
+        for row in rows:
+            sheet.append(row)
+        output = io.BytesIO()
+        workbook.save(output)
+        output.seek(0)
+        filename = f"orders-{datetime.now(timezone.utc).strftime('%Y%m%d')}.xlsx"
+        return StreamingResponse(
+            output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+
+    if format == "pdf":
+        from reportlab.lib.pagesizes import A4
+        from reportlab.pdfgen import canvas
+
+        output = io.BytesIO()
+        pdf = canvas.Canvas(output, pagesize=A4)
+        pdf.setFont("Helvetica", 10)
+        y = 800
+        pdf.drawString(40, y, "SHAMANGARO Orders Export")
+        y -= 24
+        for order in orders[:100]:
+            line = f"{order.order_number} | {order.customer_name} | {float(order.total_price)} MAD"
+            pdf.drawString(40, y, line[:110])
+            y -= 14
+            if y < 60:
+                pdf.showPage()
+                y = 800
+        pdf.save()
+        output.seek(0)
+        filename = f"orders-{datetime.now(timezone.utc).strftime('%Y%m%d')}.pdf"
+        return StreamingResponse(
+            output,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(
-        [
-            "Order Number",
-            "Date",
-            "Customer",
-            "Phone",
-            "Address",
-            "Offer",
-            "Quantity",
-            "Total (MAD)",
-            "Status",
-            "Notes",
-        ]
-    )
-    for order in orders:
-        writer.writerow(
-            [
-                order.order_number,
-                order.created_at.isoformat(),
-                order.customer_name,
-                order.phone,
-                order.address,
-                order.offer_name,
-                order.quantity,
-                float(order.total_price),
-                STATUS_LABELS.get(_normalize_status(order.status), order.status.value),
-                order.internal_notes or "",
-            ]
-        )
-
+    writer.writerow(headers)
+    writer.writerows(rows)
     output.seek(0)
     filename = f"orders-{datetime.now(timezone.utc).strftime('%Y%m%d')}.csv"
     return StreamingResponse(
@@ -310,16 +416,36 @@ async def get_order(
     if not order:
         raise HTTPException(status_code=404, detail="الطلب غير موجود")
 
-    base = _order_to_admin(order)
+    agent = await _agent_name(db, order)
+    base = _order_to_admin(order, agent)
     risk = await _build_risk_response(order, db)
-    return OrderAdminDetailResponse(**base.model_dump(), risk=risk)
+    timeline = [
+        OrderTimelineEvent.model_validate(event)
+        for event in await get_order_timeline(db, order.id)
+    ]
+    notes = [
+        OrderNoteResponse.model_validate(note)
+        for note in await get_order_notes(db, order.id)
+    ]
+    calls = [
+        OrderCallResponse.model_validate(call)
+        for call in await get_order_calls(db, order.id)
+    ]
+    return OrderAdminDetailResponse(
+        **base.model_dump(),
+        risk=risk,
+        timeline=timeline,
+        notes=notes,
+        calls=calls,
+    )
 
 
 @router.patch("/{order_id}/status", response_model=OrderAdminResponse)
 async def update_order_status(
     order_id: int,
     payload: OrderStatusUpdate,
-    _admin: AdminUser = Depends(get_current_admin),
+    background_tasks: BackgroundTasks,
+    admin: AdminUser = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -329,17 +455,18 @@ async def update_order_status(
     if not order:
         raise HTTPException(status_code=404, detail="الطلب غير موجود")
 
-    order.status = OrderStatus(payload.status)
-    order.updated_at = datetime.now(timezone.utc)
-    await db.flush()
-    return _order_to_admin(order)
+    await change_order_status(db, order, OrderStatus(payload.status), admin)
+    enqueue_status_side_effects(order.id, background_tasks)
+    agent = await _agent_name(db, order)
+    return _order_to_admin(order, agent)
 
 
 @router.patch("/{order_id}/notes", response_model=OrderAdminResponse)
 async def update_order_notes(
     order_id: int,
     payload: OrderNotesUpdate,
-    _admin: AdminUser = Depends(get_current_admin),
+    background_tasks: BackgroundTasks,
+    admin: AdminUser = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
@@ -352,7 +479,59 @@ async def update_order_notes(
     order.internal_notes = payload.internal_notes
     order.updated_at = datetime.now(timezone.utc)
     await db.flush()
-    return _order_to_admin(order)
+    enqueue_status_side_effects(order.id, background_tasks)
+    agent = await _agent_name(db, order)
+    return _order_to_admin(order, agent)
+
+
+@router.post("/{order_id}/notes", response_model=OrderNoteResponse)
+async def create_order_note(
+    order_id: int,
+    payload: OrderNoteCreate,
+    background_tasks: BackgroundTasks,
+    admin: AdminUser = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Order).where(Order.id == order_id, Order.deleted_at.is_(None))
+    )
+    order = result.scalar_one_or_none()
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+
+    note = await add_order_note(db, order, payload.body, admin)
+    enqueue_status_side_effects(order.id, background_tasks)
+    return OrderNoteResponse.model_validate(note)
+
+
+@router.post("/{order_id}/calls", response_model=OrderCallResponse)
+async def create_order_call(
+    order_id: int,
+    payload: OrderCallCreate,
+    background_tasks: BackgroundTasks,
+    admin: AdminUser = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Order).where(Order.id == order_id, Order.deleted_at.is_(None))
+    )
+    order = result.scalar_one_or_none()
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+
+    call = await log_order_call(db, order, payload.outcome, payload.notes, admin)
+
+    if payload.outcome == "no_answer":
+        await change_order_status(db, order, OrderStatus.NO_ANSWER, admin)
+    elif payload.outcome == "callback":
+        await change_order_status(db, order, OrderStatus.CALLBACK, admin)
+    elif payload.outcome == "confirmed":
+        await change_order_status(db, order, OrderStatus.CONFIRMED, admin)
+    elif payload.outcome == "answered":
+        await change_order_status(db, order, OrderStatus.WAITING_CONFIRMATION, admin)
+
+    enqueue_status_side_effects(order.id, background_tasks)
+    return OrderCallResponse.model_validate(call)
 
 
 @router.delete("/{order_id}", status_code=status.HTTP_204_NO_CONTENT)

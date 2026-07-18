@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,6 +9,9 @@ from app.models.order import Order, OrderStatus
 from app.schemas.order import OrderCreate, OrderCreateResponse, OrderPublicResponse
 from app.services.customer_risk import analyze_customer_risk, get_blacklist_entry
 from app.services.offers import get_offer
+from app.services.city import extract_city_from_address
+from app.services.order_lifecycle import log_order_created
+from app.services.order_notifications import enqueue_order_created
 from app.services.order_number import generate_order_number
 
 router = APIRouter(prefix="/orders", tags=["orders"])
@@ -30,7 +33,11 @@ def _order_to_public(order: Order) -> OrderPublicResponse:
 
 
 @router.post("", response_model=OrderCreateResponse, status_code=status.HTTP_201_CREATED)
-async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db)):
+async def create_order(
+    payload: OrderCreate,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+):
     offer = get_offer(payload.offer_id)
     if not offer:
         raise HTTPException(
@@ -57,6 +64,7 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
         customer_name=payload.customer_name,
         phone=payload.phone,
         address=payload.address,
+        city=extract_city_from_address(payload.address),
         offer_id=offer.id,
         offer_name=offer.name,
         quantity=offer.quantity,
@@ -67,6 +75,8 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
     )
     db.add(order)
     await db.flush()
+    await log_order_created(db, order)
+    enqueue_order_created(order.id, background_tasks)
 
     return OrderCreateResponse(
         order_number=order.order_number,

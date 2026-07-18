@@ -22,6 +22,14 @@ class Settings(BaseSettings):
 
     COOKIE_SECURE: bool = True
 
+    RESEND_API_KEY: str = ""
+    RESEND_FROM_EMAIL: str = "SHAMANGARO <orders@shamangaro.com>"
+    ADMIN_NOTIFY_EMAIL: str = ""
+
+    GOOGLE_SHEETS_SPREADSHEET_ID: str = ""
+    GOOGLE_SHEETS_TAB: str = "Orders"
+    GOOGLE_SERVICE_ACCOUNT_JSON: str = ""
+
     class Config:
         env_file = ".env"
         case_sensitive = True

@@ -163,4 +163,129 @@ async def test_admin_contacted_status(admin_client):
         json={"status": "CONTACTED"},
     )
     assert patch.status_code == 200
-    assert patch.json()["status"] == "CONTACTED"
+    assert patch.json()["status"] == "WAITING_CONFIRMATION"
+
+
+@pytest.mark.asyncio
+async def test_admin_order_timeline_and_notes(admin_client):
+    await admin_client.post(
+        "/orders",
+        json={
+            "customer_name": "Timeline Test",
+            "phone": "0655555555",
+            "address": "Agadir، centre",
+            "offer_id": "solo",
+        },
+    )
+    list_res = await admin_client.get("/admin/orders?search=Timeline")
+    order_id = list_res.json()["items"][0]["id"]
+
+    note_res = await admin_client.post(
+        f"/admin/orders/{order_id}/notes",
+        json={"body": "Customer requested delivery on Monday."},
+    )
+    assert note_res.status_code == 200
+
+    detail = await admin_client.get(f"/admin/orders/{order_id}")
+    assert detail.status_code == 200
+    data = detail.json()
+    assert len(data["timeline"]) >= 2
+    assert len(data["notes"]) == 1
+    assert data["city"] == "Agadir"
+
+
+@pytest.mark.asyncio
+async def test_admin_log_call_updates_status(admin_client):
+    await admin_client.post(
+        "/orders",
+        json={
+            "customer_name": "Call Test",
+            "phone": "0666666666",
+            "address": "Rabat",
+            "offer_id": "solo",
+        },
+    )
+    order_id = (await admin_client.get("/admin/orders?search=Call")).json()["items"][0]["id"]
+
+    call_res = await admin_client.post(
+        f"/admin/orders/{order_id}/calls",
+        json={"outcome": "confirmed", "notes": "Confirmed by phone"},
+    )
+    assert call_res.status_code == 200
+
+    detail = await admin_client.get(f"/admin/orders/{order_id}")
+    assert detail.json()["status"] == "CONFIRMED"
+    assert len(detail.json()["calls"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_admin_analytics(admin_client):
+    res = await admin_client.get("/admin/orders/analytics")
+    assert res.status_code == 200
+    data = res.json()
+    assert "today_revenue" in data
+    assert "orders_by_city" in data
+    assert "conversion_rate" in data
+
+
+@pytest.mark.asyncio
+async def test_admin_stats_v2(admin_client):
+    res = await admin_client.get("/admin/orders/stats")
+    assert res.status_code == 200
+    data = res.json()
+    assert "waiting_confirmation_orders" in data
+    assert "packed_orders" in data
+    assert "week_sales" in data
+
+
+@pytest.mark.asyncio
+async def test_admin_notifications(admin_client):
+    await admin_client.post(
+        "/orders",
+        json={
+            "customer_name": "Notify Test",
+            "phone": "0677777777",
+            "address": "Oujda",
+            "offer_id": "solo",
+        },
+    )
+    res = await admin_client.get("/admin/notifications/summary")
+    assert res.status_code == 200
+    assert res.json()["pending_count"] >= 0
+
+
+@pytest.mark.asyncio
+async def test_admin_export_formats(admin_client):
+    await admin_client.post(
+        "/orders",
+        json={
+            "customer_name": "Export Test",
+            "phone": "0688888888",
+            "address": "Meknes",
+            "offer_id": "solo",
+        },
+    )
+    for fmt, content_type in (
+        ("csv", "text/csv"),
+        ("xlsx", "spreadsheetml"),
+        ("pdf", "application/pdf"),
+    ):
+        res = await admin_client.get(f"/admin/orders/export?format={fmt}")
+        assert res.status_code == 200
+        assert content_type in res.headers.get("content-type", "")
+
+
+@pytest.mark.asyncio
+async def test_whatsapp_templates():
+    from app.services.whatsapp_templates import (
+        build_order_confirmed_whatsapp,
+        build_order_received_whatsapp,
+    )
+
+    received = build_order_received_whatsapp("أحمد", 2, 458.0)
+    assert "SHAMANGARO" in received
+    assert "Neo Transat" in received
+    assert "458" in received
+
+    confirmed = build_order_confirmed_whatsapp("أحمد")
+    assert "تم تأكيد طلبكم بنجاح" in confirmed
