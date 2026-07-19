@@ -12,13 +12,16 @@ import {
   PhoneCall,
   Search,
   Trash2,
+  RotateCcw,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {
   ALL_STATUS_FILTERS,
-  deleteOrder,
+  archiveOrder,
   downloadOrdersExport,
   listOrders,
+  permanentlyDeleteOrder,
+  restoreOrder,
   type OrderAdmin,
 } from "@/lib/orders";
 import { phoneToTelLink, phoneToWhatsAppLink } from "@/lib/phone";
@@ -36,6 +39,7 @@ const SORT_COLUMNS = [
 ];
 
 export default function AdminOrdersPage() {
+  const [viewMode, setViewMode] = useState<"active" | "archived">("active");
   const [orders, setOrders] = useState<OrderAdmin[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -48,7 +52,23 @@ export default function AdminOrdersPage() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [restoreId, setRestoreId] = useState<number | null>(null);
+  const [permanentDeleteOrder, setPermanentDeleteOrder] = useState<OrderAdmin | null>(
+    null
+  );
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionMessage, setActionMessage] = useState<{
+    kind: "success" | "error";
+    text: string;
+  } | null>(null);
   const [exporting, setExporting] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("archived") === "1") {
+      setViewMode("archived");
+    }
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -60,6 +80,7 @@ export default function AdminOrdersPage() {
         status: status || undefined,
         date_from: dateFrom || undefined,
         date_to: dateTo || undefined,
+        archived: viewMode === "archived",
         sort_by: sortBy,
         sort_dir: sortDir,
       });
@@ -69,7 +90,7 @@ export default function AdminOrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, status, dateFrom, dateTo, sortBy, sortDir]);
+  }, [page, search, status, dateFrom, dateTo, sortBy, sortDir, viewMode]);
 
   useEffect(() => {
     load();
@@ -95,12 +116,66 @@ export default function AdminOrdersPage() {
     navigator.clipboard.writeText(phone);
   };
 
-  const confirmDelete = async () => {
+  const confirmArchive = async () => {
     if (!deleteId) return;
-    await deleteOrder(deleteId);
-    setDeleteId(null);
-    load();
+    setActionLoading(true);
+    setActionMessage(null);
+    try {
+      await archiveOrder(deleteId);
+      setDeleteId(null);
+      setActionMessage({ kind: "success", text: "تمت أرشفة الطلب بنجاح." });
+      await load();
+    } catch {
+      setActionMessage({
+        kind: "error",
+        text: "تعذر أرشفة الطلب. حاول مرة أخرى.",
+      });
+    } finally {
+      setActionLoading(false);
+    }
   };
+
+  const confirmRestore = async () => {
+    if (!restoreId) return;
+    setActionLoading(true);
+    setActionMessage(null);
+    try {
+      await restoreOrder(restoreId);
+      setRestoreId(null);
+      setActionMessage({ kind: "success", text: "تمت استعادة الطلب بنجاح." });
+      await load();
+    } catch {
+      setActionMessage({
+        kind: "error",
+        text: "تعذر استعادة الطلب. حاول مرة أخرى.",
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const confirmPermanentDelete = async () => {
+    if (!permanentDeleteOrder) return;
+    setActionLoading(true);
+    setActionMessage(null);
+    try {
+      await permanentlyDeleteOrder(permanentDeleteOrder.id);
+      setPermanentDeleteOrder(null);
+      setActionMessage({ kind: "success", text: "تم حذف الطلب نهائياً." });
+      await load();
+    } catch {
+      setActionMessage({
+        kind: "error",
+        text: "تعذر الحذف النهائي. حاول مرة أخرى.",
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const archiveTarget = deleteId
+    ? orders.find((order) => order.id === deleteId)
+    : null;
 
   const handleExport = async (format: "csv" | "xlsx" | "pdf") => {
     setExporting(format);
@@ -128,9 +203,58 @@ export default function AdminOrdersPage() {
       <div>
         <h1 className="text-2xl font-black text-navy">الطلبات</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          إدارة وتتبع جميع الطلبات
+          {viewMode === "archived"
+            ? "الطلبات المؤرشفة — استعادة أو حذف نهائي"
+            : "إدارة وتتبع جميع الطلبات النشطة"}
         </p>
+        <div className="mt-4 flex gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode("active");
+              setPage(1);
+              setActionMessage(null);
+            }}
+            className={cn(
+              "min-h-11 rounded-lg px-4 py-2 text-sm font-bold",
+              viewMode === "active"
+                ? "bg-navy text-white"
+                : "border border-navy/15 text-navy hover:bg-navy/5"
+            )}
+          >
+            الطلبات النشطة
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode("archived");
+              setPage(1);
+              setActionMessage(null);
+            }}
+            className={cn(
+              "min-h-11 rounded-lg px-4 py-2 text-sm font-bold",
+              viewMode === "archived"
+                ? "bg-navy text-white"
+                : "border border-navy/15 text-navy hover:bg-navy/5"
+            )}
+          >
+            الأرشيف
+          </button>
+        </div>
       </div>
+
+      {actionMessage && (
+        <p
+          className={cn(
+            "rounded-xl px-4 py-3 text-sm font-bold",
+            actionMessage.kind === "success"
+              ? "bg-green-50 text-green-800"
+              : "bg-red-50 text-red-800"
+          )}
+        >
+          {actionMessage.text}
+        </p>
+      )}
 
       <div className="rounded-2xl border border-navy/10 bg-white p-4 md:p-6">
         <form
@@ -201,25 +325,28 @@ export default function AdminOrdersPage() {
             بحث
           </button>
           <div className="flex flex-wrap gap-2">
-            {(["csv", "xlsx", "pdf"] as const).map((fmt) => (
-              <button
-                key={fmt}
-                type="button"
-                disabled={exporting !== null}
-                onClick={() => handleExport(fmt)}
-                className="flex h-11 items-center gap-2 rounded-lg border border-navy/20 px-3 text-sm font-bold text-navy hover:bg-navy/5 disabled:opacity-50"
-              >
-                <Download size={16} />
-                {exporting === fmt ? "..." : fmt.toUpperCase()}
-              </button>
-            ))}
+            {viewMode === "active" &&
+              (["csv", "xlsx", "pdf"] as const).map((fmt) => (
+                <button
+                  key={fmt}
+                  type="button"
+                  disabled={exporting !== null}
+                  onClick={() => handleExport(fmt)}
+                  className="flex h-11 items-center gap-2 rounded-lg border border-navy/20 px-3 text-sm font-bold text-navy hover:bg-navy/5 disabled:opacity-50"
+                >
+                  <Download size={16} />
+                  {exporting === fmt ? "..." : fmt.toUpperCase()}
+                </button>
+              ))}
           </div>
         </form>
 
         {loading ? (
           <p className="py-12 text-center text-muted-foreground">جاري التحميل...</p>
         ) : orders.length === 0 ? (
-          <p className="py-12 text-center text-muted-foreground">لا توجد طلبات</p>
+          <p className="py-12 text-center text-muted-foreground">
+            {viewMode === "archived" ? "لا توجد طلبات مؤرشفة" : "لا توجد طلبات"}
+          </p>
         ) : (
           <>
             <div className="hidden overflow-x-auto lg:block">
@@ -297,43 +424,64 @@ export default function AdminOrdersPage() {
                         </td>
                         <td className="px-2 py-3">
                           <div className="flex items-center gap-1">
-                            <a
-                              href={phoneToTelLink(order.phone)}
-                              className="rounded p-1.5 hover:bg-navy/10"
-                              title="اتصال"
-                            >
-                              <PhoneCall size={16} />
-                            </a>
-                            <a
-                              href={phoneToWhatsAppLink(order.phone, waMsg)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="rounded p-1.5 text-[#25D366] hover:bg-green-50"
-                              title="واتساب"
-                            >
-                              <MessageCircle size={16} />
-                            </a>
-                            <Link
-                              href={`/admin/orders/${order.id}`}
-                              className="rounded p-1.5 hover:bg-navy/10"
-                              title="عرض"
-                            >
-                              <Eye size={16} />
-                            </Link>
-                            <button
-                              onClick={() => copyPhone(order.phone)}
-                              className="rounded p-1.5 hover:bg-navy/10"
-                              title="نسخ"
-                            >
-                              <Copy size={16} />
-                            </button>
-                            <button
-                              onClick={() => setDeleteId(order.id)}
-                              className="rounded p-1.5 text-red-600 hover:bg-red-50"
-                              title="حذف"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                            {viewMode === "active" ? (
+                              <>
+                                <a
+                                  href={phoneToTelLink(order.phone)}
+                                  className="rounded p-1.5 hover:bg-navy/10"
+                                  title="اتصال"
+                                >
+                                  <PhoneCall size={16} />
+                                </a>
+                                <a
+                                  href={phoneToWhatsAppLink(order.phone, waMsg)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="rounded p-1.5 text-[#25D366] hover:bg-green-50"
+                                  title="واتساب"
+                                >
+                                  <MessageCircle size={16} />
+                                </a>
+                                <Link
+                                  href={`/admin/orders/${order.id}`}
+                                  className="rounded p-1.5 hover:bg-navy/10"
+                                  title="عرض"
+                                >
+                                  <Eye size={16} />
+                                </Link>
+                                <button
+                                  onClick={() => copyPhone(order.phone)}
+                                  className="rounded p-1.5 hover:bg-navy/10"
+                                  title="نسخ"
+                                >
+                                  <Copy size={16} />
+                                </button>
+                                <button
+                                  onClick={() => setDeleteId(order.id)}
+                                  className="rounded p-1.5 text-red-600 hover:bg-red-50"
+                                  title="أرشفة"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => setRestoreId(order.id)}
+                                  className="rounded p-1.5 text-green-700 hover:bg-green-50"
+                                  title="استعادة"
+                                >
+                                  <RotateCcw size={16} />
+                                </button>
+                                <button
+                                  onClick={() => setPermanentDeleteOrder(order)}
+                                  className="rounded p-1.5 text-red-600 hover:bg-red-50"
+                                  title="حذف نهائي"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -368,12 +516,33 @@ export default function AdminOrdersPage() {
                     <p dir="ltr">{order.phone}</p>
                     <p>{order.city || "—"} — {order.total_price} د.م</p>
                   </div>
-                  <Link
-                    href={`/admin/orders/${order.id}`}
-                    className="mt-3 flex min-h-11 items-center justify-center rounded-lg bg-navy text-sm font-bold text-white"
-                  >
-                    عرض التفاصيل
-                  </Link>
+                  {viewMode === "active" ? (
+                    <Link
+                      href={`/admin/orders/${order.id}`}
+                      className="mt-3 flex min-h-11 items-center justify-center rounded-lg bg-navy text-sm font-bold text-white"
+                    >
+                      عرض التفاصيل
+                    </Link>
+                  ) : (
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setRestoreId(order.id)}
+                        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-green-300 bg-green-50 text-sm font-bold text-green-800"
+                      >
+                        <RotateCcw size={16} />
+                        استعادة
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPermanentDeleteOrder(order)}
+                        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 text-sm font-bold text-white"
+                      >
+                        <Trash2 size={16} />
+                        حذف نهائي
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -408,22 +577,90 @@ export default function AdminOrdersPage() {
       {deleteId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6">
-            <h3 className="text-lg font-bold text-navy">تأكيد الحذف</h3>
+            <h3 className="text-lg font-bold text-navy">تأكيد الأرشفة</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              هل أنت متأكد من أرشفة هذا الطلب؟
+              هل تريد أرشفة الطلب{" "}
+              {archiveTarget?.order_number ?? `#${deleteId}`}؟
             </p>
+            {archiveTarget && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {archiveTarget.customer_name}
+              </p>
+            )}
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setDeleteId(null)}
+                disabled={actionLoading}
                 className="min-h-11 flex-1 rounded-lg border border-navy/20 py-3 font-bold text-navy"
               >
                 إلغاء
               </button>
               <button
-                onClick={confirmDelete}
-                className="min-h-11 flex-1 rounded-lg bg-red-600 py-3 font-bold text-white"
+                onClick={confirmArchive}
+                disabled={actionLoading}
+                className="min-h-11 flex-1 rounded-lg bg-red-600 py-3 font-bold text-white disabled:opacity-60"
               >
-                حذف
+                {actionLoading ? "جاري..." : "أرشفة الطلب"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {restoreId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6">
+            <h3 className="text-lg font-bold text-navy">استعادة الطلب</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              هل تريد إعادة هذا الطلب إلى قائمة الطلبات النشطة؟
+            </p>
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setRestoreId(null)}
+                disabled={actionLoading}
+                className="min-h-11 flex-1 rounded-lg border border-navy/20 py-3 font-bold text-navy"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={confirmRestore}
+                disabled={actionLoading}
+                className="min-h-11 flex-1 rounded-lg bg-green-600 py-3 font-bold text-white disabled:opacity-60"
+              >
+                {actionLoading ? "جاري..." : "استعادة"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {permanentDeleteOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6">
+            <h3 className="text-lg font-bold text-red-700">حذف نهائي</h3>
+            <p className="mt-2 text-sm font-bold text-navy" dir="ltr">
+              {permanentDeleteOrder.order_number}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {permanentDeleteOrder.customer_name}
+            </p>
+            <p className="mt-3 text-sm font-bold text-red-700">
+              هذا الإجراء لا يمكن التراجع عنه. سيتم حذف الطلب نهائياً من النظام.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setPermanentDeleteOrder(null)}
+                disabled={actionLoading}
+                className="min-h-11 flex-1 rounded-lg border border-navy/20 py-3 font-bold text-navy"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={confirmPermanentDelete}
+                disabled={actionLoading}
+                className="min-h-11 flex-1 rounded-lg bg-red-600 py-3 font-bold text-white disabled:opacity-60"
+              >
+                {actionLoading ? "جاري..." : "حذف نهائي"}
               </button>
             </div>
           </div>

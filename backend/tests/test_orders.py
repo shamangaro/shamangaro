@@ -264,6 +264,63 @@ async def test_admin_notifications(admin_client):
 
 
 @pytest.mark.asyncio
+async def test_archive_restore_and_permanent_delete(admin_client):
+    await admin_client.post(
+        "/orders",
+        json={
+            "customer_name": "Archive Flow",
+            "phone": "0699999999",
+            "address": "Tanger",
+            "offer_id": "solo",
+        },
+    )
+    list_res = await admin_client.get("/admin/orders?search=Archive+Flow")
+    assert list_res.status_code == 200
+    order_id = list_res.json()["items"][0]["id"]
+
+    archive_res = await admin_client.post(f"/admin/orders/{order_id}/archive")
+    assert archive_res.status_code == 204
+
+    active_res = await admin_client.get("/admin/orders?search=Archive+Flow")
+    assert active_res.json()["items"] == []
+
+    archived_res = await admin_client.get(
+        "/admin/orders?archived=true&search=Archive+Flow"
+    )
+    assert len(archived_res.json()["items"]) == 1
+
+    restore_res = await admin_client.post(f"/admin/orders/{order_id}/restore")
+    assert restore_res.status_code == 204
+
+    active_res = await admin_client.get("/admin/orders?search=Archive+Flow")
+    assert len(active_res.json()["items"]) == 1
+
+    await admin_client.post(f"/admin/orders/{order_id}/archive")
+    delete_res = await admin_client.delete(f"/admin/orders/{order_id}")
+    assert delete_res.status_code == 204
+
+    archived_res = await admin_client.get(
+        "/admin/orders?archived=true&search=Archive+Flow"
+    )
+    assert archived_res.json()["items"] == []
+
+    await admin_client.post(
+        "/orders",
+        json={
+            "customer_name": "Active Delete Block",
+            "phone": "0699999998",
+            "address": "Tanger",
+            "offer_id": "solo",
+        },
+    )
+    active_id = (
+        await admin_client.get("/admin/orders?search=Active+Delete+Block")
+    ).json()["items"][0]["id"]
+    blocked_delete = await admin_client.delete(f"/admin/orders/{active_id}")
+    assert blocked_delete.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_admin_export_formats(admin_client):
     await admin_client.post(
         "/orders",

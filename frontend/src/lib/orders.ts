@@ -279,6 +279,7 @@ export async function listOrders(params: {
   date_from?: string;
   date_to?: string;
   confirmation_queue?: boolean;
+  archived?: boolean;
   sort_by?: string;
   sort_dir?: "asc" | "desc";
 }): Promise<OrderListResponse> {
@@ -290,6 +291,7 @@ export async function listOrders(params: {
   if (params.date_from) qs.set("date_from", params.date_from);
   if (params.date_to) qs.set("date_to", params.date_to);
   if (params.confirmation_queue) qs.set("confirmation_queue", "true");
+  if (params.archived) qs.set("archived", "true");
   if (params.sort_by) qs.set("sort_by", params.sort_by);
   if (params.sort_dir) qs.set("sort_dir", params.sort_dir);
   return apiFetch<OrderListResponse>(`/admin/orders?${qs.toString()}`);
@@ -324,8 +326,21 @@ export async function logOrderCall(
   });
 }
 
-export async function deleteOrder(id: number) {
+export async function archiveOrder(id: number) {
+  return apiFetch<void>(`/admin/orders/${id}/archive`, { method: "POST" });
+}
+
+export async function restoreOrder(id: number) {
+  return apiFetch<void>(`/admin/orders/${id}/restore`, { method: "POST" });
+}
+
+export async function permanentlyDeleteOrder(id: number) {
   return apiFetch<void>(`/admin/orders/${id}`, { method: "DELETE" });
+}
+
+/** @deprecated Use archiveOrder */
+export async function deleteOrder(id: number) {
+  return archiveOrder(id);
 }
 
 export function exportOrdersUrl(params: {

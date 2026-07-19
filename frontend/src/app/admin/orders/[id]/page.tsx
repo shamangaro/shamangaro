@@ -22,7 +22,7 @@ import {
 import {
   addOrderNote,
   addToBlacklist,
-  deleteOrder,
+  archiveOrder,
   getOrderAdmin,
   logOrderCall,
   normalizeOrderStatus,
@@ -71,6 +71,11 @@ export default function AdminOrderDetailPage() {
   const [blacklistReason, setBlacklistReason] = useState("");
   const [showDelete, setShowDelete] = useState(false);
   const [showBlacklist, setShowBlacklist] = useState(false);
+  const [archiving, setArchiving] = useState(false);
+  const [actionMessage, setActionMessage] = useState<{
+    kind: "success" | "error";
+    text: string;
+  } | null>(null);
   const noteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedNoteRef = useRef("");
 
@@ -150,10 +155,22 @@ export default function AdminOrderDetailPage() {
     }
   };
 
-  const handleDelete = async () => {
+  const handleArchive = async () => {
     if (!order) return;
-    await deleteOrder(order.id);
-    router.push("/admin/orders");
+    setArchiving(true);
+    setActionMessage(null);
+    try {
+      await archiveOrder(order.id);
+      setShowDelete(false);
+      router.push("/admin/orders?archived=1");
+    } catch {
+      setActionMessage({
+        kind: "error",
+        text: "تعذر أرشفة الطلب. حاول مرة أخرى.",
+      });
+    } finally {
+      setArchiving(false);
+    }
   };
 
   const copyPhone = () => {
@@ -453,11 +470,23 @@ export default function AdminOrderDetailPage() {
 
       <button
         onClick={() => setShowDelete(true)}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 py-3 text-sm font-bold text-red-600"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700"
       >
         <Trash2 size={16} />
         أرشفة الطلب
       </button>
+
+      {actionMessage && (
+        <p
+          className={`rounded-xl px-4 py-3 text-sm font-bold ${
+            actionMessage.kind === "success"
+              ? "bg-green-50 text-green-800"
+              : "bg-red-50 text-red-800"
+          }`}
+        >
+          {actionMessage.text}
+        </p>
+      )}
 
       {showBlacklist && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -495,22 +524,30 @@ export default function AdminOrderDetailPage() {
       {showDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6">
-            <h3 className="text-lg font-bold text-navy">تأكيد الحذف</h3>
+            <h3 className="text-lg font-bold text-navy">تأكيد الأرشفة</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              هل أنت متأكد من أرشفة الطلب {order.order_number}؟
+              هل تريد أرشفة الطلب {order.order_number}؟
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {order.customer_name}
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              سيختفي من قائمة الطلبات النشطة ويمكن استعادته من الأرشيف.
             </p>
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setShowDelete(false)}
+                disabled={archiving}
                 className="min-h-11 flex-1 rounded-lg border border-navy/20 py-3 font-bold text-navy"
               >
                 إلغاء
               </button>
               <button
-                onClick={handleDelete}
-                className="min-h-11 flex-1 rounded-lg bg-red-600 py-3 font-bold text-white"
+                onClick={handleArchive}
+                disabled={archiving}
+                className="min-h-11 flex-1 rounded-lg bg-red-600 py-3 font-bold text-white disabled:opacity-60"
               >
-                حذف
+                {archiving ? "جاري الأرشفة..." : "أرشفة الطلب"}
               </button>
             </div>
           </div>

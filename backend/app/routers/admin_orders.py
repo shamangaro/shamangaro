@@ -120,8 +120,11 @@ def _build_filters(
     date_from: str | None,
     date_to: str | None,
     confirmation_queue: bool = False,
+    archived: bool = False,
 ):
-    conditions = [Order.deleted_at.is_(None)]
+    conditions = [
+        Order.deleted_at.isnot(None) if archived else Order.deleted_at.is_(None)
+    ]
 
     if confirmation_queue:
         conditions.append(
@@ -247,13 +250,14 @@ async def list_orders(
     date_from: str | None = None,
     date_to: str | None = None,
     confirmation_queue: bool = False,
+    archived: bool = Query(False),
     sort_by: str = Query("created_at"),
     sort_dir: str = Query("desc"),
     _admin: AdminUser = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ):
     filters = _build_filters(
-        search, status_filter, date_from, date_to, confirmation_queue
+        search, status_filter, date_from, date_to, confirmation_queue, archived
     )
 
     total = await db.scalar(select(func.count(Order.id)).where(filters)) or 0
@@ -534,8 +538,8 @@ async def create_order_call(
     return OrderCallResponse.model_validate(call)
 
 
-@router.delete("/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_order(
+@router.post("/{order_id}/archive", status_code=status.HTTP_204_NO_CONTENT)
+async def archive_order(
     order_id: int,
     _admin: AdminUser = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
@@ -549,5 +553,45 @@ async def delete_order(
 
     order.deleted_at = datetime.now(timezone.utc)
     order.updated_at = datetime.now(timezone.utc)
+    await db.flush()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/{order_id}/restore", status_code=status.HTTP_204_NO_CONTENT)
+async def restore_order(
+    order_id: int,
+    _admin: AdminUser = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Order).where(Order.id == order_id, Order.deleted_at.isnot(None))
+    )
+    order = result.scalar_one_or_none()
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود في الأرشيف")
+
+    order.deleted_at = None
+    order.updated_at = datetime.now(timezone.utc)
+    await db.flush()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.delete("/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def permanently_delete_order(
+    order_id: int,
+    _admin: AdminUser = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Order).where(Order.id == order_id, Order.deleted_at.isnot(None))
+    )
+    order = result.scalar_one_or_none()
+    if not order:
+        raise HTTPException(
+            status_code=404,
+            detail="الطلب غير موجود في الأرشيف — لا يمكن الحذف النهائي",
+        )
+
+    await db.delete(order)
     await db.flush()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
