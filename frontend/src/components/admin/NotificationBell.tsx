@@ -2,6 +2,7 @@
 
 import { Bell, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getNotificationSummary,
@@ -75,15 +76,8 @@ function notificationBody(item: NotificationItem): string {
   return `العرض: ${offerLabel}`;
 }
 
-function showBrowserNotification(item: NotificationItem) {
-  if (typeof Notification === "undefined") return;
-  if (Notification.permission === "granted") {
-    new Notification(notificationTitle(item), {
-      body: notificationBody(item),
-      icon: "/images/logo-icon.png",
-      tag: item.order_number,
-    });
-  }
+function orderDetailsPath(orderId: number): string {
+  return `/admin/orders/${orderId}`;
 }
 
 const IOS_HOME_SCREEN_MESSAGE =
@@ -96,6 +90,7 @@ const UNSUPPORTED_MESSAGE =
   "المتصفح الحالي لا يدعم إشعارات المتصفح.";
 
 export function NotificationBell() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
   const [items, setItems] = useState<NotificationItem[]>([]);
@@ -198,6 +193,54 @@ export function NotificationBell() {
     showGrantedSuccess();
   }, [showDeniedMessage, showGrantedSuccess, showStatus]);
 
+  const markNotificationsSeenLocally = useCallback(async () => {
+    try {
+      await markNotificationsSeen();
+      lastSeenRef.current = new Date().toISOString();
+      setCount(0);
+    } catch (err) {
+      console.error("[NotificationBell] markNotificationsSeen failed:", err);
+    }
+  }, []);
+
+  const openOrderFromNotification = useCallback(
+    async (item: NotificationItem) => {
+      if (!item.order_id) {
+        console.error("[NotificationBell] missing order_id for notification", item);
+        return;
+      }
+      setOpen(false);
+      setToast(null);
+      router.push(orderDetailsPath(item.order_id));
+      await markNotificationsSeenLocally();
+    },
+    [router, markNotificationsSeenLocally]
+  );
+
+  const showBrowserNotification = useCallback(
+    (item: NotificationItem) => {
+      if (typeof Notification === "undefined") return;
+      if (Notification.permission !== "granted") return;
+      if (!item.order_id) return;
+
+      const notification = new Notification(notificationTitle(item), {
+        body: notificationBody(item),
+        icon: "/images/logo-icon.png",
+        tag: item.order_number,
+      });
+
+      notification.onclick = (event) => {
+        event.preventDefault();
+        notification.close();
+        if (typeof window !== "undefined") {
+          window.focus();
+        }
+        void openOrderFromNotification(item);
+      };
+    },
+    [openOrderFromNotification]
+  );
+
   const poll = useCallback(async () => {
     try {
       const data = await getNotificationSummary(lastSeenRef.current);
@@ -220,7 +263,7 @@ export function NotificationBell() {
         console.error("[NotificationBell] poll failed:", err);
       }
     }
-  }, []);
+  }, [showBrowserNotification]);
 
   useEffect(() => {
     poll();
@@ -237,17 +280,7 @@ export function NotificationBell() {
     const willOpen = !open;
     setOpen(willOpen);
     if (willOpen) {
-      try {
-        await markNotificationsSeen();
-        lastSeenRef.current = new Date().toISOString();
-        setCount(0);
-      } catch (err) {
-        console.error("[NotificationBell] markNotificationsSeen failed:", err);
-        showStatus(
-          "error",
-          `تعذر تحديث الإشعارات: ${err instanceof Error ? err.message : String(err)}`
-        );
-      }
+      await markNotificationsSeenLocally();
     }
   };
 
@@ -313,8 +346,11 @@ export function NotificationBell() {
                 items.map((item) => (
                   <Link
                     key={item.order_number}
-                    href={`/admin/orders/${item.order_id}`}
-                    onClick={() => setOpen(false)}
+                    href={orderDetailsPath(item.order_id)}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      void openOrderFromNotification(item);
+                    }}
                     className="block border-b border-navy/5 px-4 py-3 hover:bg-cream/50"
                   >
                     <p className="font-mono text-xs font-bold text-navy" dir="ltr">
@@ -333,13 +369,17 @@ export function NotificationBell() {
       </div>
 
       {toast && (
-        <div className="fixed bottom-4 left-4 z-50 max-w-sm rounded-xl border border-red-200 bg-white p-4 shadow-2xl">
+        <button
+          type="button"
+          onClick={() => void openOrderFromNotification(toast)}
+          className="fixed bottom-4 left-4 z-50 max-w-sm rounded-xl border border-red-200 bg-white p-4 text-right shadow-2xl"
+        >
           <p className="text-xs font-bold text-red-600">🔔 {notificationTitle(toast)}</p>
           <p className="mt-1 text-sm text-navy">{notificationBody(toast)}</p>
           <p className="mt-1 font-mono text-xs text-muted-foreground" dir="ltr">
             {toast.order_number}
           </p>
-        </div>
+        </button>
       )}
     </>
   );
