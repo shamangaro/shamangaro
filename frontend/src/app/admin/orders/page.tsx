@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ChevronDown,
@@ -117,6 +116,13 @@ export default function AdminOrdersPage() {
   const copyPhone = (phone: string) => {
     navigator.clipboard.writeText(phone);
   };
+
+  const openOrderDetails = useCallback(
+    (orderId: number) => {
+      router.push(`/admin/orders/${orderId}`);
+    },
+    [router]
+  );
 
   const confirmArchive = async () => {
     if (!deleteId) return;
@@ -444,13 +450,15 @@ export default function AdminOrdersPage() {
                                 >
                                   <MessageCircle size={16} />
                                 </a>
-                                <Link
-                                  href={`/admin/orders/${order.id}`}
+                                <button
+                                  type="button"
+                                  onClick={() => openOrderDetails(order.id)}
                                   className="rounded p-1.5 hover:bg-navy/10"
                                   title="عرض"
+                                  aria-label="عرض تفاصيل الطلب"
                                 >
                                   <Eye size={16} />
-                                </Link>
+                                </button>
                                 <button
                                   onClick={() => copyPhone(order.phone)}
                                   className="rounded p-1.5 hover:bg-navy/10"
@@ -519,16 +527,13 @@ export default function AdminOrdersPage() {
                     <p>{order.city || "—"} — {order.total_price} د.م</p>
                   </div>
                   {viewMode === "active" ? (
-                    <Link
-                      href={`/admin/orders/${order.id}`}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        router.push(`/admin/orders/${order.id}`);
-                      }}
+                    <button
+                      type="button"
+                      onClick={() => openOrderDetails(order.id)}
                       className="relative z-10 mt-3 flex min-h-11 w-full items-center justify-center rounded-lg bg-navy text-sm font-bold text-white"
                     >
                       عرض التفاصيل
-                    </Link>
+                    </button>
                   ) : (
                     <div className="mt-3 flex gap-2">
                       <button
