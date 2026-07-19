@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ChevronDown,
   ChevronLeft,
@@ -39,6 +40,7 @@ const SORT_COLUMNS = [
 ];
 
 export default function AdminOrdersPage() {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<"active" | "archived">("active");
   const [orders, setOrders] = useState<OrderAdmin[]>([]);
   const [total, setTotal] = useState(0);
@@ -519,7 +521,11 @@ export default function AdminOrdersPage() {
                   {viewMode === "active" ? (
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="mt-3 flex min-h-11 items-center justify-center rounded-lg bg-navy text-sm font-bold text-white"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        router.push(`/admin/orders/${order.id}`);
+                      }}
+                      className="relative z-10 mt-3 flex min-h-11 w-full items-center justify-center rounded-lg bg-navy text-sm font-bold text-white"
                     >
                       عرض التفاصيل
                     </Link>
