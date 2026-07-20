@@ -54,7 +54,7 @@ export const socialLinks = [
     name: "Facebook" as const,
     href: socialUrl(
       process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK,
-      "https://facebook.com/shamangaro"
+      "https://www.facebook.com/people/Shamangaro/61574339571013/"
     ),
     label: "Facebook",
   },

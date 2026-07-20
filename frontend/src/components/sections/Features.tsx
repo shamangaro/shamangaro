@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Container } from "@/components/shared/Container";
-import { Timer, TreePine, Droplets, Ruler, Package } from "lucide-react";
+import { Timer, TreePine, Droplets, Scale, Package } from "lucide-react";
 
 const features = [
   {
@@ -22,9 +22,9 @@ const features = [
     description: "مقاوم للماء، الشمس، و الرمل. ما كيتسخش بسهولة.",
   },
   {
-    icon: Ruler,
-    title: "مساحة مريحة — 140 سم",
-    description: "مساحة واسعة تناسب أي شخص، كبير أو صغير.",
+    icon: Scale,
+    title: "تحمل حتى 90 كيلو",
+    description: "هيكل قوي من خشب صلب — راحة آمنة للاستخدام اليومي.",
   },
   {
     icon: Package,

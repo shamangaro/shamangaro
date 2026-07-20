@@ -1,31 +1,50 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Container } from "@/components/shared/Container";
 import { Logo } from "@/components/shared/Logo";
-import { Star, ChevronLeft, ChevronRight, X, ZoomIn, Droplets, Armchair, TreePine, BadgeCheck, Truck, Shield, Package } from "lucide-react";
+import {
+  Star,
+  X,
+  ZoomIn,
+  ChevronLeft,
+  ChevronRight,
+  Droplets,
+  Armchair,
+  TreePine,
+  BadgeCheck,
+  Truck,
+  Shield,
+  Package,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const AUTOPLAY_MS = 4500;
 
 const images = [
   {
-    src: "/images/neo-transat-casablanca-duo.png",
-    alt: "Neo Transat — راحة لزوجين في الدار البيضاء",
+    src: "/images/neo-transat-fabric-beach.png",
+    alt: "Neo Transat — جودة القماش و علامة SHAMANGARO",
+    caption: "الجودة",
+    subtitle: "قماش مقاوم و علامة SHAMANGARO",
   },
   {
-    src: "/images/neo-transat-lake-relax.png",
-    alt: "Neo Transat — إسترخاء على ضفاف البحيرة",
+    src: "/images/neo-transat-beach-relax.png",
+    alt: "Neo Transat — راحة على الشاطئ",
+    caption: "الشاطئ",
+    subtitle: "راحة تطل على البحر",
   },
   {
-    src: "/images/neo-transat-lifestyle-carry.png",
-    alt: "Neo Transat — سهلة الحمل",
+    src: "/images/neo-transat-river-relax.png",
+    alt: "Neo Transat — إسترخاء عند النهر",
+    caption: "الطبيعة",
+    subtitle: "لحظة هدوء عند النهر",
   },
   {
-    src: "/images/neo-transat-open.png",
-    alt: "Neo Transat مفتوحة — التصميم",
+    src: "/images/neo-transat-casablanca-sunset.png",
+    alt: "Neo Transat — راحة في الدار البيضاء",
+    caption: "الدار البيضاء",
+    subtitle: "راحة تطل على البحر و المسجد",
   },
 ];
 
@@ -38,25 +57,10 @@ const heroHighlights = [
 export function ProductHero() {
   const [current, setCurrent] = useState(0);
   const [zoomed, setZoomed] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const reduceMotion = useReducedMotion();
-  const galleryRef = useRef<HTMLDivElement>(null);
 
-  const next = useCallback(
-    () => setCurrent((c) => (c + 1) % images.length),
-    []
-  );
-  const prev = useCallback(
-    () => setCurrent((c) => (c - 1 + images.length) % images.length),
-    []
-  );
-
-  useEffect(() => {
-    if (reduceMotion || zoomed || paused) return;
-
-    const id = window.setInterval(next, AUTOPLAY_MS);
-    return () => window.clearInterval(id);
-  }, [next, paused, reduceMotion, zoomed]);
+  const slide = images[current];
+  const next = () => setCurrent((c) => (c + 1) % images.length);
+  const prev = () => setCurrent((c) => (c - 1 + images.length) % images.length);
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#f5f5f5] via-white to-[#fafafa]">
@@ -82,74 +86,122 @@ export function ProductHero() {
             </h2>
 
             <div className="mx-auto w-full max-w-md lg:max-w-none">
-              <div className="rounded-[1.5rem] border-2 border-navy/20 bg-white p-2 shadow-sm sm:rounded-[2.5rem] sm:p-4 md:rounded-[3rem] md:p-5">
+              <div className="relative overflow-hidden rounded-[1.35rem] border border-navy/10 bg-[#0c1218] p-px shadow-[0_25px_60px_-20px_rgba(12,18,24,0.55)] sm:rounded-[1.75rem] md:rounded-[2rem]">
+                <div className="pointer-events-none absolute inset-x-8 top-0 z-20 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent" />
                 <div
-                  ref={galleryRef}
-                  className="group relative cursor-zoom-in"
-                  onMouseEnter={() => setPaused(true)}
-                  onMouseLeave={() => setPaused(false)}
-                  onTouchStart={() => setPaused(true)}
-                  onTouchEnd={() => setPaused(false)}
+                  className="group relative cursor-zoom-in overflow-hidden rounded-[1.32rem] sm:rounded-[1.72rem] md:rounded-[1.97rem]"
                   onClick={() => setZoomed(true)}
                 >
-                  <div className="relative aspect-square overflow-hidden rounded-[1.35rem] bg-gradient-to-br from-[#dce8ef]/50 via-[#faf8f5] to-[#f3efe8] sm:rounded-[1.75rem] md:rounded-[2.25rem]">
-                    <AnimatePresence mode="wait" initial={false}>
-                      <motion.div
-                        key={current}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                        className="absolute inset-0"
-                      >
-                        <Image
-                          src={images[current].src}
-                          alt={images[current].alt}
-                          fill
-                          className="object-contain p-4 transition-transform duration-500 group-hover:scale-[1.02] sm:p-6 md:p-8"
-                          priority={current === 0}
-                          sizes="(max-width: 768px) 92vw, 46vw"
-                        />
-                      </motion.div>
-                    </AnimatePresence>
+                  <div className="relative aspect-[4/5] overflow-hidden bg-[#0c1218] sm:aspect-square">
+                    <Image
+                      key={slide.src}
+                      src={slide.src}
+                      alt={slide.alt}
+                      fill
+                      className="object-cover object-center"
+                      priority={current === 0}
+                      sizes="(max-width: 768px) 92vw, 46vw"
+                    />
 
-                    <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-md backdrop-blur-sm opacity-100 sm:bottom-4 sm:left-4 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
-                      <ZoomIn size={13} />
-                      إضغط للتكبير
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
+
+                    <div className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-5">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gold sm:text-[11px]">
+                        {slide.caption}
+                      </p>
+                      <p className="mt-1 text-sm font-bold text-white sm:text-base">
+                        {slide.subtitle}
+                      </p>
+
+                      <div className="mt-3 flex items-center justify-between gap-3">
+                        <div className="flex flex-1 gap-1.5">
+                          {images.map((_, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrent(i);
+                              }}
+                              aria-label={`صورة ${i + 1}`}
+                              className="relative h-1 flex-1 overflow-hidden rounded-full bg-white/25"
+                            >
+                              <span
+                                className={cn(
+                                  "absolute inset-y-0 start-0 rounded-full bg-gold",
+                                  i === current ? "w-full" : "w-0"
+                                )}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                        <span className="flex shrink-0 items-center gap-1 text-[10px] font-medium text-white/70">
+                          <ZoomIn size={12} />
+                          تكبير
+                        </span>
+                      </div>
                     </div>
 
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         next();
                       }}
-                      className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white/95 text-navy shadow-[0_4px_20px_-4px_rgba(17,17,17,0.15)] backdrop-blur-sm transition-all hover:border-navy hover:bg-navy hover:text-white hover:shadow-lg sm:left-4"
+                      className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white backdrop-blur-md transition-colors hover:border-gold/50 hover:bg-navy sm:left-3"
                       aria-label="التالي"
                     >
                       <ChevronLeft size={18} strokeWidth={2} />
                     </button>
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         prev();
                       }}
-                      className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-navy/10 bg-white/95 text-navy shadow-[0_4px_20px_-4px_rgba(17,17,17,0.15)] backdrop-blur-sm transition-all hover:border-navy hover:bg-navy hover:text-white hover:shadow-lg sm:right-4"
+                      className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white backdrop-blur-md transition-colors hover:border-gold/50 hover:bg-navy sm:right-3"
                       aria-label="السابق"
                     >
                       <ChevronRight size={18} strokeWidth={2} />
                     </button>
                   </div>
                 </div>
+              </div>
 
-                <div className="mt-4 sm:mt-5">
-                  <Logo
-                    variant="wordmark"
-                    size="sm"
-                    href={null}
-                    subtitle="Premium Brand"
-                    subtitleClassName="text-[10px] font-semibold uppercase tracking-[0.14em] text-navy/45 sm:text-[11px]"
-                  />
-                </div>
+              <div className="mt-4 grid grid-cols-4 gap-2 sm:mt-5 sm:gap-2.5">
+                {images.map((image, i) => (
+                  <button
+                    key={image.src}
+                    type="button"
+                    onClick={() => setCurrent(i)}
+                    aria-label={image.alt}
+                    className={cn(
+                      "relative aspect-square overflow-hidden rounded-xl border-2 transition-colors",
+                      i === current
+                        ? "border-gold shadow-[0_8px_20px_-8px_rgba(212,168,83,0.55)]"
+                        : "border-navy/10 opacity-70 hover:border-navy/25 hover:opacity-100"
+                    )}
+                  >
+                    <Image
+                      src={image.src}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-4 sm:mt-5">
+                <Logo
+                  variant="wordmark"
+                  size="sm"
+                  href={null}
+                  subtitle="Premium Brand"
+                  subtitleClassName="text-[10px] font-semibold uppercase tracking-[0.14em] text-navy/45 sm:text-[11px]"
+                />
               </div>
 
               <div className="mt-4 flex flex-col gap-2 min-[400px]:grid min-[400px]:grid-cols-3 sm:mt-5 sm:gap-3">
@@ -285,88 +337,90 @@ export function ProductHero() {
             </div>
           </motion.div>
 
-          {/* Zoom Modal */}
-          <AnimatePresence>
-            {zoomed && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          {zoomed && (
+            <div
+              className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+              onClick={() => setZoomed(false)}
+            >
+              <button
+                type="button"
                 onClick={() => setZoomed(false)}
+                className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+                aria-label="إغلاق"
               >
-                <button
-                  onClick={() => setZoomed(false)}
-                  className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
-                  aria-label="إغلاق"
-                >
-                  <X size={22} />
-                </button>
+                <X size={22} />
+              </button>
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    next();
-                  }}
-                  className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
-                  aria-label="التالي"
-                >
-                  <ChevronLeft size={24} />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    prev();
-                  }}
-                  className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
-                  aria-label="السابق"
-                >
-                  <ChevronRight size={24} />
-                </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  next();
+                }}
+                className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white hover:bg-white/20"
+                aria-label="التالي"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prev();
+                }}
+                className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white hover:bg-white/20"
+                aria-label="السابق"
+              >
+                <ChevronRight size={24} />
+              </button>
 
-                <motion.div
-                  key={current}
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="relative h-[85vh] w-[90vw] max-w-4xl"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Image
-                    src={images[current].src}
-                    alt={images[current].alt}
-                    fill
-                    className="object-contain"
-                    sizes="90vw"
-                  />
-                </motion.div>
-
-                <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
-                  {images.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrent(i);
-                      }}
-                      className="flex h-11 w-11 items-center justify-center rounded-full transition-all"
-                    >
-                      <span
-                        className={cn(
-                          "block rounded-full transition-all",
-                          i === current
-                            ? "h-2.5 w-6 bg-white"
-                            : "h-2.5 w-2.5 bg-white/30"
-                        )}
-                      />
-                    </button>
-                  ))}
+              <div
+                className="relative h-[85vh] w-[90vw] max-w-5xl overflow-hidden rounded-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Image
+                  key={`zoom-${slide.src}`}
+                  src={slide.src}
+                  alt={slide.alt}
+                  fill
+                  className="object-cover object-center"
+                  sizes="90vw"
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-5 pt-16">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
+                    {slide.caption}
+                  </p>
+                  <p className="mt-1 text-base font-bold text-white">
+                    {slide.subtitle}
+                  </p>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+
+              <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrent(i);
+                    }}
+                    className="flex h-11 w-11 items-center justify-center rounded-full"
+                    aria-label={`صورة ${i + 1}`}
+                  >
+                    <span
+                      className={cn(
+                        "block rounded-full",
+                        i === current
+                          ? "h-2.5 w-6 bg-white"
+                          : "h-2.5 w-2.5 bg-white/30"
+                      )}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </Container>
     </section>
