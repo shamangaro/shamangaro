@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -26,6 +26,7 @@ import {
   getOrderAdmin,
   logOrderCall,
   normalizeOrderStatus,
+  restoreOrder,
   updateOrderStatus,
   type CallOutcome,
   type OrderAdminDetail,
@@ -39,6 +40,7 @@ import {
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { OrderTimeline } from "@/components/admin/OrderTimeline";
 import { RiskFlag, TrustBadge } from "@/components/admin/TrustBadge";
+import { ApiError } from "@/lib/api";
 
 const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
   { value: "NEW", label: "جديد" },
@@ -61,10 +63,12 @@ const CALL_OUTCOMES: { value: CallOutcome; label: string }[] = [
 
 export default function AdminOrderDetailPage() {
   const params = useParams();
-  const router = useRouter();
-  const orderId = Number(params.id);
+  const rawId = params.id;
+  const orderId = typeof rawId === "string" ? Number(rawId) : NaN;
+  const validOrderId = Number.isFinite(orderId) && orderId > 0;
   const [order, setOrder] = useState<OrderAdminDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [blacklisting, setBlacklisting] = useState(false);
   const [noteDraft, setNoteDraft] = useState("");
@@ -72,6 +76,7 @@ export default function AdminOrderDetailPage() {
   const [showDelete, setShowDelete] = useState(false);
   const [showBlacklist, setShowBlacklist] = useState(false);
   const [archiving, setArchiving] = useState(false);
+  const [restoring, setRestoring] = useState(false);
   const [actionMessage, setActionMessage] = useState<{
     kind: "success" | "error";
     text: string;
@@ -82,21 +87,45 @@ export default function AdminOrderDetailPage() {
   const loadOrder = useCallback(async () => {
     const data = await getOrderAdmin(orderId);
     setOrder(data);
+    setLoadError(null);
   }, [orderId]);
 
   useEffect(() => {
-    if (!orderId) return;
+    if (!validOrderId) {
+      setLoading(false);
+      setLoadError("رقم الطلب غير صالح.");
+      return;
+    }
+
     loadOrder()
-      .catch(() => router.push("/admin/orders"))
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 401) {
+          setLoadError("انتهت الجلسة. سجّل الدخول مرة أخرى.");
+          return;
+        }
+        if (err instanceof ApiError && err.status === 404) {
+          setLoadError("الطلب غير موجود أو تم حذفه.");
+          return;
+        }
+        setLoadError("تعذر تحميل تفاصيل الطلب. حاول مرة أخرى.");
+      })
       .finally(() => setLoading(false));
-  }, [orderId, router, loadOrder]);
+  }, [validOrderId, loadOrder]);
+
+  const showActionError = (text = "تعذر تنفيذ العملية. حاول مرة أخرى.") => {
+    setActionMessage({ kind: "error", text });
+  };
 
   const handleStatusChange = async (status: OrderStatus) => {
-    if (!order) return;
+    if (!order || order.is_archived) return;
     setSaving(true);
+    setActionMessage(null);
     setOrder({ ...order, status });
     try {
       await updateOrderStatus(order.id, status);
+      await loadOrder();
+    } catch {
+      showActionError();
       await loadOrder();
     } finally {
       setSaving(false);
@@ -104,11 +133,14 @@ export default function AdminOrderDetailPage() {
   };
 
   const handleCall = async (outcome: CallOutcome) => {
-    if (!order) return;
+    if (!order || order.is_archived) return;
     setSaving(true);
+    setActionMessage(null);
     try {
       await logOrderCall(order.id, outcome);
       await loadOrder();
+    } catch {
+      showActionError();
     } finally {
       setSaving(false);
     }
@@ -116,13 +148,17 @@ export default function AdminOrderDetailPage() {
 
   const saveNote = useCallback(
     async (body: string) => {
-      if (!order || !body.trim() || body.trim() === lastSavedNoteRef.current) {
+      if (!order || order.is_archived || !body.trim() || body.trim() === lastSavedNoteRef.current) {
         return;
       }
-      await addOrderNote(order.id, body.trim());
-      lastSavedNoteRef.current = body.trim();
-      await loadOrder();
-      setNoteDraft("");
+      try {
+        await addOrderNote(order.id, body.trim());
+        lastSavedNoteRef.current = body.trim();
+        await loadOrder();
+        setNoteDraft("");
+      } catch {
+        showActionError("تعذر حفظ الملاحظة.");
+      }
     },
     [order, loadOrder]
   );
@@ -139,6 +175,7 @@ export default function AdminOrderDetailPage() {
   const handleBlacklist = async () => {
     if (!order || !blacklistReason.trim()) return;
     setBlacklisting(true);
+    setActionMessage(null);
     try {
       await addToBlacklist({
         phone: order.phone,
@@ -150,19 +187,21 @@ export default function AdminOrderDetailPage() {
       setShowBlacklist(false);
       setBlacklistReason("");
       await loadOrder();
+    } catch {
+      showActionError("تعذر إضافة العميل للقائمة السوداء.");
     } finally {
       setBlacklisting(false);
     }
   };
 
   const handleArchive = async () => {
-    if (!order) return;
+    if (!order || order.is_archived) return;
     setArchiving(true);
     setActionMessage(null);
     try {
       await archiveOrder(order.id);
       setShowDelete(false);
-      router.push("/admin/orders?archived=1");
+      window.location.href = "/admin/orders?archived=1";
     } catch {
       setActionMessage({
         kind: "error",
@@ -170,6 +209,24 @@ export default function AdminOrderDetailPage() {
       });
     } finally {
       setArchiving(false);
+    }
+  };
+
+  const handleRestore = async () => {
+    if (!order || !order.is_archived) return;
+    setRestoring(true);
+    setActionMessage(null);
+    try {
+      await restoreOrder(order.id);
+      setActionMessage({ kind: "success", text: "تمت استعادة الطلب بنجاح." });
+      await loadOrder();
+    } catch {
+      setActionMessage({
+        kind: "error",
+        text: "تعذر استعادة الطلب. حاول مرة أخرى.",
+      });
+    } finally {
+      setRestoring(false);
     }
   };
 
@@ -183,7 +240,21 @@ export default function AdminOrderDetailPage() {
     );
   }
 
-  if (!order) return null;
+  if (loadError || !order) {
+    return (
+      <div className="mx-auto max-w-md space-y-4 py-16 text-center">
+        <p className="text-lg font-bold text-red-700">{loadError ?? "الطلب غير موجود."}</p>
+        <a
+          href="/admin/orders"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-navy px-6 text-sm font-bold text-white"
+        >
+          العودة إلى الطلبات
+        </a>
+      </div>
+    );
+  }
+
+  const isArchived = Boolean(order.is_archived);
 
   const risk = order.risk;
   const currentStatus = normalizeOrderStatus(order.status);
@@ -229,6 +300,23 @@ export default function AdminOrderDetailPage() {
           )}
         </div>
       </div>
+
+      {isArchived && (
+        <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4">
+          <p className="font-bold text-amber-900">طلب مؤرشف</p>
+          <p className="mt-1 text-sm text-amber-800">
+            هذا الطلب في الأرشيف. يمكنك استعادته للعودة إلى القائمة النشطة.
+          </p>
+          <button
+            type="button"
+            onClick={handleRestore}
+            disabled={restoring}
+            className="mt-3 min-h-11 rounded-lg bg-green-600 px-4 text-sm font-bold text-white disabled:opacity-60"
+          >
+            {restoring ? "جاري الاستعادة..." : "استعادة الطلب"}
+          </button>
+        </div>
+      )}
 
       {risk?.is_blacklisted && (
         <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-4">
@@ -390,54 +478,77 @@ export default function AdminOrderDetailPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
-        <p className="mb-3 text-sm font-bold text-muted-foreground">نتيجة المكالمة</p>
-        <div className="flex flex-wrap gap-2">
-          {CALL_OUTCOMES.map((opt) => (
-            <button
-              key={opt.value}
-              disabled={saving}
-              onClick={() => handleCall(opt.value)}
-              className="min-h-11 rounded-full border border-navy/15 px-4 py-2.5 text-sm font-bold text-navy hover:bg-navy hover:text-white disabled:opacity-40"
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      {!isArchived && (
+        <>
+          <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+            <p className="mb-3 text-sm font-bold text-muted-foreground">نتيجة المكالمة</p>
+            <div className="flex flex-wrap gap-2">
+              {CALL_OUTCOMES.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  disabled={saving}
+                  onClick={() => handleCall(opt.value)}
+                  className="min-h-11 rounded-full border border-navy/15 px-4 py-2.5 text-sm font-bold text-navy hover:bg-navy hover:text-white disabled:opacity-40"
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
-        <h2 className="mb-4 text-sm font-bold text-muted-foreground">تغيير الحالة</h2>
-        <div className="flex flex-wrap gap-2">
-          {STATUS_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              disabled={saving || currentStatus === opt.value}
-              onClick={() => handleStatusChange(opt.value)}
-              className="min-h-11 rounded-full border border-navy/15 px-4 py-2.5 text-sm font-bold text-navy hover:bg-navy hover:text-white disabled:opacity-40"
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
+          <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+            <h2 className="mb-4 text-sm font-bold text-muted-foreground">تغيير الحالة</h2>
+            <div className="flex flex-wrap gap-2">
+              {STATUS_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  disabled={saving || currentStatus === opt.value}
+                  onClick={() => handleStatusChange(opt.value)}
+                  className="min-h-11 rounded-full border border-navy/15 px-4 py-2.5 text-sm font-bold text-navy hover:bg-navy hover:text-white disabled:opacity-40"
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
-        <div className="mb-4 flex items-center gap-2">
-          <StickyNote size={18} className="text-gold" />
-          <h2 className="text-sm font-bold text-muted-foreground">
-            ملاحظات داخلية (حفظ تلقائي)
-          </h2>
-        </div>
-        <textarea
-          value={noteDraft}
-          onChange={(e) => setNoteDraft(e.target.value)}
-          rows={3}
-          placeholder="اكتب ملاحظة..."
-          className="w-full rounded-xl border-2 border-navy/15 px-4 py-3 text-sm outline-none focus:border-navy"
-        />
-        {order.notes.length > 0 && (
-          <ul className="mt-4 space-y-2 border-t border-navy/10 pt-4">
+          <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <StickyNote size={18} className="text-gold" />
+              <h2 className="text-sm font-bold text-muted-foreground">
+                ملاحظات داخلية (حفظ تلقائي)
+              </h2>
+            </div>
+            <textarea
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+              rows={3}
+              placeholder="اكتب ملاحظة..."
+              className="w-full rounded-xl border-2 border-navy/15 px-4 py-3 text-sm outline-none focus:border-navy"
+            />
+            {order.notes.length > 0 && (
+              <ul className="mt-4 space-y-2 border-t border-navy/10 pt-4">
+                {order.notes.map((note) => (
+                  <li key={note.id} className="rounded-lg bg-cream/50 px-3 py-2 text-sm">
+                    <p>{note.body}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {new Date(note.created_at).toLocaleString("ar-MA")}
+                      {note.admin_username && ` — ${note.admin_username}`}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
+
+      {isArchived && order.notes.length > 0 && (
+        <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
+          <h2 className="mb-4 text-sm font-bold text-muted-foreground">ملاحظات داخلية</h2>
+          <ul className="space-y-2">
             {order.notes.map((note) => (
               <li key={note.id} className="rounded-lg bg-cream/50 px-3 py-2 text-sm">
                 <p>{note.body}</p>
@@ -448,8 +559,8 @@ export default function AdminOrderDetailPage() {
               </li>
             ))}
           </ul>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
         <h2 className="mb-4 text-sm font-bold text-muted-foreground">
@@ -458,8 +569,9 @@ export default function AdminOrderDetailPage() {
         <OrderTimeline events={order.timeline} />
       </div>
 
-      {!risk?.is_blacklisted && (
+      {!isArchived && !risk?.is_blacklisted && (
         <button
+          type="button"
           onClick={() => setShowBlacklist(true)}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-300 bg-red-50 py-3 text-sm font-bold text-red-700"
         >
@@ -468,13 +580,16 @@ export default function AdminOrderDetailPage() {
         </button>
       )}
 
-      <button
-        onClick={() => setShowDelete(true)}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700"
-      >
-        <Trash2 size={16} />
-        أرشفة الطلب
-      </button>
+      {!isArchived && (
+        <button
+          type="button"
+          onClick={() => setShowDelete(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-bold text-white hover:bg-red-700"
+        >
+          <Trash2 size={16} />
+          أرشفة الطلب
+        </button>
+      )}
 
       {actionMessage && (
         <p

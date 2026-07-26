@@ -50,6 +50,7 @@ export default function AdminOrdersPage() {
   const [sortBy, setSortBy] = useState("created_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [restoreId, setRestoreId] = useState<number | null>(null);
   const [permanentDeleteOrder, setPermanentDeleteOrder] = useState<OrderAdmin | null>(
@@ -71,6 +72,7 @@ export default function AdminOrdersPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const listData = await listOrders({
         page,
@@ -86,6 +88,11 @@ export default function AdminOrdersPage() {
       setOrders(listData.items);
       setTotal(listData.total);
       setTotalPages(listData.total_pages);
+    } catch {
+      setLoadError("تعذر تحميل الطلبات. تأكد من اتصالك وسجّل الدخول إن لزم.");
+      setOrders([]);
+      setTotal(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -241,6 +248,12 @@ export default function AdminOrdersPage() {
           </button>
         </div>
       </div>
+
+      {loadError && (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-800">
+          {loadError}
+        </p>
+      )}
 
       {actionMessage && (
         <p
@@ -450,6 +463,7 @@ export default function AdminOrdersPage() {
                                   <Eye size={16} />
                                 </a>
                                 <button
+                                  type="button"
                                   onClick={() => copyPhone(order.phone)}
                                   className="rounded p-1.5 hover:bg-navy/10"
                                   title="نسخ"
@@ -457,6 +471,7 @@ export default function AdminOrdersPage() {
                                   <Copy size={16} />
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={() => setDeleteId(order.id)}
                                   className="rounded p-1.5 text-red-600 hover:bg-red-50"
                                   title="أرشفة"
@@ -466,7 +481,16 @@ export default function AdminOrdersPage() {
                               </>
                             ) : (
                               <>
+                                <a
+                                  href={`/admin/orders/${order.id}`}
+                                  className="rounded p-1.5 hover:bg-navy/10"
+                                  title="عرض"
+                                  aria-label="عرض تفاصيل الطلب"
+                                >
+                                  <Eye size={16} />
+                                </a>
                                 <button
+                                  type="button"
                                   onClick={() => setRestoreId(order.id)}
                                   className="rounded p-1.5 text-green-700 hover:bg-green-50"
                                   title="استعادة"
@@ -474,6 +498,7 @@ export default function AdminOrdersPage() {
                                   <RotateCcw size={16} />
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={() => setPermanentDeleteOrder(order)}
                                   className="rounded p-1.5 text-red-600 hover:bg-red-50"
                                   title="حذف نهائي"
@@ -517,30 +542,49 @@ export default function AdminOrdersPage() {
                     <p>{order.city || "—"} — {order.total_price} د.م</p>
                   </div>
                   {viewMode === "active" ? (
-                    <a
-                      href={`/admin/orders/${order.id}`}
-                      className="relative z-10 mt-3 flex min-h-11 w-full items-center justify-center rounded-lg bg-navy text-sm font-bold text-white"
-                    >
-                      عرض التفاصيل
-                    </a>
-                  ) : (
                     <div className="mt-3 flex gap-2">
+                      <a
+                        href={`/admin/orders/${order.id}`}
+                        className="relative z-10 flex min-h-11 flex-1 items-center justify-center rounded-lg bg-navy text-sm font-bold text-white"
+                      >
+                        عرض التفاصيل
+                      </a>
                       <button
                         type="button"
-                        onClick={() => setRestoreId(order.id)}
-                        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-green-300 bg-green-50 text-sm font-bold text-green-800"
+                        onClick={() => setDeleteId(order.id)}
+                        className="flex min-h-11 items-center justify-center rounded-lg border border-red-300 bg-red-50 px-4 text-red-700"
+                        title="أرشفة"
+                        aria-label="أرشفة الطلب"
                       >
-                        <RotateCcw size={16} />
-                        استعادة
+                        <Trash2 size={18} />
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => setPermanentDeleteOrder(order)}
-                        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 text-sm font-bold text-white"
+                    </div>
+                  ) : (
+                    <div className="mt-3 space-y-2">
+                      <a
+                        href={`/admin/orders/${order.id}`}
+                        className="flex min-h-11 w-full items-center justify-center rounded-lg border border-navy/15 text-sm font-bold text-navy"
                       >
-                        <Trash2 size={16} />
-                        حذف نهائي
-                      </button>
+                        عرض التفاصيل
+                      </a>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setRestoreId(order.id)}
+                          className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-green-300 bg-green-50 text-sm font-bold text-green-800"
+                        >
+                          <RotateCcw size={16} />
+                          استعادة
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPermanentDeleteOrder(order)}
+                          className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 text-sm font-bold text-white"
+                        >
+                          <Trash2 size={16} />
+                          حذف نهائي
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ChevronLeft,
@@ -427,12 +426,12 @@ export default function ConfirmationPage() {
                 <OrderTimeline events={current.timeline} />
               </div>
 
-              <Link
+              <a
                 href={`/admin/orders/${current.id}`}
                 className="block text-center text-sm font-bold text-navy underline"
               >
                 عرض التفاصيل الكاملة
-              </Link>
+              </a>
             </>
           )}
         </div>

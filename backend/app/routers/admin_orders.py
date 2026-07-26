@@ -413,9 +413,7 @@ async def get_order(
     _admin: AdminUser = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
-        select(Order).where(Order.id == order_id, Order.deleted_at.is_(None))
-    )
+    result = await db.execute(select(Order).where(Order.id == order_id))
     order = result.scalar_one_or_none()
     if not order:
         raise HTTPException(status_code=404, detail="الطلب غير موجود")
@@ -437,6 +435,7 @@ async def get_order(
     ]
     return OrderAdminDetailResponse(
         **base.model_dump(),
+        is_archived=order.deleted_at is not None,
         risk=risk,
         timeline=timeline,
         notes=notes,

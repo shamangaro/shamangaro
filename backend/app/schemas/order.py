@@ -108,6 +108,7 @@ class OrderCallResponse(BaseModel):
 
 
 class OrderAdminDetailResponse(OrderAdminResponse):
+    is_archived: bool = False
     risk: OrderRiskResponse | None = None
     timeline: list[OrderTimelineEvent] = []
     notes: list[OrderNoteResponse] = []

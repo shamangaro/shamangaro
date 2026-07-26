@@ -87,6 +87,7 @@ export interface OrderCall {
 }
 
 export interface OrderAdminDetail extends OrderAdmin {
+  is_archived?: boolean;
   risk: OrderRisk | null;
   timeline: OrderTimelineEvent[];
   notes: OrderNote[];

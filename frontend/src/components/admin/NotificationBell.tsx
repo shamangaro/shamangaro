@@ -1,8 +1,6 @@
 "use client";
 
 import { Bell, X } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getNotificationSummary,
@@ -90,7 +88,6 @@ const UNSUPPORTED_MESSAGE =
   "المتصفح الحالي لا يدعم إشعارات المتصفح.";
 
 export function NotificationBell() {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
   const [items, setItems] = useState<NotificationItem[]>([]);
@@ -203,19 +200,11 @@ export function NotificationBell() {
     }
   }, []);
 
-  const openOrderFromNotification = useCallback(
-    async (item: NotificationItem) => {
-      if (!item.order_id) {
-        console.error("[NotificationBell] missing order_id for notification", item);
-        return;
-      }
-      setOpen(false);
-      setToast(null);
-      router.push(orderDetailsPath(item.order_id));
-      await markNotificationsSeenLocally();
-    },
-    [router, markNotificationsSeenLocally]
-  );
+  const dismissNotificationUi = useCallback(async () => {
+    setOpen(false);
+    setToast(null);
+    await markNotificationsSeenLocally();
+  }, [markNotificationsSeenLocally]);
 
   const showBrowserNotification = useCallback(
     (item: NotificationItem) => {
@@ -234,11 +223,11 @@ export function NotificationBell() {
         notification.close();
         if (typeof window !== "undefined") {
           window.focus();
+          window.location.assign(orderDetailsPath(item.order_id));
         }
-        void openOrderFromNotification(item);
       };
     },
-    [openOrderFromNotification]
+    []
   );
 
   const poll = useCallback(async () => {
@@ -344,12 +333,11 @@ export function NotificationBell() {
                 </p>
               ) : (
                 items.map((item) => (
-                  <Link
+                  <a
                     key={item.order_number}
                     href={orderDetailsPath(item.order_id)}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      void openOrderFromNotification(item);
+                    onClick={() => {
+                      void dismissNotificationUi();
                     }}
                     className="block border-b border-navy/5 px-4 py-3 hover:bg-cream/50"
                   >
@@ -360,7 +348,7 @@ export function NotificationBell() {
                     <p className="text-xs text-muted-foreground">
                       {item.total_price} د.م
                     </p>
-                  </Link>
+                  </a>
                 ))
               )}
             </div>
@@ -369,9 +357,11 @@ export function NotificationBell() {
       </div>
 
       {toast && (
-        <button
-          type="button"
-          onClick={() => void openOrderFromNotification(toast)}
+        <a
+          href={orderDetailsPath(toast.order_id)}
+          onClick={() => {
+            void dismissNotificationUi();
+          }}
           className="fixed bottom-4 left-4 z-50 max-w-sm rounded-xl border border-red-200 bg-white p-4 text-right shadow-2xl"
         >
           <p className="text-xs font-bold text-red-600">🔔 {notificationTitle(toast)}</p>
@@ -379,7 +369,7 @@ export function NotificationBell() {
           <p className="mt-1 font-mono text-xs text-muted-foreground" dir="ltr">
             {toast.order_number}
           </p>
-        </button>
+        </a>
       )}
     </>
   );
