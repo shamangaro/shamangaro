@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Truck, Wallet, Shield, BadgeCheck } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { Logo } from "@/components/shared/Logo";
+import { LedTickerBand } from "@/components/shared/LedTickerBand";
 import { useCart } from "@/components/layout/cart-store";
 import { cn } from "@/lib/utils";
 
 const announcements = [
-  { icon: "🚚", text: "توصيل مجاني لجميع مدن المغرب" },
-  { icon: "💵", text: "الدفع عند الاستلام" },
+  { icon: Truck, label: "توصيل مجاني لجميع مدن المغرب" },
+  { icon: Wallet, label: "الدفع عند الاستلام" },
+  { icon: Shield, label: "ضمان سنة كاملة" },
+  { icon: BadgeCheck, label: "جودة SHAMANGARO Premium" },
 ];
 
 const navLinks = [
@@ -23,75 +25,17 @@ const navLinks = [
 
 const logoSubtitle = "Premium Brand";
 const logoSubtitleClassName =
-  "font-semibold uppercase tracking-[0.14em] text-navy/45 text-[9px] sm:text-[10px] md:text-[11px]";
+  "font-semibold uppercase tracking-[0.14em] text-navy/45 text-[10px] sm:text-[11px] md:text-xs";
 
 function AnnouncementBar() {
-  const [index, setIndex] = useState(0);
-  const reduceMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (reduceMotion) return;
-
-    const id = window.setInterval(() => {
-      setIndex((current) => (current + 1) % announcements.length);
-    }, 4000);
-
-    return () => window.clearInterval(id);
-  }, [reduceMotion]);
-
-  const active = announcements[index];
-
   return (
-    <div aria-live="polite" aria-atomic="true">
-      <motion.div
-        className="relative overflow-hidden border-t border-gold/60 bg-black"
-        animate={
-          reduceMotion
-            ? undefined
-            : { backgroundColor: ["#000000", "#141414", "#000000"] }
-        }
-        transition={
-          reduceMotion
-            ? undefined
-            : { duration: 2.8, repeat: Infinity, ease: "easeInOut" }
-        }
-      >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_0%,rgba(212,168,83,0.1),transparent)]" />
-        <Container className="relative flex h-9 items-center justify-center overflow-hidden sm:h-10">
-          {reduceMotion ? (
-            <p className="flex max-w-full items-center gap-1.5 px-1 text-xs font-bold tracking-wide text-white sm:gap-2 sm:text-sm">
-              <span
-                aria-hidden="true"
-                className="flex h-5 w-5 items-center justify-center rounded-full bg-gold/15 text-xs"
-              >
-                {active.icon}
-              </span>
-              <span className="truncate">{active.text}</span>
-            </p>
-          ) : (
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.p
-                key={index}
-                initial={{ y: "100%", opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: "-100%", opacity: 0 }}
-                transition={{ duration: 0.55, ease: [0.32, 0.72, 0, 1] }}
-                className="absolute inset-x-0 flex items-center justify-center gap-1.5 px-3 text-xs font-bold tracking-wide text-white sm:gap-2 sm:px-6 sm:text-sm lg:px-8"
-              >
-                <span
-                  aria-hidden="true"
-                  className="flex h-5 w-5 items-center justify-center rounded-full bg-gold/15 text-xs"
-                >
-                  {active.icon}
-                </span>
-                <span className="truncate">{active.text}</span>
-              </motion.p>
-            </AnimatePresence>
-          )}
-        </Container>
-      </motion.div>
-      <div className="h-[2px] bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
-    </div>
+    <LedTickerBand
+      items={announcements}
+      ariaLabel="عروض و مميزات SHAMANGARO"
+      compact
+      animation="vertical"
+      intervalMs={4000}
+    />
   );
 }
 
@@ -114,17 +58,17 @@ export function Header() {
           )}
         >
           <Container>
-            <div className="relative flex min-h-[3.25rem] items-center gap-2.5 sm:min-h-[3.75rem]">
+            <div className="relative flex min-h-[3.75rem] items-center gap-2.5 sm:min-h-[4.25rem]">
               <Logo
-                size="sm"
+                size="md"
                 href="/"
                 priority
                 subtitle={logoSubtitle}
                 subtitleClassName={logoSubtitleClassName}
-                className="min-w-0 max-w-[58%] shrink md:hidden"
+                className="min-w-0 max-w-[62%] shrink md:hidden"
               />
               <Logo
-                size="md"
+                size="lg"
                 href="/"
                 priority
                 subtitle={logoSubtitle}
