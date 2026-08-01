@@ -1,9 +1,20 @@
 import { contactInfo } from "@/config/legal";
 
+/**
+ * Build the official WhatsApp send URL from a plain UTF-8 message.
+ * Encodes the message exactly once — never pass pre-encoded text.
+ */
+export function buildWhatsAppSendUrl(phone: string, message: string): string {
+  const digits = phone.replace(/\D/g, "");
+  const text = encodeURIComponent(message);
+  return `https://api.whatsapp.com/send?phone=${digits}&text=${text}`;
+}
+
 export function whatsappLink(message?: string): string {
-  const base = `https://wa.me/${contactInfo.whatsapp}`;
-  if (!message) return base;
-  return `${base}?text=${encodeURIComponent(message)}`;
+  if (!message) {
+    return `https://api.whatsapp.com/send?phone=${contactInfo.whatsapp}`;
+  }
+  return buildWhatsAppSendUrl(contactInfo.whatsapp, message);
 }
 
 export function buildOrderReceivedWhatsApp(

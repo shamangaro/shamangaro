@@ -1,3 +1,5 @@
+import { buildWhatsAppSendUrl } from "@/lib/whatsapp";
+
 /** Moroccan mobile: 06 or 07 + 8 digits (10 digits total). */
 const MOROCCAN_PHONE_REGEX = /^0[67]\d{8}$/;
 
@@ -27,7 +29,9 @@ export function phoneToTelLink(phone: string): string {
 }
 
 export function phoneToWhatsAppLink(phone: string, text?: string): string {
-  const base = `https://wa.me/${phoneToInternational(phone)}`;
-  if (!text) return base;
-  return `${base}?text=${encodeURIComponent(text)}`;
+  const international = phoneToInternational(phone);
+  if (!text) {
+    return `https://api.whatsapp.com/send?phone=${international}`;
+  }
+  return buildWhatsAppSendUrl(international, text);
 }
