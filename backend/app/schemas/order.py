@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.services.phone import is_valid_moroccan_phone, normalize_moroccan_phone
 
@@ -84,6 +84,8 @@ class OrderRiskResponse(BaseModel):
 
 
 class OrderTimelineEvent(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     event_type: str
     status: str | None = None
@@ -93,6 +95,8 @@ class OrderTimelineEvent(BaseModel):
 
 
 class OrderNoteResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     body: str
     admin_username: str | None = None
@@ -100,6 +104,8 @@ class OrderNoteResponse(BaseModel):
 
 
 class OrderCallResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     outcome: str
     notes: str | None = None
