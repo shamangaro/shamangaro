@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { brandBandClasses } from "@/lib/brand-band";
 
 export type LedTickerItem = {
   label: string;
@@ -17,6 +18,7 @@ type LedTickerBandProps = {
   className?: string;
   compact?: boolean;
   animation?: "horizontal" | "vertical";
+  variant?: "dark" | "light" | "brand";
 };
 
 export function LedTickerBand({
@@ -26,6 +28,7 @@ export function LedTickerBand({
   className,
   compact = false,
   animation = "horizontal",
+  variant = "dark",
 }: LedTickerBandProps) {
   const reduceMotion = useReducedMotion();
   const [active, setActive] = useState(0);
@@ -41,6 +44,8 @@ export function LedTickerBand({
   const item = items[active];
   const Icon = item.icon;
   const isVertical = animation === "vertical";
+  const isLight = variant === "light";
+  const isBrand = variant === "brand";
 
   const motionProps = isVertical
     ? {
@@ -61,21 +66,46 @@ export function LedTickerBand({
       aria-label={ariaLabel}
       aria-live="polite"
       className={cn(
-        "relative overflow-hidden border-y border-gold/45 bg-[#060c12]",
+        "relative overflow-hidden border-y",
+        isBrand
+          ? brandBandClasses.root
+          : isLight
+            ? "border-navy/10 bg-white"
+            : "border-gold/45 bg-[#060c12]",
         compact ? "py-1.5 sm:py-2" : "py-3 sm:py-3.5",
         className
       )}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/80 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(212,168,83,0.35) 2px, rgba(212,168,83,0.35) 3px)",
-        }}
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent",
+          isBrand
+            ? "via-gold/55"
+            : isLight
+              ? "via-gold/45"
+              : "via-gold/80"
+        )}
       />
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent to-transparent",
+          isBrand
+            ? "via-gold/35"
+            : isLight
+              ? "via-navy/10"
+              : "via-gold/50"
+        )}
+      />
+      {!isLight && !isBrand ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(212,168,83,0.35) 2px, rgba(212,168,83,0.35) 3px)",
+          }}
+        />
+      ) : null}
 
       {reduceMotion ? (
         <div className="relative flex flex-wrap items-center justify-center gap-x-6 gap-y-2 px-4 sm:gap-x-8">
@@ -90,7 +120,8 @@ export function LedTickerBand({
                 />
                 <span
                   className={cn(
-                    "font-bold tracking-wide text-white",
+                    "font-bold tracking-wide",
+                    isLight ? "text-navy" : "text-white",
                     compact ? "text-[11px] sm:text-xs" : "text-xs sm:text-sm"
                   )}
                 >
@@ -111,13 +142,19 @@ export function LedTickerBand({
             <>
               <span
                 aria-hidden="true"
-                className="absolute start-4 text-[10px] text-gold/35 sm:start-8"
+                className={cn(
+                  "absolute start-4 text-[10px] sm:start-8",
+                  isLight ? "text-gold/50" : "text-gold/35"
+                )}
               >
                 ◆
               </span>
               <span
                 aria-hidden="true"
-                className="absolute end-4 text-[10px] text-gold/35 sm:end-8"
+                className={cn(
+                  "absolute end-4 text-[10px] sm:end-8",
+                  isLight ? "text-gold/50" : "text-gold/35"
+                )}
               >
                 ◆
               </span>
@@ -135,7 +172,12 @@ export function LedTickerBand({
             >
               <span
                 className={cn(
-                  "flex items-center justify-center rounded-sm border border-gold/35 bg-gold/10 shadow-[0_0_14px_rgba(212,168,83,0.25)]",
+                  "flex items-center justify-center rounded-sm border bg-gold/10",
+                  isLight
+                    ? "border-gold/40 shadow-none"
+                    : isBrand
+                      ? "border-gold/30 shadow-none"
+                      : "border-gold/35 shadow-[0_0_14px_rgba(212,168,83,0.25)]",
                   compact ? "h-6 w-6" : "h-7 w-7"
                 )}
               >
@@ -147,7 +189,10 @@ export function LedTickerBand({
               </span>
               <span
                 className={cn(
-                  "whitespace-nowrap font-bold tracking-[0.08em] text-white [text-shadow:0_0_12px_rgba(212,168,83,0.35)]",
+                  "whitespace-nowrap font-bold tracking-[0.08em]",
+                  isLight
+                    ? "text-navy"
+                    : "text-white [text-shadow:0_0_12px_rgba(212,168,83,0.35)]",
                   compact
                     ? "text-[11px] sm:text-xs"
                     : "text-sm sm:text-[15px]"

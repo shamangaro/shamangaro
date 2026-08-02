@@ -69,7 +69,7 @@ function FeatureCard({
 
 export function Features() {
   return (
-    <section className="bg-gradient-to-b from-white to-[#f5f5f5] py-14 md:py-20">
+    <section className="bg-gradient-to-b from-white to-[#f5f5f5] pt-5 pb-14 md:pt-8 md:pb-20">
       <Container>
         {/* Section header */}
         <motion.div

@@ -71,7 +71,7 @@ export function OrderSection() {
   const set = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
   return (
-    <section id="order" className="bg-[#f8f8f8] py-10 pb-32 lg:py-14 lg:pb-14">
+    <section id="order" className="scroll-mt-32 bg-[#f8f8f8] py-10 pb-16 sm:scroll-mt-36 lg:py-14 lg:pb-8">
       <Container>
         <div className="mx-auto max-w-lg">
           {/* Header */}

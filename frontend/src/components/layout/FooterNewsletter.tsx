@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
+import { brandBandClasses } from "@/lib/brand-band";
 
 export function FooterNewsletter() {
   const [email, setEmail] = useState("");
@@ -42,7 +43,9 @@ export function FooterNewsletter() {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] backdrop-blur-sm sm:p-8">
+    <div
+      className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 ${brandBandClasses.footerFrame}`}
+    >
       <div className="pointer-events-none absolute -left-16 -top-16 h-40 w-40 rounded-full bg-gold/10 blur-3xl" />
       <div className="relative">
         <div className="mb-2 flex items-center gap-2">
@@ -77,7 +80,7 @@ export function FooterNewsletter() {
                 placeholder="example@email.com"
                 dir="ltr"
                 disabled={status === "loading"}
-                className="h-12 flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-4 text-sm text-white outline-none transition-all placeholder:text-white/30 focus:border-white/25 focus:bg-white/[0.08] focus:ring-2 focus:ring-white/10 disabled:opacity-60 sm:px-5 sm:text-base"
+                className="h-12 flex-1 rounded-2xl border border-white/25 bg-white/15 px-4 text-sm text-white outline-none transition-all placeholder:text-white/40 focus:border-gold/40 focus:bg-white/20 focus:ring-2 focus:ring-gold/20 disabled:opacity-60 sm:px-5 sm:text-base"
               />
               <button
                 type="submit"

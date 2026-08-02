@@ -16,6 +16,7 @@ import {
   footerQuickLinkGroups,
   socialLinks,
 } from "@/config/site";
+import { brandBandClasses } from "@/lib/brand-band";
 
 function TikTokIcon({ className }: { className?: string }) {
   return (
@@ -65,12 +66,13 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden bg-[#0a0a0a] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(212,168,83,0.08),transparent)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+    <footer
+      className={`relative overflow-hidden text-white ${brandBandClasses.gradient}`}
+    >
+      <div className={brandBandClasses.topLine} />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(212,168,83,0.1),transparent)]" />
 
       <Container className="relative pt-8 pb-14 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-20">
-        {/* SECTION 1 — Brand */}
         <FooterSection className="flex flex-col items-center text-center">
           <div className="flex justify-center">
             <Logo
@@ -80,15 +82,16 @@ export function Footer() {
               textClassName="text-white"
             />
           </div>
-          <p className="mt-4 max-w-xl text-base leading-[1.8] text-white/65 sm:text-lg">
+          <p className="mt-4 max-w-xl text-base leading-[1.8] text-white/90 sm:text-lg">
             {brandStatement}
           </p>
           <div className="mt-4 h-px w-16 bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
         </FooterSection>
 
-        {/* SECTION 2 — Quick links */}
         <FooterSection delay={0.1} className="mt-6 sm:mt-8">
-          <div className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.02] px-4 py-6 sm:rounded-[2rem] sm:px-7 sm:py-7 lg:rounded-[2.25rem] lg:px-10 lg:py-8">
+          <div
+            className={`rounded-[1.75rem] px-4 py-6 sm:rounded-[2rem] sm:px-7 sm:py-7 lg:rounded-[2.25rem] lg:px-10 lg:py-8 ${brandBandClasses.footerFrame}`}
+          >
             <h3 className="mb-5 text-center text-lg font-bold uppercase tracking-[0.15em] text-white sm:mb-6 sm:text-xl">
               روابط سريعة
             </h3>
@@ -122,7 +125,9 @@ export function Footer() {
         {/* SECTION 4 + 5 — Support & Newsletter */}
         <div className="mt-14 grid gap-6 sm:mt-16 lg:mt-20 lg:grid-cols-2 lg:gap-8">
           <FooterSection delay={0.12}>
-            <div className="relative h-full overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] backdrop-blur-sm sm:p-7">
+            <div
+              className={`relative h-full overflow-hidden rounded-3xl p-5 sm:p-7 ${brandBandClasses.footerFrame}`}
+            >
               <div className="pointer-events-none absolute -bottom-14 -right-14 h-32 w-32 rounded-full bg-gold/10 blur-3xl" />
               <div className="relative">
                 <div className="mb-2 flex items-center gap-2">
@@ -141,7 +146,7 @@ export function Footer() {
                 <div className="mt-5 space-y-3">
                   <a
                     href={`mailto:${contactInfo.email}`}
-                    className="group flex items-center gap-3.5 rounded-xl border border-white/10 bg-white/[0.05] p-3.5 transition-all duration-300 hover:border-gold/25 hover:bg-white/[0.08] sm:p-4"
+                    className={`group flex items-center gap-3.5 rounded-xl p-3.5 transition-all duration-300 hover:border-gold/35 hover:bg-white/15 sm:p-4 ${brandBandClasses.footerInnerFrame}`}
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold/15 text-gold transition-transform duration-300 group-hover:scale-105">
                       <Mail size={19} strokeWidth={1.75} />
@@ -159,7 +164,9 @@ export function Footer() {
                     </div>
                   </a>
 
-                  <div className="rounded-xl border border-white/10 bg-white/[0.05] p-3.5 sm:p-4">
+                  <div
+                    className={`rounded-xl p-3.5 sm:p-4 ${brandBandClasses.footerInnerFrame}`}
+                  >
                     <div className="flex items-center gap-3.5">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.08] text-gold">
                         <Clock size={19} strokeWidth={1.75} />
@@ -219,19 +226,20 @@ export function Footer() {
           </div>
         </FooterSection>
 
-        {/* SECTION 7 — Bottom bar */}
         <FooterSection delay={0.2} className="mt-14 sm:mt-16 lg:mt-20">
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
           <div className="flex flex-col items-center gap-3 pt-8 text-center sm:flex-row sm:justify-between sm:text-start">
-            <p className="text-sm text-white/45">
+            <p className="text-sm text-white/60">
               © {year} SHAMANGARO. جميع الحقوق محفوظة.
             </p>
-            <p className="text-sm text-white/45">
+            <p className="text-sm text-white/60">
               Made with <span className="text-gold">❤</span> in Morocco
             </p>
           </div>
         </FooterSection>
       </Container>
+
+      <div className={brandBandClasses.bottomLine} />
     </footer>
   );
 }

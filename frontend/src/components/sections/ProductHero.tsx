@@ -6,6 +6,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Container } from "@/components/shared/Container";
 import { LedTickerBand } from "@/components/shared/LedTickerBand";
+import { OrderCtaButton } from "@/components/shared/OrderCtaButton";
+import { scrollToOrderForm } from "@/lib/scroll-to-order-form";
 import {
   Star,
   X,
@@ -188,27 +190,6 @@ export function ProductHero() {
             subtitle={slide.subtitle}
             className="absolute bottom-8 start-6 sm:bottom-10 sm:start-8"
           />
-
-          <div className="absolute bottom-4 inset-x-0 flex justify-center gap-2">
-            {images.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setCurrent(i)}
-                className="flex h-10 w-10 items-center justify-center rounded-full"
-                aria-label={`صورة ${i + 1}`}
-              >
-                <span
-                  className={cn(
-                    "block rounded-full transition-all",
-                    i === current
-                      ? "h-2 w-7 bg-gold"
-                      : "h-2 w-2 bg-white/40 hover:bg-white/65"
-                  )}
-                />
-              </button>
-            ))}
-          </div>
         </div>
       </div>,
       document.body
@@ -262,30 +243,6 @@ export function ProductHero() {
                 className="absolute bottom-5 start-5 z-10 sm:bottom-7 sm:start-7 md:bottom-8 md:start-8"
               />
 
-              <div className="absolute bottom-4 inset-x-0 z-10 flex items-center justify-center gap-1.5 px-16">
-                {images.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrent(i);
-                    }}
-                    aria-label={`صورة ${i + 1}`}
-                    className="relative h-8 w-8"
-                  >
-                    <span
-                      className={cn(
-                        "absolute start-1/2 top-1/2 block -translate-x-1/2 -translate-y-1/2 rounded-full transition-all",
-                        i === current
-                          ? "h-1.5 w-6 bg-white"
-                          : "h-1.5 w-1.5 bg-white/45 hover:bg-white/70"
-                      )}
-                    />
-                  </button>
-                ))}
-              </div>
-
               <button
                 type="button"
                 onClick={(e) => {
@@ -331,6 +288,7 @@ export function ProductHero() {
         items={heroHighlights}
         ariaLabel="مميزات Neo Transat"
         className="relative z-10"
+        variant="light"
       />
 
       <Container className="relative z-10 pb-10 md:pb-16 lg:pb-20">
@@ -382,12 +340,12 @@ export function ProductHero() {
               <span className="text-sm text-muted-foreground">(+500 تقييم)</span>
             </div>
 
-            <a
-              href="#order"
-              className="mt-8 inline-flex w-full max-w-md items-center justify-center rounded-full bg-navy px-10 py-4 text-base font-bold text-white shadow-xl shadow-navy/15 transition-all duration-300 hover:scale-[1.02] hover:bg-navy-light hover:shadow-2xl hover:shadow-navy/20 sm:w-auto"
+            <OrderCtaButton
+              onClick={() => scrollToOrderForm()}
+              className="mt-8 max-w-md sm:w-auto"
             >
               اطلب دابا
-            </a>
+            </OrderCtaButton>
 
             <div className="mt-5 w-full max-w-md rounded-2xl bg-[#1b3a4b] p-4 sm:p-5">
               <div className="grid grid-cols-2 gap-3">
