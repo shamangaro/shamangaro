@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { StickyOrderCTA } from "@/components/shared/StickyOrderCTA";
 import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
+import { FreeDeliveryStrip } from "@/components/shared/FreeDeliveryHighlight";
 import { ProductHero } from "@/components/sections/ProductHero";
 import { ComparisonSlider } from "@/components/sections/ComparisonSlider";
 import { OrderSection } from "@/components/sections/OrderSection";
@@ -17,6 +18,7 @@ export default function Home() {
       <main className="pb-28 lg:pb-0">
         <ProductHero />
         <ComparisonSlider />
+        <FreeDeliveryStrip />
         <OrderSection />
         <Features />
         <HowToUse />

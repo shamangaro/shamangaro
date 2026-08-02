@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { OrderCtaButton } from "@/components/shared/OrderCtaButton";
 import { scrollToOrderForm } from "@/lib/scroll-to-order-form";
+import { freeDelivery } from "@/config/site";
 
 export function StickyOrderCTA() {
   const [visible, setVisible] = useState(true);
@@ -41,8 +42,8 @@ export function StickyOrderCTA() {
             <OrderCtaButton onClick={scrollToOrder} size="compact">
               أطلب الآن
             </OrderCtaButton>
-            <p className="mt-1 text-center text-xs font-medium text-muted-foreground">
-              الدفع عند الإستلام · بدون دفع مسبق
+            <p className="mt-1 text-center text-[11px] font-medium text-muted-foreground">
+              🚚 {freeDelivery.headline} · الدفع عند الإستلام
             </p>
           </div>
         </motion.div>

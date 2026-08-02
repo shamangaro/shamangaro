@@ -105,6 +105,10 @@ async def run_order_created_hooks(order_id: int) -> None:
         queue_new_order_notification(order)
         await send_admin_new_order_email(order)
 
+        from app.services.telegram_notifications import send_new_order_telegram_notification
+
+        await send_new_order_telegram_notification(db, order)
+
     from app.services.google_sheets import sync_order_to_sheet
 
     await sync_order_to_sheet(order_id)

@@ -18,6 +18,7 @@ import {
   getOriginalTotal,
   productOffers,
 } from "@/lib/offers";
+import { freeDelivery } from "@/config/site";
 
 export function OrderSection() {
   const router = useRouter();
@@ -304,7 +305,7 @@ export function OrderSection() {
                   </p>
                 ) : null}
                 <p className="mt-3 text-center text-sm font-medium text-muted-foreground">
-                  💵 الدفع عند الإستلام · بدون دفع مسبق
+                  🚚 {freeDelivery.full} · 💵 الدفع عند الإستلام
                 </p>
               </div>
             </form>
@@ -332,10 +333,10 @@ export function OrderSection() {
                 </div>
                 <p className="min-w-0 flex-1 text-right">
                   <span className="block text-[14px] font-bold text-white">
-                    توصيل 2-5 أيام
+                    {freeDelivery.headline}
                   </span>
-                  <span className="block text-[11px] text-white/60">
-                    لجميع المدن
+                  <span className="block text-[11px] font-semibold text-emerald-300">
+                    {freeDelivery.subline}
                   </span>
                 </p>
               </div>

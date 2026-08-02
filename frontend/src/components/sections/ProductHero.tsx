@@ -8,6 +8,8 @@ import { Container } from "@/components/shared/Container";
 import { LedTickerBand } from "@/components/shared/LedTickerBand";
 import { OrderCtaButton } from "@/components/shared/OrderCtaButton";
 import { scrollToOrderForm } from "@/lib/scroll-to-order-form";
+import { FreeDeliveryBanner } from "@/components/shared/FreeDeliveryHighlight";
+import { freeDelivery } from "@/config/site";
 import {
   Star,
   X,
@@ -93,7 +95,6 @@ const heroHighlights = [
   { icon: Armchair, label: "راحة أفضل" },
   { icon: TreePine, label: "خشب ممتاز" },
   { icon: BadgeCheck, label: "جودة SHAMANGARO" },
-  { icon: Truck, label: "توصيل لجميع المدن" },
   { icon: Shield, label: "ضمان سنة كاملة" },
 ];
 
@@ -291,6 +292,10 @@ export function ProductHero() {
         variant="light"
       />
 
+      <Container className="relative z-10 -mt-px pb-3 pt-6 md:pt-8">
+        <FreeDeliveryBanner className="mx-auto max-w-3xl" />
+      </Container>
+
       <Container className="relative z-10 pb-10 md:pb-16 lg:pb-20">
         <div className="mx-auto max-w-2xl">
           {/* Copy */}
@@ -368,10 +373,10 @@ export function ProductHero() {
                   </div>
                   <p className="min-w-0 flex-1 text-right">
                     <span className="block text-[13px] font-bold leading-snug text-white sm:text-[14px]">
-                      توصيل 2-5 أيام
+                      {freeDelivery.headline}
                     </span>
-                    <span className="block text-[10px] text-white/60 sm:text-[11px]">
-                      لجميع المدن
+                    <span className="block text-[10px] font-semibold text-emerald-300 sm:text-[11px]">
+                      {freeDelivery.subline}
                     </span>
                   </p>
                 </div>

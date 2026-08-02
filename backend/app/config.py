@@ -30,6 +30,11 @@ class Settings(BaseSettings):
     GOOGLE_SHEETS_TAB: str = "Orders"
     GOOGLE_SERVICE_ACCOUNT_JSON: str = ""
 
+    TELEGRAM_NOTIFICATIONS_ENABLED: bool = False
+    TELEGRAM_BOT_TOKEN: str = ""
+    TELEGRAM_CHAT_ID: str = ""
+    CRM_PUBLIC_URL: str = "https://shamangaro.com"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

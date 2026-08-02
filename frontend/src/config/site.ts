@@ -1,9 +1,17 @@
 export const brandStatement =
   "علامة مغربية Premium للحياة الخارجية. نصمم منتجات تجمع بين الراحة، الجودة والأناقة.";
 
+/** Central free-delivery copy — keep consistent across LP */
+export const freeDelivery = {
+  headline: "توصيل مجاني",
+  subline: "لجميع مدن المغرب",
+  detail: "2-5 أيام عمل · بدون مصاريف إضافية",
+  full: "توصيل مجاني لجميع مدن المغرب",
+} as const;
+
 export const footerTrustBadges = [
   { icon: "check", label: "الدفع عند الاستلام" },
-  { icon: "truck", label: "توصيل لجميع مدن المغرب" },
+  { icon: "truck", label: freeDelivery.full },
   { icon: "shield", label: "ضمان سنة" },
   { icon: "star", label: "جودة Premium" },
 ] as const;
