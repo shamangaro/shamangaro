@@ -9,6 +9,7 @@ from app.models.order import Order, OrderStatus
 from app.schemas.order import OrderCreate, OrderCreateResponse, OrderPublicResponse
 from app.services.customer_risk import analyze_customer_risk, get_blacklist_entry
 from app.services.offers import get_offer
+from app.services.products import resolve_watches_order
 from app.services.city import extract_city_from_address
 from app.services.order_lifecycle import log_order_created
 from app.services.order_notifications import enqueue_order_created
@@ -38,13 +39,6 @@ async def create_order(
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
 ):
-    offer = get_offer(payload.offer_id)
-    if not offer:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="العرض المحدد غير صالح",
-        )
-
     order_number = await generate_order_number(db)
 
     blacklist = await get_blacklist_entry(db, payload.phone)
@@ -59,19 +53,57 @@ async def create_order(
             or len(analysis.warnings) > 0
         )
 
+    internal_notes: str | None = None
+
+    if payload.offer_id:
+        offer = get_offer(payload.offer_id)
+        if not offer:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="العرض المحدد غير صالح",
+            )
+        offer_id = offer.id
+        offer_name = offer.name
+        quantity = offer.quantity
+        unit_price = offer.unit_price
+        total_price = offer.total_price
+    else:
+        try:
+            product_order = resolve_watches_order(
+                selected_variant=payload.selected_variant or "",
+                quantity=payload.quantity or 1,
+                source_page=payload.source_page,
+            )
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        offer_id = product_order.offer_id
+        offer_name = product_order.offer_name
+        quantity = product_order.quantity
+        unit_price = product_order.unit_price
+        total_price = product_order.total_price
+        internal_notes = (
+            f"product_slug={payload.product_slug}; "
+            f"variant={product_order.selected_variant}; "
+            f"source_page={product_order.source_page}"
+        )
+
     order = Order(
         order_number=order_number,
         customer_name=payload.customer_name,
         phone=payload.phone,
         address=payload.address,
         city=extract_city_from_address(payload.address),
-        offer_id=offer.id,
-        offer_name=offer.name,
-        quantity=offer.quantity,
-        unit_price=offer.unit_price,
-        total_price=offer.total_price,
+        offer_id=offer_id,
+        offer_name=offer_name,
+        quantity=quantity,
+        unit_price=unit_price,
+        total_price=total_price,
         status=OrderStatus.NEW,
         is_risk=is_risk,
+        internal_notes=internal_notes,
     )
     db.add(order)
     await db.flush()

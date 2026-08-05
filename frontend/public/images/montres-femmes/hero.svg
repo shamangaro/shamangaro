@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <rect width="800" height="600" fill="#F7F3EE"/>
+  <circle cx="400" cy="280" r="180" fill="#E8DFD4"/>
+  <circle cx="400" cy="280" r="130" fill="#FAF7F2" stroke="#C4A882" stroke-width="3"/>
+  <circle cx="400" cy="280" r="105" fill="#F5EFE6"/>
+  <circle cx="400" cy="280" r="8" fill="#B8924A"/>
+  <line x1="400" y1="280" x2="400" y2="230" stroke="#7B2D42" stroke-width="3" stroke-linecap="round"/>
+  <line x1="400" y1="280" x2="445" y2="295" stroke="#7B2D42" stroke-width="2" stroke-linecap="round"/>
+  <rect x="310" y="400" width="180" height="24" rx="12" fill="#7B2D42" opacity="0.15"/>
+  <text x="400" y="520" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#7B2D42">Montres Femmes Élégantes</text>
+  <text x="400" y="555" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#B8924A">245 DH · توصيل مجاني</text>
+</svg>

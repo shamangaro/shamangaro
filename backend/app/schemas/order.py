@@ -1,16 +1,29 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.services.phone import is_valid_moroccan_phone, normalize_moroccan_phone
+from app.services.products import (
+    WATCHES_PRODUCT_NAME,
+    WATCHES_PRODUCT_SLUG,
+    WATCHES_UNIT_PRICE,
+    WATCH_VARIANTS,
+)
 
 
 class OrderCreate(BaseModel):
     customer_name: str = Field(min_length=2, max_length=200)
     phone: str = Field(min_length=10, max_length=20)
     address: str = Field(min_length=5, max_length=500)
-    offer_id: Literal["solo", "duo", "family"]
+    offer_id: Literal["solo", "duo", "family"] | None = None
+    product_slug: Literal["montres-femmes"] | None = None
+    product_name: str | None = None
+    selected_variant: str | None = None
+    quantity: int | None = Field(default=None, ge=1, le=10)
+    unit_price: float | None = None
+    total_amount: float | None = None
+    source_page: str | None = None
 
     @field_validator("customer_name", "address")
     @classmethod
@@ -23,6 +36,36 @@ class OrderCreate(BaseModel):
         if not is_valid_moroccan_phone(value):
             raise ValueError("رقم الهاتف غير صالح")
         return normalize_moroccan_phone(value)
+
+    @model_validator(mode="after")
+    def validate_order_payload(self) -> "OrderCreate":
+        has_offer = self.offer_id is not None
+        has_product = self.product_slug is not None
+
+        if has_offer and has_product:
+            raise ValueError("لا يمكن الجمع بين عرض Neo Transat ومنتج آخر")
+        if not has_offer and not has_product:
+            raise ValueError("يجب تحديد العرض أو المنتج")
+
+        if has_product:
+            if self.product_slug != WATCHES_PRODUCT_SLUG:
+                raise ValueError("المنتج غير مدعوم")
+            if self.product_name and self.product_name.strip() != WATCHES_PRODUCT_NAME:
+                raise ValueError("اسم المنتج غير صالح")
+            if not self.selected_variant:
+                raise ValueError("يجب اختيار الطراز")
+            variant_key = self.selected_variant.strip().lower()
+            if variant_key not in WATCH_VARIANTS:
+                raise ValueError("الطراز المحدد غير صالح")
+            if self.quantity is None:
+                raise ValueError("يجب تحديد الكمية")
+            expected_total = round(WATCHES_UNIT_PRICE * self.quantity, 2)
+            if self.unit_price is not None and self.unit_price != WATCHES_UNIT_PRICE:
+                raise ValueError("سعر الوحدة غير صالح")
+            if self.total_amount is not None and self.total_amount != expected_total:
+                raise ValueError("المبلغ الإجمالي غير صالح")
+
+        return self
 
 
 class OrderPublicResponse(BaseModel):

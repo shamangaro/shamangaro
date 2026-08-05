@@ -355,3 +355,90 @@ async def test_whatsapp_templates():
 
     confirmed = build_order_confirmed_whatsapp("أحمد")
     assert "تم تأكيد طلبكم بنجاح" in confirmed
+
+
+@pytest.mark.asyncio
+async def test_create_watches_order_burgundy(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "سارة العلمي",
+            "phone": "0612345678",
+            "address": "الدار البيضاء، المعاريف",
+            "product_slug": "montres-femmes",
+            "product_name": "Montres Femmes Élégantes",
+            "selected_variant": "burgundy",
+            "quantity": 1,
+            "unit_price": 245.0,
+            "total_amount": 245.0,
+            "source_page": "/products/montres-femmes",
+        },
+    )
+    assert res.status_code == 201
+    data = res.json()
+    assert data["order_number"].startswith("SH-")
+    assert data["total_price"] == 245.0
+
+    public = await client.get(f"/orders/{data['order_number']}")
+    assert public.status_code == 200
+    body = public.json()
+    assert body["offer_name"] == "Montres Femmes Élégantes — Burgundy"
+    assert body["quantity"] == 1
+    assert body["total_price"] == 245.0
+
+
+@pytest.mark.asyncio
+async def test_create_watches_order_invalid_variant(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "Test",
+            "phone": "0612345678",
+            "address": "Casablanca",
+            "product_slug": "montres-femmes",
+            "selected_variant": "invalid",
+            "quantity": 1,
+            "unit_price": 245.0,
+            "total_amount": 245.0,
+        },
+    )
+    assert res.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_watches_order_wrong_total(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "Test",
+            "phone": "0612345678",
+            "address": "Casablanca",
+            "product_slug": "montres-femmes",
+            "selected_variant": "taupe",
+            "quantity": 2,
+            "unit_price": 245.0,
+            "total_amount": 400.0,
+        },
+    )
+    assert res.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_neo_transat_order_unchanged(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "أحمد بنعلي",
+            "phone": "0698765432",
+            "address": "الرباط",
+            "offer_id": "duo",
+        },
+    )
+    assert res.status_code == 201
+    data = res.json()
+    assert data["total_price"] == 458.0
+
+    public = await client.get(f"/orders/{data['order_number']}")
+    assert public.json()["offer_name"] == "كرسيين"
+    assert public.json()["total_price"] == 458.0
+

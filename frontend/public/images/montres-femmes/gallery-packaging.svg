@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" fill="none">
+  <rect width="500" height="400" fill="#F7F3EE"/>
+  <rect x="100" y="60" width="300" height="280" rx="8" fill="#7B2D42" opacity="0.08"/>
+  <rect x="120" y="80" width="260" height="240" rx="6" fill="#FAF7F2" stroke="#B8924A" stroke-width="2"/>
+  <rect x="160" y="130" width="180" height="120" rx="4" fill="#F5EFE6"/>
+  <circle cx="250" cy="175" r="35" fill="#F5E8EC" stroke="#7B2D42" stroke-width="2"/>
+  <text x="250" y="350" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#7B2D42">تغليف هدايا أنيق</text>
+</svg>

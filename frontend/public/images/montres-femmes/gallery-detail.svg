@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" fill="none">
+  <rect width="500" height="400" fill="#F7F3EE"/>
+  <rect x="60" y="80" width="380" height="240" rx="16" fill="#FAF7F2" stroke="#E8DFD4" stroke-width="2"/>
+  <circle cx="250" cy="180" r="70" fill="#F5E8EC" stroke="#7B2D42" stroke-width="3"/>
+  <circle cx="250" cy="180" r="50" fill="#FAF7F2"/>
+  <circle cx="250" cy="180" r="4" fill="#B8924A"/>
+  <text x="250" y="290" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#666">تفاصيل دقيقة · سوار ناعم</text>
+</svg>
