@@ -3,43 +3,47 @@ import { Container } from "@/components/shared/Container";
 const steps = [
   {
     num: "1",
-    title: "اختاري الطراز والكمية",
-    description: "Taupe، Burgundy، أو Navy Blue — وحددي الكمية.",
+    title: "اختاري الساعات",
+    description: "تصفّحي الصور و زيدي اللي عجباتك.",
   },
   {
     num: "2",
-    title: "عمرّي معلوماتك",
-    description: "الاسم، الهاتف، والعنوان — بدون دفع أونلاين.",
+    title: "دخّلي معلوماتك",
+    description: "الإسم، الهاتف، و المدينة — بلا دفع أونلاين.",
   },
   {
     num: "3",
-    title: "نتصلو للتأكيد",
-    description: "فريقنا كيتواصل معاك خلال ساعات.",
+    title: "غادي نعيطو ليك",
+    description: "الفريق ديالنا كيتواصل معاك فـساعات.",
   },
   {
     num: "4",
-    title: "استلمي وادفعي",
+    title: "توصلك و كتخلّصي",
     description: "التوصيل 1–3 أيام — الدفع عند الباب.",
   },
 ];
 
 export function WatchesOrderingSteps() {
   return (
-    <section className="bg-white py-10 sm:py-14">
+    <section className="bg-white py-6 sm:py-8">
       <Container>
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-[#2A1A1F] sm:text-3xl">
+        <div className="mb-4 text-center">
+          <h2 className="text-xl font-bold text-[#0F2A1F] sm:text-2xl">
             كيفاش تطلبي؟
           </h2>
         </div>
         <div className="mx-auto grid max-w-3xl gap-6 sm:grid-cols-2">
-          {steps.map((step) => (
+          {steps.map((step, i) => (
             <div key={step.num} className="flex gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#7B2D42] text-sm font-bold text-white">
+              <div
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${
+                  i % 2 === 0 ? "bg-[#1A5C42]" : "bg-[#247A58]"
+                }`}
+              >
                 {step.num}
               </div>
               <div>
-                <h3 className="font-semibold text-[#2A1A1F]">{step.title}</h3>
+                <h3 className="font-semibold text-[#0F2A1F]">{step.title}</h3>
                 <p className="mt-1 text-sm text-[#666]">{step.description}</p>
               </div>
             </div>

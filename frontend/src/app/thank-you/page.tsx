@@ -4,6 +4,7 @@ import { Container } from "@/components/shared/Container";
 import { Logo } from "@/components/shared/Logo";
 import { getServerApiBase } from "@/lib/api-server";
 import type { OrderPublic } from "@/lib/orders";
+import { getWatchesThankYouHomeHref, isWatchesPublicOrder } from "@/lib/watches-orders";
 
 interface ThankYouPageProps {
   searchParams: Promise<{ order?: string }>;
@@ -26,6 +27,8 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
   const params = await searchParams;
   const orderNumber = params.order?.trim();
   const order = orderNumber ? await getOrderPublic(orderNumber) : null;
+  const isWatchesOrder = isWatchesPublicOrder(order);
+  const homeHref = getWatchesThankYouHomeHref(order);
 
   return (
     <main className="min-h-screen bg-[#f8f8f8] py-12 md:py-20">
@@ -37,8 +40,14 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
                 <Logo
                   variant="wordmark"
                   size="md"
-                  href="/"
+                  href={homeHref}
+                  subtitle={isWatchesOrder ? "Montres Femmes" : undefined}
                   textClassName="text-white"
+                  subtitleClassName={
+                    isWatchesOrder
+                      ? "font-semibold uppercase tracking-[0.14em] text-gold/80 text-[10px] sm:text-[11px]"
+                      : undefined
+                  }
                 />
               </div>
               <div className="mx-auto mt-6 flex h-20 w-20 items-center justify-center rounded-full bg-gold/20">
@@ -83,11 +92,27 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
                     </div>
                     <div className="flex items-start gap-3 rounded-xl border border-navy/10 p-4 sm:col-span-2">
                       <Package size={20} className="mt-0.5 shrink-0 text-gold" />
-                      <div>
+                      <div className="w-full">
                         <p className="text-xs text-muted-foreground">العرض</p>
-                        <p className="font-bold text-navy">
-                          {order.offer_name} × {order.quantity}
-                        </p>
+                        <p className="font-bold text-navy">{order.offer_name}</p>
+                        {order.line_items && order.line_items.length > 0 ? (
+                          <ul className="mt-3 space-y-2 text-sm">
+                            {order.line_items.map((item) => (
+                              <li
+                                key={`${item.watch_id}-${item.quantity}`}
+                                className="flex justify-between gap-3 border-t border-navy/10 pt-2 first:border-0 first:pt-0"
+                              >
+                                <span className="text-navy">
+                                  {item.watch_name} × {item.quantity}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            × {order.quantity}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -115,7 +140,7 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
               )}
 
               <Link
-                href="/"
+                href={homeHref}
                 className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-gold py-4 text-base font-bold text-navy transition-colors hover:bg-gold-light sm:text-lg"
               >
                 <Home size={20} />

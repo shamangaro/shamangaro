@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { MouseEventHandler } from "react";
 import { cn } from "@/lib/utils";
 
 const LOGO_ICON_SRC = "/images/logo-icon.png";
@@ -33,6 +34,7 @@ export interface LogoProps {
   textClassName?: string;
   subtitleClassName?: string;
   priority?: boolean;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 }
 
 function LogoIcon({
@@ -69,6 +71,7 @@ export function Logo({
   textClassName,
   subtitleClassName,
   priority = false,
+  onClick,
 }: LogoProps) {
   const content =
     variant === "icon" ? (
@@ -104,6 +107,7 @@ export function Logo({
     return (
       <Link
         href={href}
+        onClick={onClick}
         className="inline-flex shrink-0 items-center"
         aria-label="SHAMANGARO"
       >

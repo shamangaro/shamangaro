@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   createContext,
@@ -8,53 +8,154 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { WATCHES_PRODUCT } from "./config";
+import type { WatchSlide } from "./config";
 import {
-  WATCHES_PRODUCT,
-  WATCH_VARIANTS,
-  computeWatchTotal,
-  getWatchVariant,
-  type WatchVariantId,
-} from "./config";
-
-export type WatchQuantity = 1 | 2 | 3;
+  countSelectedModels,
+  countSelectedWatches,
+  computeWatchTotalFromLines,
+  decrementWatchLineQuantity,
+  incrementWatchLineQuantity,
+  isSlideSelectedInCart,
+  MAX_WATCH_LINE_QUANTITY,
+  normalizeWatchLines,
+  removeWatchLine,
+  selectWatchLine,
+  type SelectedWatchLine,
+  type SelectWatchResult,
+  type WatchSelection,
+} from "./watch-selection-utils";
+import { scrollToWatchesCart } from "@/lib/scroll-to-watches-order";
 
 interface WatchesPageState {
-  variantId: WatchVariantId | null;
-  quantity: WatchQuantity | null;
+  selectedLines: SelectedWatchLine[];
+  selectedCount: number;
+  totalModels: number;
+  isSelectionComplete: boolean;
+  checkoutUnlocked: boolean;
   unitPrice: number;
   total: number;
-  hasSelection: boolean;
-  setVariantId: (id: WatchVariantId) => void;
-  setQuantity: (qty: WatchQuantity) => void;
+  isSlideSelected: (slide: WatchSlide) => boolean;
+  selectWatch: (watch: WatchSelection) => SelectWatchResult;
+  incrementLineQuantity: (slideId: string) => void;
+  decrementLineQuantity: (slideId: string) => void;
+  removeSelectedWatch: (slideId: string) => void;
+  unlockCheckout: () => void;
+  scrollToCart: () => void;
 }
 
 const WatchesPageContext = createContext<WatchesPageState | null>(null);
 
 export function WatchesPageProvider({ children }: { children: ReactNode }) {
-  const [variantId, setVariantIdState] = useState<WatchVariantId | null>(null);
-  const [quantity, setQuantityState] = useState<WatchQuantity | null>(null);
+  const [selectedLines, setSelectedLines] = useState<SelectedWatchLine[]>([]);
+  const [checkoutUnlocked, setCheckoutUnlocked] = useState(false);
 
-  const setVariantId = useCallback((id: WatchVariantId) => {
-    setVariantIdState(id);
+  const selectedCount = countSelectedWatches(selectedLines);
+  const totalModels = countSelectedModels(selectedLines);
+  const isSelectionComplete = selectedLines.length > 0;
+  const total = computeWatchTotalFromLines(selectedLines);
+
+  const commitLines = useCallback(
+    (updater: (lines: SelectedWatchLine[]) => SelectedWatchLine[]) => {
+      setSelectedLines((lines) => normalizeWatchLines(updater(lines)));
+    },
+    []
+  );
+
+  const scrollToCart = useCallback(() => {
+    scrollToWatchesCart();
   }, []);
 
-  const setQuantity = useCallback((qty: WatchQuantity) => {
-    setQuantityState(qty);
-  }, []);
+  const isSlideSelected = useCallback(
+    (slide: WatchSlide) => isSlideSelectedInCart(selectedLines, slide),
+    [selectedLines]
+  );
 
-  const total = quantity ? computeWatchTotal(quantity) : 0;
+  const selectWatch = useCallback(
+    (watch: WatchSelection): SelectWatchResult => {
+      setCheckoutUnlocked(false);
+
+      const outcome: { result: SelectWatchResult } = { result: "unchanged" };
+      commitLines((lines) => {
+        const next = selectWatchLine(lines, watch);
+        outcome.result = next.result;
+        return next.lines;
+      });
+
+      if (outcome.result === "added") {
+        window.requestAnimationFrame(() => scrollToCart());
+      }
+
+      return outcome.result;
+    },
+    [commitLines, scrollToCart]
+  );
+
+  const incrementLineQuantity = useCallback(
+    (slideId: string) => {
+      setCheckoutUnlocked(false);
+      commitLines((lines) => {
+        if (countSelectedWatches(lines) >= MAX_WATCH_LINE_QUANTITY) return lines;
+        return incrementWatchLineQuantity(lines, slideId);
+      });
+    },
+    [commitLines]
+  );
+
+  const decrementLineQuantity = useCallback(
+    (slideId: string) => {
+      setCheckoutUnlocked(false);
+      commitLines((lines) => decrementWatchLineQuantity(lines, slideId));
+    },
+    [commitLines]
+  );
+
+  const removeSelectedWatch = useCallback(
+    (slideId: string) => {
+      setCheckoutUnlocked(false);
+      commitLines((lines) => removeWatchLine(lines, slideId));
+    },
+    [commitLines]
+  );
+
+  const unlockCheckout = useCallback(() => {
+    if (selectedLines.length > 0) {
+      setCheckoutUnlocked(true);
+    }
+  }, [selectedLines.length]);
 
   const value = useMemo<WatchesPageState>(
     () => ({
-      variantId,
-      quantity,
+      selectedLines,
+      selectedCount,
+      totalModels,
+      isSelectionComplete,
+      checkoutUnlocked,
       unitPrice: WATCHES_PRODUCT.unitPrice,
       total,
-      hasSelection: variantId !== null && quantity !== null,
-      setVariantId,
-      setQuantity,
+      isSlideSelected,
+      selectWatch,
+      incrementLineQuantity,
+      decrementLineQuantity,
+      removeSelectedWatch,
+      unlockCheckout,
+      scrollToCart,
     }),
-    [variantId, quantity, total, setVariantId, setQuantity]
+    [
+      selectedLines,
+      selectedCount,
+      totalModels,
+      isSelectionComplete,
+      checkoutUnlocked,
+      total,
+      isSlideSelected,
+      selectWatch,
+      incrementLineQuantity,
+      decrementLineQuantity,
+      removeSelectedWatch,
+      unlockCheckout,
+      scrollToCart,
+    ]
   );
 
   return (
@@ -72,10 +173,4 @@ export function useWatchesPage() {
   return ctx;
 }
 
-export function useSelectedVariant() {
-  const { variantId } = useWatchesPage();
-  if (!variantId) return null;
-  return getWatchVariant(variantId);
-}
-
-export { WATCH_VARIANTS, WATCHES_PRODUCT };
+export { WATCHES_PRODUCT } from "./config";

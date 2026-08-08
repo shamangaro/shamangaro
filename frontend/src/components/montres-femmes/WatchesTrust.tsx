@@ -4,47 +4,51 @@ import { Container } from "@/components/shared/Container";
 const items = [
   {
     icon: Banknote,
-    title: "الدفع عند الاستلام",
-    description: "كاش أو بطاقة عند التوصيل — بدون دفع أونلاين.",
+    title: "الدفع عند الإستلام",
+    subline: "بدون دفع أونلاين",
   },
   {
     icon: Truck,
     title: "توصيل مجاني",
-    description: "1–3 أيام عمل لجميع المدن المغربية.",
+    subline: "1–3 أيام · كل المدن",
+    sublineClassName: "font-semibold text-emerald-300",
   },
   {
     icon: RefreshCw,
-    title: "التبديل متاح",
-    description: "بغيتي تبدلي اللون؟ تواصلي معنا بعد الاستلام.",
+    title: "كاين التبديل",
+    subline: "تبدّلي اللون بسهولة",
   },
   {
     icon: Shield,
-    title: "خدمة موثوقة",
-    description: "فريق SHAMANGARO كيتواصل معاك للتأكيد قبل الشحن.",
+    title: "خدمة مضمونة",
+    subline: "تأكيد قبل الشحن",
   },
 ];
 
 export function WatchesTrust() {
   return (
-    <section className="bg-[#7B2D42] py-10 text-white sm:py-14">
+    <section className="bg-[#E8F5ED] py-6 sm:py-8">
       <Container>
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold sm:text-3xl">ثقة وضمان</h2>
-          <p className="mt-2 text-sm text-white/80">
-            طلب آمن · توصيل مجاني · التبديل متاح
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map(({ icon: Icon, title, description }) => (
-            <div
-              key={title}
-              className="rounded-2xl bg-white/10 p-5 backdrop-blur-sm"
-            >
-              <Icon className="mb-3 h-7 w-7 text-[#B8924A]" />
-              <h3 className="font-semibold">{title}</h3>
-              <p className="mt-1 text-sm text-white/75">{description}</p>
-            </div>
-          ))}
+        <div className="mx-auto w-full max-w-md rounded-2xl bg-gradient-to-br from-[#0F3D2E] to-[#1A5C42] p-4 shadow-sm ring-1 ring-[#B8924A]/25 sm:p-5">
+          <div className="grid grid-cols-2 gap-3">
+            {items.map(({ icon: Icon, title, subline, sublineClassName }) => (
+              <div key={title} className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 sm:h-10 sm:w-10">
+                  <Icon size={20} className="text-[#B8924A]" />
+                </div>
+                <p className="min-w-0 flex-1 text-right">
+                  <span className="block text-[13px] font-bold leading-snug text-white sm:text-[14px]">
+                    {title}
+                  </span>
+                  <span
+                    className={`block text-[10px] text-white/60 sm:text-[11px] ${sublineClassName ?? ""}`}
+                  >
+                    {subline}
+                  </span>
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </Container>
     </section>

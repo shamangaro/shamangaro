@@ -25,6 +25,7 @@ from app.schemas.order import (
     OrderStatsResponse,
     OrderStatusUpdate,
     OrderTimelineEvent,
+    WatchLineItemPublic,
 )
 from app.services.analytics import get_analytics, get_extended_stats
 from app.services.customer_risk import analyze_customer_risk, count_customers_by_trust
@@ -39,6 +40,7 @@ from app.services.order_lifecycle import (
     public_status,
 )
 from app.services.order_notifications import enqueue_status_side_effects
+from app.services.watch_line_items import parse_line_items
 
 router = APIRouter(prefix="/admin/orders", tags=["admin-orders"])
 
@@ -65,6 +67,8 @@ async def _agent_name(db: AsyncSession, order: Order) -> str | None:
 
 
 def _order_to_admin(order: Order, agent: str | None = None) -> OrderAdminResponse:
+    parsed = parse_line_items(order.internal_notes)
+    line_items = [WatchLineItemPublic(**item) for item in parsed] if parsed else None
     return OrderAdminResponse(
         id=order.id,
         order_number=order.order_number,
@@ -79,6 +83,7 @@ def _order_to_admin(order: Order, agent: str | None = None) -> OrderAdminRespons
         total_price=float(order.total_price),
         status=_normalize_status(order.status),
         internal_notes=order.internal_notes,
+        line_items=line_items,
         is_risk=order.is_risk,
         confirmation_agent=agent,
         created_at=order.created_at,

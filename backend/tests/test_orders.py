@@ -358,33 +358,120 @@ async def test_whatsapp_templates():
 
 
 @pytest.mark.asyncio
+async def test_create_watches_order_fatima_burgundy_two(client):
+    """Fatima Zahra — Burgundy × 2 = 498 DH."""
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "Fatima Zahra",
+            "phone": "0612345678",
+            "city": "الدار البيضاء",
+            "product_slug": "montres-femmes",
+            "product_name": "Montres Femmes Élégantes",
+            "selected_variant": "burgundy",
+            "quantity": 2,
+            "unit_price": 249.0,
+            "total_amount": 498.0,
+            "source_page": "/products/montres-femmes",
+        },
+    )
+    assert res.status_code == 201
+    data = res.json()
+    assert data["total_price"] == 498.0
+
+    public = await client.get(f"/orders/{data['order_number']}")
+    body = public.json()
+    assert body["offer_name"] == "Montres Femmes Élégantes — Burgundy"
+    assert body["quantity"] == 2
+
+
+@pytest.mark.asyncio
+async def test_create_watches_order_missing_variant(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "Test",
+            "phone": "0612345678",
+            "city": "الدار البيضاء",
+            "product_slug": "montres-femmes",
+            "product_name": "Montres Femmes Élégantes",
+            "quantity": 1,
+            "unit_price": 249.0,
+            "total_amount": 249.0,
+        },
+    )
+    assert res.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_watches_order_watches_invalid_phone(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "Test",
+            "phone": "0512345678",
+            "city": "الدار البيضاء",
+            "product_slug": "montres-femmes",
+            "product_name": "Montres Femmes Élégantes",
+            "selected_variant": "burgundy",
+            "quantity": 1,
+            "unit_price": 249.0,
+            "total_amount": 249.0,
+        },
+    )
+    assert res.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_watches_order_quantity_three(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "Test",
+            "phone": "0612345678",
+            "city": "الدار البيضاء",
+            "product_slug": "montres-femmes",
+            "product_name": "Montres Femmes Élégantes",
+            "selected_variant": "navy-blue",
+            "quantity": 3,
+            "unit_price": 249.0,
+            "total_amount": 747.0,
+            "source_page": "/products/montres-femmes",
+        },
+    )
+    assert res.status_code == 201
+    assert res.json()["total_price"] == 747.0
+
+
+@pytest.mark.asyncio
 async def test_create_watches_order_burgundy(client):
     res = await client.post(
         "/orders",
         json={
             "customer_name": "سارة العلمي",
             "phone": "0612345678",
+            "city": "الدار البيضاء",
             "address": "الدار البيضاء، المعاريف",
             "product_slug": "montres-femmes",
             "product_name": "Montres Femmes Élégantes",
             "selected_variant": "burgundy",
             "quantity": 1,
-            "unit_price": 245.0,
-            "total_amount": 245.0,
+            "unit_price": 249.0,
+            "total_amount": 249.0,
             "source_page": "/products/montres-femmes",
         },
     )
     assert res.status_code == 201
     data = res.json()
     assert data["order_number"].startswith("SH-")
-    assert data["total_price"] == 245.0
+    assert data["total_price"] == 249.0
 
     public = await client.get(f"/orders/{data['order_number']}")
     assert public.status_code == 200
     body = public.json()
     assert body["offer_name"] == "Montres Femmes Élégantes — Burgundy"
     assert body["quantity"] == 1
-    assert body["total_price"] == 245.0
+    assert body["total_price"] == 249.0
 
 
 @pytest.mark.asyncio
@@ -394,12 +481,12 @@ async def test_create_watches_order_invalid_variant(client):
         json={
             "customer_name": "Test",
             "phone": "0612345678",
-            "address": "Casablanca",
+            "city": "الدار البيضاء",
             "product_slug": "montres-femmes",
             "selected_variant": "invalid",
             "quantity": 1,
-            "unit_price": 245.0,
-            "total_amount": 245.0,
+            "unit_price": 249.0,
+            "total_amount": 249.0,
         },
     )
     assert res.status_code == 422
@@ -412,15 +499,46 @@ async def test_create_watches_order_wrong_total(client):
         json={
             "customer_name": "Test",
             "phone": "0612345678",
-            "address": "Casablanca",
+            "city": "الدار البيضاء",
             "product_slug": "montres-femmes",
             "selected_variant": "taupe",
             "quantity": 2,
-            "unit_price": 245.0,
+            "unit_price": 249.0,
             "total_amount": 400.0,
         },
     )
     assert res.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_watches_order_multi_line(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "Test Multi",
+            "phone": "0612345678",
+            "city": "الدار البيضاء",
+            "product_slug": "montres-femmes",
+            "product_name": "Montres Femmes Élégantes",
+            "line_items": [
+                {"variant_id": "taupe", "quantity": 2},
+                {"variant_id": "burgundy", "quantity": 1},
+            ],
+            "quantity": 3,
+            "unit_price": 249.0,
+            "total_amount": 747.0,
+            "source_page": "/products/montres-femmes",
+        },
+    )
+    assert res.status_code == 201
+    data = res.json()
+    assert data["total_price"] == 747.0
+
+    public = await client.get(f"/orders/{data['order_number']}")
+    body = public.json()
+    assert body["quantity"] == 3
+    assert body["line_items"] is not None
+    assert len(body["line_items"]) == 2
 
 
 @pytest.mark.asyncio

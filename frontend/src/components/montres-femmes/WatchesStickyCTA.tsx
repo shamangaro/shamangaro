@@ -1,36 +1,47 @@
 "use client";
 
-import { useSelectedVariant, useWatchesPage } from "./WatchesPageContext";
-import { formatWatchPrice } from "./config";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { formatWatchPrice, WATCHES_PRODUCT } from "./config";
+import { scrollToWatchesOrder } from "@/lib/scroll-to-watches-order";
 
 export function WatchesStickyCTA() {
-  const { total, quantity, hasSelection } = useWatchesPage();
-  const variant = useSelectedVariant();
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const form = document.getElementById("watches-order-form");
+    if (!form) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setVisible(!entry.isIntersecting);
+      },
+      { threshold: 0.05, rootMargin: "0px 0px -80px 0px" }
+    );
+
+    observer.observe(form);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#E8DFD4] bg-[#FAF7F2]/95 p-3 backdrop-blur-md lg:hidden">
-      <div className="mx-auto flex max-w-lg items-center gap-3">
-        <div className="min-w-0 flex-1">
-          {hasSelection && variant && quantity ? (
-            <>
-              <p className="truncate text-xs text-[#666]">
-                {variant.label} × {quantity}
-              </p>
-              <p className="text-lg font-bold text-[#7B2D42]">
-                {formatWatchPrice(total)}
-              </p>
-            </>
-          ) : (
-            <p className="text-sm text-[#666]">اختاري الموديل والعدد</p>
-          )}
-        </div>
-        <a
-          href="#watches-selection"
-          className="shrink-0 rounded-xl bg-[#7B2D42] px-5 py-3 text-sm font-bold text-white shadow-md"
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 80, opacity: 0 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="fixed bottom-0 left-0 right-0 z-40 px-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden"
         >
-          طلبي دابا
-        </a>
-      </div>
-    </div>
+          <button
+            type="button"
+            onClick={() => scrollToWatchesOrder()}
+            className="mx-auto flex w-full max-w-lg items-center justify-center rounded-xl border border-[#B8924A]/45 bg-[#1A5C42] px-5 py-3 text-sm font-bold text-white shadow-md ring-1 ring-[#B8924A]/30 transition hover:bg-[#0F3D2E]"
+          >
+            اختاري الساعة — {formatWatchPrice(WATCHES_PRODUCT.unitPrice)}
+          </button>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

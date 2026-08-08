@@ -60,15 +60,36 @@ def build_order_notification_message(order: Order) -> str:
         "🛒 المنتج:",
         escape_html(order.offer_name),
         "",
-        "📦 الكمية:",
-        escape_html(str(order.quantity)),
-        "",
-        "💰 المبلغ:",
-        f"{escape_html(total)} DH",
-        "",
-        "💵 الدفع عند الاستلام",
-        "🚚 التوصيل مجاني",
     ]
+
+    from app.services.watch_line_items import parse_line_items
+
+    parsed_items = parse_line_items(order.internal_notes)
+    if parsed_items:
+        lines.append("📋 التفاصيل:")
+        for item in parsed_items:
+            lines.append(
+                escape_html(
+                    f"• {item['watch_name']} × {item['quantity']}"
+                )
+            )
+        lines.append("")
+        lines.append("📦 الكمية الإجمالية:")
+        lines.append(escape_html(str(order.quantity)))
+    else:
+        lines.append("📦 الكمية:")
+        lines.append(escape_html(str(order.quantity)))
+
+    lines.extend(
+        [
+            "",
+            "💰 المبلغ:",
+            f"{escape_html(total)} DH",
+            "",
+            "💵 الدفع عند الاستلام",
+            "🚚 التوصيل مجاني",
+        ]
+    )
     return "\n".join(lines)
 
 

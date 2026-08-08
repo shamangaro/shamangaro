@@ -1,16 +1,16 @@
-import { Sparkles, Feather, Palette, Gift } from "lucide-react";
+import { Sparkles, Feather, Gift } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { WATCH_BENEFITS } from "./config";
 
-const icons = [Sparkles, Feather, Palette, Gift];
+const icons = [Sparkles, Feather, Gift];
 
 export function WatchesBenefits() {
   return (
-    <section className="bg-[#F7F3EE] py-10 sm:py-14">
+    <section className="bg-[#E8F5ED] py-6 sm:py-8">
       <Container>
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-[#2A1A1F] sm:text-3xl">
-            ليش تختاري هاد الساعة؟
+        <div className="mb-4 text-center">
+          <h2 className="text-xl font-bold text-[#0F2A1F] sm:text-2xl">
+            علاش تختاري هاد الساعة؟
           </h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:gap-6">
@@ -19,13 +19,13 @@ export function WatchesBenefits() {
             return (
               <div
                 key={benefit.title}
-                className="flex gap-4 rounded-2xl bg-white p-5 shadow-sm"
+                className="flex gap-3 rounded-xl border border-[#A8C9B4] bg-white p-3.5 shadow-sm ring-1 ring-[#B8924A]/15"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#7B2D42]/10">
-                  <Icon className="h-6 w-6 text-[#7B2D42]" />
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#A8C9B4] bg-[#E8F5ED] ring-1 ring-[#B8924A]/25">
+                  <Icon className="h-6 w-6 text-[#B8924A]" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[#2A1A1F]">{benefit.title}</h3>
+                  <h3 className="font-semibold text-[#0F2A1F]">{benefit.title}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-[#666]">
                     {benefit.description}
                   </p>

@@ -464,10 +464,29 @@ export default function AdminOrderDetailPage() {
       <div className="rounded-2xl border border-navy/10 bg-white p-4 sm:p-6">
         <div className="flex items-start gap-3">
           <Package size={18} className="mt-0.5 text-gold" />
-          <div>
-            <p className="font-bold text-navy">
-              {order.offer_name} × {order.quantity}
-            </p>
+          <div className="w-full">
+            <p className="font-bold text-navy">{order.offer_name}</p>
+            {order.line_items && order.line_items.length > 0 ? (
+              <ul className="mt-3 space-y-2 text-sm">
+                {order.line_items.map((item) => (
+                  <li
+                    key={`${item.watch_id}-${item.quantity}`}
+                    className="flex items-center justify-between gap-3 border-t border-navy/10 pt-2 first:border-0 first:pt-0"
+                  >
+                    <span className="font-medium text-navy">
+                      {item.watch_name} × {item.quantity}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {order.unit_price * item.quantity} د.م
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-1 text-sm text-muted-foreground">
+                × {order.quantity}
+              </p>
+            )}
             <p className="mt-1 text-sm text-muted-foreground">
               {order.unit_price} د.م / وحدة
             </p>

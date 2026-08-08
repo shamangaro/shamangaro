@@ -6,18 +6,36 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.order import Order, OrderStatus
-from app.schemas.order import OrderCreate, OrderCreateResponse, OrderPublicResponse
+from app.schemas.order import (
+    OrderCreate,
+    OrderCreateResponse,
+    OrderPublicResponse,
+    WatchLineItemPublic,
+)
 from app.services.customer_risk import analyze_customer_risk, get_blacklist_entry
 from app.services.offers import get_offer
-from app.services.products import resolve_watches_order
+from app.services.products import resolve_watches_multi_order, resolve_watches_order
 from app.services.city import extract_city_from_address
 from app.services.order_lifecycle import log_order_created
 from app.services.order_notifications import enqueue_order_created
 from app.services.order_number import generate_order_number
+from app.services.watch_line_items import (
+    WatchLineItemData,
+    merge_internal_notes,
+    parse_line_items,
+    serialize_line_items,
+)
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 THANK_YOU_MAX_AGE = timedelta(days=7)
+
+
+def _line_items_to_public(order: Order) -> list[WatchLineItemPublic] | None:
+    parsed = parse_line_items(order.internal_notes)
+    if not parsed:
+        return None
+    return [WatchLineItemPublic(**item) for item in parsed]
 
 
 def _order_to_public(order: Order) -> OrderPublicResponse:
@@ -30,6 +48,7 @@ def _order_to_public(order: Order) -> OrderPublicResponse:
         total_price=float(order.total_price),
         status=order.status.value,
         created_at=order.created_at,
+        line_items=_line_items_to_public(order),
     )
 
 
@@ -44,8 +63,9 @@ async def create_order(
     blacklist = await get_blacklist_entry(db, payload.phone)
     is_risk = blacklist is not None
     if not is_risk:
+        risk_address = payload.address or payload.city or ""
         analysis = await analyze_customer_risk(
-            db, payload.phone, payload.customer_name, payload.address
+            db, payload.phone, payload.customer_name, risk_address
         )
         is_risk = (
             analysis.is_blacklisted
@@ -67,6 +87,44 @@ async def create_order(
         quantity = offer.quantity
         unit_price = offer.unit_price
         total_price = offer.total_price
+    elif payload.line_items:
+        try:
+            product_order = resolve_watches_multi_order(
+                line_items=[
+                    {"variant_id": item.variant_id, "quantity": item.quantity}
+                    for item in payload.line_items
+                ],
+                source_page=payload.source_page,
+            )
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        offer_id = product_order.offer_id
+        offer_name = product_order.offer_name
+        quantity = product_order.quantity
+        unit_price = product_order.unit_price
+        total_price = product_order.total_price
+        watches_city = (payload.city or "").strip()
+        address_pending = not payload.address or payload.address.strip() == watches_city
+        line_items_note = serialize_line_items(
+            [
+                WatchLineItemData(
+                    variant_id=item.variant_id,
+                    variant_label=item.variant_label,
+                    quantity=item.quantity,
+                    image=item.image or None,
+                )
+                for item in product_order.line_items
+            ]
+        )
+        internal_notes = merge_internal_notes(
+            f"product_slug={payload.product_slug}",
+            line_items_note,
+            f"source_page={product_order.source_page}",
+            "address_pending_call=1" if address_pending else None,
+        )
     else:
         try:
             product_order = resolve_watches_order(
@@ -84,18 +142,36 @@ async def create_order(
         quantity = product_order.quantity
         unit_price = product_order.unit_price
         total_price = product_order.total_price
-        internal_notes = (
-            f"product_slug={payload.product_slug}; "
-            f"variant={product_order.selected_variant}; "
-            f"source_page={product_order.source_page}"
+        watches_city = (payload.city or "").strip()
+        address_pending = not payload.address or payload.address.strip() == watches_city
+        line_items_note = serialize_line_items(
+            [
+                WatchLineItemData(
+                    variant_id=item.variant_id,
+                    variant_label=item.variant_label,
+                    quantity=item.quantity,
+                    image=item.image or None,
+                )
+                for item in product_order.line_items
+            ]
         )
+        internal_notes = merge_internal_notes(
+            f"product_slug={payload.product_slug}",
+            f"variant={product_order.selected_variant}",
+            line_items_note,
+            f"source_page={product_order.source_page}",
+            "address_pending_call=1" if address_pending else None,
+        )
+
+    stored_address = (payload.address or "").strip()
+    stored_city = (payload.city or "").strip() or extract_city_from_address(stored_address)
 
     order = Order(
         order_number=order_number,
         customer_name=payload.customer_name,
         phone=payload.phone,
-        address=payload.address,
-        city=extract_city_from_address(payload.address),
+        address=stored_address,
+        city=stored_city,
         offer_id=offer_id,
         offer_name=offer_name,
         quantity=quantity,

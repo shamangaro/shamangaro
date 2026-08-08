@@ -2,43 +2,39 @@ import {
   isValidMoroccanPhone,
   normalizeMoroccanPhone,
 } from "@/lib/phone";
-import type { WatchVariantId } from "./config";
+import type { SelectedWatchLine } from "./watch-selection-utils";
+import { countSelectedWatches } from "./watch-selection-utils";
 
 export const WATCHES_VALIDATION = {
-  model: "اختاري موديل الساعة",
-  quantity: "اختاري العدد",
+  selection: "اختاري ساعة على الأقل قبل ما تكملي الطلب",
   name: "دخلي الاسم الكامل",
   phone: "دخلي رقم هاتف مغربي صحيح كيبدأ بـ 06 أو 07",
   city: "اختاري المدينة",
-  address: "دخلي العنوان بالتفصيل",
 } as const;
 
 export interface WatchesFormValues {
   name: string;
   phone: string;
   city: string;
-  address: string;
 }
 
 export interface WatchesFormErrors {
-  model?: string;
-  quantity?: string;
+  selection?: string;
   name?: string;
   phone?: string;
   city?: string;
-  address?: string;
 }
 
 export function validateWatchesCheckout(
-  variantId: WatchVariantId | null,
-  quantity: number | null,
+  selectedLines: SelectedWatchLine[],
+  checkoutUnlocked: boolean,
   form: WatchesFormValues
 ): WatchesFormErrors {
   const errors: WatchesFormErrors = {};
+  const selectedCount = countSelectedWatches(selectedLines);
 
-  if (!variantId) errors.model = WATCHES_VALIDATION.model;
-  if (!quantity || ![1, 2, 3].includes(quantity)) {
-    errors.quantity = WATCHES_VALIDATION.quantity;
+  if (!checkoutUnlocked || selectedCount < 1) {
+    errors.selection = WATCHES_VALIDATION.selection;
   }
   if (!form.name.trim() || form.name.trim().length < 2) {
     errors.name = WATCHES_VALIDATION.name;
@@ -47,15 +43,8 @@ export function validateWatchesCheckout(
     errors.phone = WATCHES_VALIDATION.phone;
   }
   if (!form.city.trim()) errors.city = WATCHES_VALIDATION.city;
-  if (!form.address.trim() || form.address.trim().length < 5) {
-    errors.address = WATCHES_VALIDATION.address;
-  }
 
   return errors;
-}
-
-export function buildWatchesAddress(city: string, address: string): string {
-  return `${city.trim()}، ${address.trim()}`;
 }
 
 export function normalizeWatchesPhone(phone: string): string {

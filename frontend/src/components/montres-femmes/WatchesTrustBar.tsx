@@ -1,26 +1,22 @@
-import { Truck, Banknote, RefreshCw, Shield } from "lucide-react";
-import { Container } from "@/components/shared/Container";
+import { Banknote, RefreshCw, Shield, Truck } from "lucide-react";
+import { LedTickerBand } from "@/components/shared/LedTickerBand";
 
-const items = [
-  { icon: Truck, label: "توصيل مجاني" },
-  { icon: Banknote, label: "الدفع عند الاستلام" },
-  { icon: RefreshCw, label: "التبديل متوفر" },
+const announcements = [
+  { icon: Truck, label: "توصيل مجاني لجميع مدن المغرب" },
+  { icon: Banknote, label: "الدفع عند الإستلام" },
+  { icon: RefreshCw, label: "كاين التبديل" },
   { icon: Shield, label: "تغليف هدايا" },
 ];
 
 export function WatchesTrustBar() {
   return (
-    <div className="border-b border-[#E8DFD4] bg-[#F7F3EE] py-2.5">
-      <Container>
-        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-[#5C4A52] sm:text-sm">
-          {items.map(({ icon: Icon, label }) => (
-            <span key={label} className="inline-flex items-center gap-1.5">
-              <Icon className="h-3.5 w-3.5 text-[#B8924A]" aria-hidden />
-              {label}
-            </span>
-          ))}
-        </div>
-      </Container>
-    </div>
+    <LedTickerBand
+      items={announcements}
+      ariaLabel="عروض و مميزات Montres Femmes"
+      compact
+      animation="vertical"
+      intervalMs={4000}
+      variant="feminine-brand"
+    />
   );
 }

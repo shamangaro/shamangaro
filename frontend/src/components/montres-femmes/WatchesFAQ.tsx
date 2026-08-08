@@ -10,10 +10,10 @@ export function WatchesFAQ() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="bg-[#F7F3EE] py-10 sm:py-14">
+    <section className="bg-[#F7F3EE] py-6 sm:py-8">
       <Container>
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-[#2A1A1F] sm:text-3xl">
+        <div className="mb-4 text-center">
+          <h2 className="text-xl font-bold text-[#0F2A1F] sm:text-2xl">
             أسئلة شائعة
           </h2>
         </div>
@@ -26,18 +26,18 @@ export function WatchesFAQ() {
               <button
                 type="button"
                 onClick={() => setOpen(open === i ? null : i)}
-                className="flex w-full items-center justify-between gap-4 p-4 text-right"
+                className="flex w-full items-center justify-between gap-3 p-3 text-right"
               >
-                <span className="font-medium text-[#2A1A1F]">{item.q}</span>
+                <span className="font-medium text-[#0F2A1F]">{item.q}</span>
                 <ChevronDown
                   className={cn(
-                    "h-5 w-5 shrink-0 text-[#7B2D42] transition",
+                    "h-5 w-5 shrink-0 text-[#1A5C42] transition",
                     open === i && "rotate-180"
                   )}
                 />
               </button>
               {open === i && (
-                <div className="border-t border-[#E8DFD4] px-4 pb-4 pt-2">
+                <div className="border-t border-[#D8E8DC] px-4 pb-4 pt-2">
                   <p className="text-sm leading-relaxed text-[#666]">{item.a}</p>
                 </div>
               )}

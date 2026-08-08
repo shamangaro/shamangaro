@@ -6,6 +6,7 @@ import { FreeDeliveryStrip } from "@/components/shared/FreeDeliveryHighlight";
 import { ProductHero } from "@/components/sections/ProductHero";
 import { ComparisonSlider } from "@/components/sections/ComparisonSlider";
 import { OrderSection } from "@/components/sections/OrderSection";
+import { MontresFemmesPromoBanner } from "@/components/sections/MontresFemmesPromoBanner";
 import { Features } from "@/components/sections/Features";
 import { HowToUse } from "@/components/sections/HowToUse";
 import { Reviews } from "@/components/sections/Reviews";
@@ -18,6 +19,7 @@ export default function Home() {
       <main className="pb-28 lg:pb-0">
         <ProductHero />
         <ComparisonSlider />
+        <MontresFemmesPromoBanner />
         <FreeDeliveryStrip />
         <OrderSection />
         <Features />

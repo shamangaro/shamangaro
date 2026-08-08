@@ -13,6 +13,14 @@ export interface OrderCreateResponse {
   total_price: number;
 }
 
+export interface WatchOrderLineItem {
+  watch_id: string;
+  watch_name: string;
+  model_number: string;
+  image?: string | null;
+  quantity: number;
+}
+
 export interface OrderPublic {
   order_number: string;
   customer_name: string;
@@ -22,6 +30,7 @@ export interface OrderPublic {
   total_price: number;
   status: string;
   created_at: string;
+  line_items?: WatchOrderLineItem[] | null;
 }
 
 export interface OrderAdmin {
@@ -38,6 +47,7 @@ export interface OrderAdmin {
   total_price: number;
   status: string;
   internal_notes: string | null;
+  line_items?: WatchOrderLineItem[] | null;
   is_risk: boolean;
   confirmation_agent: string | null;
   created_at: string;
