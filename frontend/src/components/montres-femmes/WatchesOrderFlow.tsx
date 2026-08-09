@@ -6,6 +6,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/shared/Container";
+import {
+  buildWatchesPurchaseEvent,
+  trackMetaPurchase,
+} from "@/lib/meta-pixel-purchase";
 import { buildWatchesOrderPayload, createWatchesOrder } from "@/lib/watches-orders";
 import { scrollToWatchesCheckout } from "@/lib/scroll-to-watches-order";
 import { ApiError } from "@/lib/api";
@@ -83,12 +87,18 @@ export function WatchesOrderFlow() {
     setSubmitting(true);
 
     try {
-      const result = await createWatchesOrder(
-        buildWatchesOrderPayload(selectedLines, {
-          name: form.name,
-          phone: normalizeWatchesPhone(form.phone),
-          city: form.city,
-        })
+      const payload = buildWatchesOrderPayload(selectedLines, {
+        name: form.name,
+        phone: normalizeWatchesPhone(form.phone),
+        city: form.city,
+      });
+      const result = await createWatchesOrder(payload);
+      trackMetaPurchase(
+        buildWatchesPurchaseEvent(
+          result.order_number,
+          payload.line_items,
+          result.total_price
+        )
       );
       router.push(`/thank-you?order=${result.order_number}`);
     } catch (err) {

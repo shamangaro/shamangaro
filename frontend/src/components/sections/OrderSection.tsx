@@ -11,6 +11,10 @@ import {
   MOROCCAN_PHONE_ERROR,
 } from "@/lib/phone";
 import { createOrder } from "@/lib/orders";
+import {
+  buildNeoTransatPurchaseEvent,
+  trackMetaPurchase,
+} from "@/lib/meta-pixel-purchase";
 import { ApiError } from "@/lib/api";
 import {
   BASE_PRICE_PER_CHAIR,
@@ -55,6 +59,13 @@ export function OrderSection() {
         address: form.address.trim(),
         offer_id: selected as "solo" | "duo" | "family",
       });
+      trackMetaPurchase(
+        buildNeoTransatPurchaseEvent(
+          result.order_number,
+          selected,
+          result.total_price
+        )
+      );
       router.push(`/thank-you?order=${result.order_number}`);
     } catch (err) {
       setSubmitting(false);
