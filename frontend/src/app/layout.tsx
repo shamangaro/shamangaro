@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Tajawal } from "next/font/google";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 import "@/styles/globals.css";
 
 const tajawal = Tajawal({
@@ -95,6 +96,7 @@ export default function RootLayout({
       <body
         className={`${tajawal.variable} font-sans antialiased selection:bg-gold/20 selection:text-navy`}
       >
+        <MetaPixel />
         {children}
       </body>
     </html>
