@@ -21,6 +21,7 @@ from app.schemas.order import (
     OrderNoteCreate,
     OrderNoteResponse,
     OrderNotesUpdate,
+    OrderProductCounts,
     OrderRiskResponse,
     OrderStatsResponse,
     OrderStatusUpdate,
@@ -40,6 +41,12 @@ from app.services.order_lifecycle import (
     public_status,
 )
 from app.services.order_notifications import enqueue_status_side_effects
+from app.services.order_product import (
+    OrderProductType,
+    classify_order_model,
+    neo_transat_product_sql_condition,
+    watches_product_sql_condition,
+)
 from app.services.watch_line_items import parse_line_items
 
 router = APIRouter(prefix="/admin/orders", tags=["admin-orders"])
@@ -69,6 +76,7 @@ async def _agent_name(db: AsyncSession, order: Order) -> str | None:
 def _order_to_admin(order: Order, agent: str | None = None) -> OrderAdminResponse:
     parsed = parse_line_items(order.internal_notes)
     line_items = [WatchLineItemPublic(**item) for item in parsed] if parsed else None
+    product_type = classify_order_model(order)
     return OrderAdminResponse(
         id=order.id,
         order_number=order.order_number,
@@ -84,6 +92,7 @@ def _order_to_admin(order: Order, agent: str | None = None) -> OrderAdminRespons
         status=_normalize_status(order.status),
         internal_notes=order.internal_notes,
         line_items=line_items,
+        product_type=product_type.value,
         is_risk=order.is_risk,
         confirmation_agent=agent,
         created_at=order.created_at,
@@ -198,6 +207,44 @@ def _build_filters(
     return and_(*conditions)
 
 
+def _apply_product_filter(filters, product: str | None):
+    if not product:
+        return filters
+    normalized = product.strip().lower()
+    if normalized == OrderProductType.NEO_TRANSAT.value:
+        return and_(filters, neo_transat_product_sql_condition())
+    if normalized == OrderProductType.WATCHES.value:
+        return and_(filters, watches_product_sql_condition())
+    return filters
+
+
+async def _product_counts(db: AsyncSession, base_filters) -> OrderProductCounts:
+    all_count = await db.scalar(select(func.count(Order.id)).where(base_filters)) or 0
+    neo_count = (
+        await db.scalar(
+            select(func.count(Order.id)).where(
+                and_(base_filters, neo_transat_product_sql_condition())
+            )
+        )
+        or 0
+    )
+    watches_count = (
+        await db.scalar(
+            select(func.count(Order.id)).where(
+                and_(base_filters, watches_product_sql_condition())
+            )
+        )
+        or 0
+    )
+    unknown_count = max(0, all_count - neo_count - watches_count)
+    return OrderProductCounts(
+        all=all_count,
+        neo_transat=neo_count,
+        watches=watches_count,
+        unknown=unknown_count,
+    )
+
+
 @router.get("/stats", response_model=OrderStatsResponse)
 async def get_order_stats(
     _admin: AdminUser = Depends(get_current_admin),
@@ -254,6 +301,7 @@ async def list_orders(
     status_filter: str | None = Query(None, alias="status"),
     date_from: str | None = None,
     date_to: str | None = None,
+    product: str | None = None,
     confirmation_queue: bool = False,
     archived: bool = Query(False),
     sort_by: str = Query("created_at"),
@@ -261,9 +309,10 @@ async def list_orders(
     _admin: AdminUser = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    filters = _build_filters(
+    base_filters = _build_filters(
         search, status_filter, date_from, date_to, confirmation_queue, archived
     )
+    filters = _apply_product_filter(base_filters, product)
 
     total = await db.scalar(select(func.count(Order.id)).where(filters)) or 0
     total_pages = max(1, (total + page_size - 1) // page_size)
@@ -281,12 +330,15 @@ async def list_orders(
         agent = await _agent_name(db, order)
         items.append(_order_to_admin(order, agent))
 
+    product_counts = await _product_counts(db, base_filters)
+
     return OrderListResponse(
         items=items,
         total=total,
         page=page,
         page_size=page_size,
         total_pages=total_pages,
+        product_counts=product_counts,
     )
 
 

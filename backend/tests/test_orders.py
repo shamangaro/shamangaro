@@ -348,10 +348,38 @@ async def test_whatsapp_templates():
         build_order_received_whatsapp,
     )
 
-    received = build_order_received_whatsapp("أحمد", 2, 458.0)
-    assert "SHAMANGARO" in received
-    assert "Neo Transat" in received
-    assert "458" in received
+    neo_received = build_order_received_whatsapp(
+        {
+            "customer_name": "أحمد",
+            "offer_id": "duo",
+            "quantity": 2,
+            "total_price": 458.0,
+        }
+    )
+    assert "SHAMANGARO" in neo_received
+    assert "Neo Transat" in neo_received
+    assert "458" in neo_received
+
+    watches_received = build_order_received_whatsapp(
+        {
+            "customer_name": "Fatima",
+            "offer_id": "montres-femmes",
+            "city": "الدار البيضاء",
+            "quantity": 2,
+            "total_price": 498.0,
+            "line_items": [
+                {
+                    "watch_id": "burgundy",
+                    "watch_name": "عنابي",
+                    "model_number": "Burgundy",
+                    "quantity": 2,
+                }
+            ],
+        }
+    )
+    assert "Fatima" in watches_received
+    assert "Burgundy" in watches_received
+    assert "Neo Transat" not in watches_received
 
     confirmed = build_order_confirmed_whatsapp("أحمد")
     assert "تم تأكيد طلبكم بنجاح" in confirmed

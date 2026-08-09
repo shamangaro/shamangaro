@@ -22,12 +22,24 @@ import {
   permanentlyDeleteOrder,
   restoreOrder,
   type OrderAdmin,
+  type OrderProductCounts,
 } from "@/lib/orders";
 import { phoneToTelLink, phoneToWhatsAppLink } from "@/lib/phone";
-import { buildOrderReceivedWhatsApp } from "@/lib/whatsapp";
+import {
+  buildOrderReceivedWhatsApp,
+  toOrderWhatsAppContext,
+} from "@/lib/whatsapp";
 import { StatusBadge } from "@/components/admin/StatusBadge";
+import { OrderProductBadge } from "@/components/admin/OrderProductBadge";
 import { RiskFlag } from "@/components/admin/TrustBadge";
+import type { OrderProductType } from "@/lib/order-product";
 import { cn } from "@/lib/utils";
+
+const PRODUCT_TABS: { value: "" | OrderProductType; label: string }[] = [
+  { value: "", label: "الكل" },
+  { value: "neo-transat", label: "Neo Transat" },
+  { value: "watches", label: "الساعات" },
+];
 
 const SORT_COLUMNS = [
   { key: "created_at", label: "التاريخ" },
@@ -62,12 +74,43 @@ export default function AdminOrdersPage() {
     text: string;
   } | null>(null);
   const [exporting, setExporting] = useState<string | null>(null);
+  const [productFilter, setProductFilter] = useState<"" | OrderProductType>("");
+  const [productCounts, setProductCounts] = useState<OrderProductCounts>({
+    all: 0,
+    neo_transat: 0,
+    watches: 0,
+    unknown: 0,
+  });
+
+  const buildListQuery = useCallback(() => {
+    const params = new URLSearchParams();
+    if (productFilter) params.set("product", productFilter);
+    if (search) params.set("search", search);
+    if (status) params.set("status", status);
+    if (dateFrom) params.set("date_from", dateFrom);
+    if (dateTo) params.set("date_to", dateTo);
+    if (viewMode === "archived") params.set("archived", "1");
+    const query = params.toString();
+    return query ? `?${query}` : "";
+  }, [productFilter, search, status, dateFrom, dateTo, viewMode]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("archived") === "1") {
       setViewMode("archived");
     }
+    const product = params.get("product");
+    if (product === "neo-transat" || product === "watches") {
+      setProductFilter(product);
+    }
+    const urlSearch = params.get("search");
+    if (urlSearch) setSearch(urlSearch);
+    const urlStatus = params.get("status");
+    if (urlStatus) setStatus(urlStatus);
+    const urlDateFrom = params.get("date_from");
+    if (urlDateFrom) setDateFrom(urlDateFrom);
+    const urlDateTo = params.get("date_to");
+    if (urlDateTo) setDateTo(urlDateTo);
   }, []);
 
   const load = useCallback(async () => {
@@ -81,6 +124,7 @@ export default function AdminOrdersPage() {
         status: status || undefined,
         date_from: dateFrom || undefined,
         date_to: dateTo || undefined,
+        product: productFilter || undefined,
         archived: viewMode === "archived",
         sort_by: sortBy,
         sort_dir: sortDir,
@@ -88,6 +132,7 @@ export default function AdminOrdersPage() {
       setOrders(listData.items);
       setTotal(listData.total);
       setTotalPages(listData.total_pages);
+      setProductCounts(listData.product_counts);
     } catch {
       setLoadError("تعذر تحميل الطلبات. تأكد من اتصالك وسجّل الدخول إن لزم.");
       setOrders([]);
@@ -96,7 +141,7 @@ export default function AdminOrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, status, dateFrom, dateTo, sortBy, sortDir, viewMode]);
+  }, [page, search, status, dateFrom, dateTo, sortBy, sortDir, viewMode, productFilter]);
 
   useEffect(() => {
     load();
@@ -105,7 +150,19 @@ export default function AdminOrdersPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
+    const query = buildListQuery();
+    window.history.replaceState(null, "", `/admin/orders${query}`);
     load();
+  };
+
+  const setProductTab = (value: "" | OrderProductType) => {
+    setProductFilter(value);
+    setPage(1);
+    const params = new URLSearchParams(window.location.search);
+    if (value) params.set("product", value);
+    else params.delete("product");
+    const query = params.toString();
+    window.history.replaceState(null, "", `/admin/orders${query ? `?${query}` : ""}`);
   };
 
   const toggleSort = (key: string) => {
@@ -269,6 +326,32 @@ export default function AdminOrdersPage() {
       )}
 
       <div className="rounded-2xl border border-navy/10 bg-white p-4 md:p-6">
+        <div className="mb-6 flex flex-wrap gap-2">
+          {PRODUCT_TABS.map((tab) => {
+            const count =
+              tab.value === ""
+                ? productCounts.all
+                : tab.value === "neo-transat"
+                  ? productCounts.neo_transat
+                  : productCounts.watches;
+            return (
+              <button
+                key={tab.value || "all"}
+                type="button"
+                onClick={() => setProductTab(tab.value)}
+                className={cn(
+                  "min-h-11 rounded-lg px-4 py-2 text-sm font-bold",
+                  productFilter === tab.value
+                    ? "bg-navy text-white"
+                    : "border border-navy/15 text-navy hover:bg-navy/5"
+                )}
+              >
+                {tab.label} ({count})
+              </button>
+            );
+          })}
+        </div>
+
         <form
           onSubmit={handleSearch}
           className="mb-6 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end"
@@ -366,6 +449,7 @@ export default function AdminOrdersPage() {
                 <thead>
                   <tr className="border-b border-navy/10 text-right">
                     <th className="px-2 py-3 font-bold text-navy">رقم الطلب</th>
+                    <th className="px-2 py-3 font-bold text-navy">المنتج</th>
                     {SORT_COLUMNS.map((col) => (
                       <th key={col.key} className="px-2 py-3 font-bold text-navy">
                         <button
@@ -397,10 +481,9 @@ export default function AdminOrdersPage() {
                 <tbody>
                   {orders.map((order) => {
                     const waMsg = buildOrderReceivedWhatsApp(
-                      order.customer_name,
-                      order.quantity,
-                      order.total_price
+                      toOrderWhatsAppContext(order)
                     );
+                    const detailHref = `/admin/orders/${order.id}${buildListQuery()}`;
                     return (
                       <tr
                         key={order.id}
@@ -408,6 +491,9 @@ export default function AdminOrdersPage() {
                       >
                         <td className="px-2 py-3 font-mono font-bold" dir="ltr">
                           {order.order_number}
+                        </td>
+                        <td className="px-2 py-3">
+                          <OrderProductBadge order={order} />
                         </td>
                         <td className="px-2 py-3 text-muted-foreground">
                           {formatDate(order.created_at)}
@@ -455,7 +541,7 @@ export default function AdminOrdersPage() {
                                   <MessageCircle size={16} />
                                 </a>
                                 <a
-                                  href={`/admin/orders/${order.id}`}
+                                  href={detailHref}
                                   className="rounded p-1.5 hover:bg-navy/10"
                                   title="عرض"
                                   aria-label="عرض تفاصيل الطلب"
@@ -482,7 +568,7 @@ export default function AdminOrdersPage() {
                             ) : (
                               <>
                                 <a
-                                  href={`/admin/orders/${order.id}`}
+                                  href={detailHref}
                                   className="rounded p-1.5 hover:bg-navy/10"
                                   title="عرض"
                                   aria-label="عرض تفاصيل الطلب"
@@ -530,6 +616,9 @@ export default function AdminOrdersPage() {
                       <p className="mt-1 text-sm text-muted-foreground">
                         {formatDate(order.created_at)}
                       </p>
+                      <div className="mt-2">
+                        <OrderProductBadge order={order} />
+                      </div>
                     </div>
                     <div className="flex flex-col items-end gap-1">
                       <StatusBadge status={order.status} />
@@ -544,7 +633,7 @@ export default function AdminOrdersPage() {
                   {viewMode === "active" ? (
                     <div className="mt-3 flex gap-2">
                       <a
-                        href={`/admin/orders/${order.id}`}
+                        href={`/admin/orders/${order.id}${buildListQuery()}`}
                         className="relative z-10 flex min-h-11 flex-1 items-center justify-center rounded-lg bg-navy text-sm font-bold text-white"
                       >
                         عرض التفاصيل
@@ -562,7 +651,7 @@ export default function AdminOrdersPage() {
                   ) : (
                     <div className="mt-3 space-y-2">
                       <a
-                        href={`/admin/orders/${order.id}`}
+                        href={`/admin/orders/${order.id}${buildListQuery()}`}
                         className="flex min-h-11 w-full items-center justify-center rounded-lg border border-navy/15 text-sm font-bold text-navy"
                       >
                         عرض التفاصيل

@@ -162,6 +162,7 @@ class OrderAdminResponse(BaseModel):
     status: str
     internal_notes: str | None = None
     line_items: list[WatchLineItemPublic] | None = None
+    product_type: Literal["neo-transat", "watches", "unknown"] = "unknown"
     is_risk: bool = False
     confirmation_agent: str | None = None
     created_at: datetime
@@ -254,12 +255,20 @@ class OrderCallCreate(BaseModel):
     notes: str | None = Field(default=None, max_length=2000)
 
 
+class OrderProductCounts(BaseModel):
+    all: int
+    neo_transat: int
+    watches: int
+    unknown: int = 0
+
+
 class OrderListResponse(BaseModel):
     items: list[OrderAdminResponse]
     total: int
     page: int
     page_size: int
     total_pages: int
+    product_counts: OrderProductCounts
 
 
 class OrderStatsResponse(BaseModel):

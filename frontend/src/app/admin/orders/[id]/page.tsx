@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import Image from "next/image";
+import { useParams, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -36,8 +37,11 @@ import { phoneToTelLink, phoneToWhatsAppLink } from "@/lib/phone";
 import {
   buildOrderConfirmedWhatsApp,
   buildOrderReceivedWhatsApp,
+  toOrderWhatsAppContext,
 } from "@/lib/whatsapp";
 import { StatusBadge } from "@/components/admin/StatusBadge";
+import { OrderProductBadge } from "@/components/admin/OrderProductBadge";
+import { classifyOrderProduct } from "@/lib/order-product";
 import { OrderTimeline } from "@/components/admin/OrderTimeline";
 import { RiskFlag, TrustBadge } from "@/components/admin/TrustBadge";
 import { ApiError } from "@/lib/api";
@@ -63,9 +67,12 @@ const CALL_OUTCOMES: { value: CallOutcome; label: string }[] = [
 
 export default function AdminOrderDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const rawId = params.id;
   const orderId = typeof rawId === "string" ? Number(rawId) : NaN;
   const validOrderId = Number.isFinite(orderId) && orderId > 0;
+  const listQuery = searchParams.toString();
+  const backHref = listQuery ? `/admin/orders?${listQuery}` : "/admin/orders";
   const [order, setOrder] = useState<OrderAdminDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -255,15 +262,16 @@ export default function AdminOrderDetailPage() {
   }
 
   const isArchived = Boolean(order.is_archived);
+  const productType = classifyOrderProduct(order);
+  const whatsappContext = toOrderWhatsAppContext(order);
 
   const risk = order.risk;
   const currentStatus = normalizeOrderStatus(order.status);
-  const receivedWa = buildOrderReceivedWhatsApp(
-    order.customer_name,
-    order.quantity,
-    order.total_price
-  );
-  const confirmedWa = buildOrderConfirmedWhatsApp(order.customer_name);
+  const receivedWa = buildOrderReceivedWhatsApp(whatsappContext);
+  const confirmedWa = buildOrderConfirmedWhatsApp(whatsappContext);
+  const watchesTotalQuantity =
+    order.line_items?.reduce((sum, item) => sum + item.quantity, 0) ??
+    order.quantity;
 
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleString("ar-MA", {
@@ -275,7 +283,7 @@ export default function AdminOrderDetailPage() {
     <div className="mx-auto max-w-3xl space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <Link
-          href="/admin/orders"
+          href={backHref}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-navy/5"
         >
           <ArrowRight size={20} />
@@ -289,6 +297,7 @@ export default function AdminOrderDetailPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <OrderProductBadge productType={productType} />
           <RiskFlag isRisk={order.is_risk} />
           <StatusBadge status={order.status} />
           {risk && (
@@ -465,8 +474,44 @@ export default function AdminOrderDetailPage() {
         <div className="flex items-start gap-3">
           <Package size={18} className="mt-0.5 text-gold" />
           <div className="w-full">
-            <p className="font-bold text-navy">{order.offer_name}</p>
-            {order.line_items && order.line_items.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-bold text-navy">{order.offer_name}</p>
+              <OrderProductBadge productType={productType} />
+            </div>
+            {productType === "watches" && order.line_items && order.line_items.length > 0 ? (
+              <ul className="mt-4 space-y-3">
+                {order.line_items.map((item) => (
+                  <li
+                    key={`${item.watch_id}-${item.quantity}`}
+                    className="flex items-start gap-3 rounded-xl border border-navy/10 p-3"
+                  >
+                    {item.image ? (
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-[#f5f5f5]">
+                        <Image
+                          src={item.image}
+                          alt={item.watch_name}
+                          fill
+                          className="object-contain p-1"
+                          sizes="64px"
+                        />
+                      </div>
+                    ) : null}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-navy">{item.watch_name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.model_number}
+                      </p>
+                      <p className="mt-2 text-sm">
+                        الكمية: {item.quantity} · {order.unit_price} د.م / وحدة
+                      </p>
+                      <p className="text-sm font-bold text-navy">
+                        المجموع: {order.unit_price * item.quantity} د.م
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : order.line_items && order.line_items.length > 0 ? (
               <ul className="mt-3 space-y-2 text-sm">
                 {order.line_items.map((item) => (
                   <li
@@ -487,9 +532,15 @@ export default function AdminOrderDetailPage() {
                 × {order.quantity}
               </p>
             )}
-            <p className="mt-1 text-sm text-muted-foreground">
-              {order.unit_price} د.م / وحدة
-            </p>
+            {productType === "watches" ? (
+              <p className="mt-3 text-sm text-muted-foreground">
+                العدد الإجمالي: {watchesTotalQuantity} · {order.unit_price} د.م / ساعة
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {order.unit_price} د.م / وحدة
+              </p>
+            )}
             <p className="mt-3 text-2xl font-black text-navy">
               {order.total_price} <span className="text-sm font-bold">د.م</span>
             </p>

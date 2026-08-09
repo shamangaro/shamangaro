@@ -24,8 +24,10 @@ import { phoneToTelLink, phoneToWhatsAppLink } from "@/lib/phone";
 import {
   buildOrderConfirmedWhatsApp,
   buildOrderReceivedWhatsApp,
+  toOrderWhatsAppContext,
 } from "@/lib/whatsapp";
 import { StatusBadge } from "@/components/admin/StatusBadge";
+import { OrderProductBadge } from "@/components/admin/OrderProductBadge";
 import { OrderTimeline } from "@/components/admin/OrderTimeline";
 import { cn } from "@/lib/utils";
 
@@ -148,14 +150,10 @@ export default function ConfirmationPage() {
 
   const current = detail;
   const receivedWa = current
-    ? buildOrderReceivedWhatsApp(
-        current.customer_name,
-        current.quantity,
-        current.total_price
-      )
+    ? buildOrderReceivedWhatsApp(toOrderWhatsAppContext(current))
     : "";
   const confirmedWa = current
-    ? buildOrderConfirmedWhatsApp(current.customer_name)
+    ? buildOrderConfirmedWhatsApp(toOrderWhatsAppContext(current))
     : "";
 
   return (
@@ -216,6 +214,9 @@ export default function ConfirmationPage() {
                         <p className="text-xs text-muted-foreground" dir="ltr">
                           {order.phone}
                         </p>
+                        <div className="mt-2">
+                          <OrderProductBadge order={order} />
+                        </div>
                       </div>
                       <StatusBadge status={order.status} />
                     </div>

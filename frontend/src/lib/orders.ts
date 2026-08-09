@@ -1,5 +1,6 @@
 import { apiFetch } from "./api";
 import { getApiBase } from "./api-base";
+import type { OrderProductType } from "./order-product";
 
 export interface OrderCreatePayload {
   customer_name: string;
@@ -48,6 +49,7 @@ export interface OrderAdmin {
   status: string;
   internal_notes: string | null;
   line_items?: WatchOrderLineItem[] | null;
+  product_type?: OrderProductType;
   is_risk: boolean;
   confirmation_agent: string | null;
   created_at: string;
@@ -114,12 +116,20 @@ export interface BlacklistEntry {
   created_at: string;
 }
 
+export interface OrderProductCounts {
+  all: number;
+  neo_transat: number;
+  watches: number;
+  unknown: number;
+}
+
 export interface OrderListResponse {
   items: OrderAdmin[];
   total: number;
   page: number;
   page_size: number;
   total_pages: number;
+  product_counts: OrderProductCounts;
 }
 
 export interface OrderStats {
@@ -289,6 +299,7 @@ export async function listOrders(params: {
   status?: string;
   date_from?: string;
   date_to?: string;
+  product?: OrderProductType | "";
   confirmation_queue?: boolean;
   archived?: boolean;
   sort_by?: string;
@@ -301,6 +312,7 @@ export async function listOrders(params: {
   if (params.status) qs.set("status", params.status);
   if (params.date_from) qs.set("date_from", params.date_from);
   if (params.date_to) qs.set("date_to", params.date_to);
+  if (params.product) qs.set("product", params.product);
   if (params.confirmation_queue) qs.set("confirmation_queue", "true");
   if (params.archived) qs.set("archived", "true");
   if (params.sort_by) qs.set("sort_by", params.sort_by);
