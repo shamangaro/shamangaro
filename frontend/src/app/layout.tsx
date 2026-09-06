@@ -17,7 +17,7 @@ export const viewport: Viewport = {
 };
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://shamangaro.com";
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://shamangaro.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
