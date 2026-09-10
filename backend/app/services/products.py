@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 WATCHES_PRODUCT_SLUG = "montres-femmes"
 WATCHES_PRODUCT_NAME = "Montres Femmes Élégantes"
-WATCHES_UNIT_PRICE = 249.0
+WATCHES_UNIT_PRICE = 250.0
 WATCHES_SOURCE_PAGE = "/products/montres-femmes"
 WATCHES_MAX_QUANTITY = 99
 
@@ -10,12 +10,24 @@ WATCH_VARIANTS: dict[str, str] = {
     "taupe": "Taupe",
     "burgundy": "Burgundy",
     "navy-blue": "Navy Blue",
+    "two-tone-white": "Two-tone White",
+    "two-tone-brown": "Two-tone Brown",
+    "gold-brown": "Gold Brown",
+    "navy-leather": "Navy Leather",
+    "burgundy-oval": "Burgundy Oval",
+    "cream-leather": "Cream Leather",
 }
 
 WATCH_VARIANT_IMAGES: dict[str, str] = {
     "taupe": "/images/montres-femmes/slide-01-packaging.png",
     "burgundy": "/images/montres-femmes/slide-04-burgundy.png",
     "navy-blue": "/images/montres-femmes/slide-02-navy.png",
+    "two-tone-white": "/images/montres-femmes/watch-01-twotone-white.jpg",
+    "two-tone-brown": "/images/montres-femmes/watch-02-twotone-brown.jpg",
+    "gold-brown": "/images/montres-femmes/watch-03-gold-brown.jpg",
+    "navy-leather": "/images/montres-femmes/watch-04-navy-leather.jpg",
+    "burgundy-oval": "/images/montres-femmes/watch-05-burgundy-oval.jpg",
+    "cream-leather": "/images/montres-femmes/watch-06-cream-leather.jpg",
 }
 
 

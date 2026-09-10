@@ -78,7 +78,7 @@ export function WatchesCityCombobox({
                 type="button"
                 className={cn(
                   "w-full px-4 py-2.5 text-start text-sm transition hover:bg-[#FAF7F2]",
-                  value === city && "bg-[#FAF7F2] font-semibold text-[#1A5C42]"
+                  value === city && "bg-[#FAF7F2] font-semibold text-[#134A35]"
                 )}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => pick(city)}

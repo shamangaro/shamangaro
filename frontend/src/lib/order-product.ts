@@ -48,6 +48,6 @@ export const PRODUCT_BADGE_LABELS: Record<OrderProductType, string> = {
 
 export const PRODUCT_BADGE_CLASSES: Record<OrderProductType, string> = {
   "neo-transat": "bg-navy/10 text-navy ring-1 ring-navy/15",
-  watches: "bg-[#0F3D2E]/10 text-[#0F3D2E] ring-1 ring-[#1A5C42]/20",
+  watches: "bg-[#0A2F23]/10 text-[#0A2F23] ring-1 ring-[#134A35]/20",
   unknown: "bg-amber-50 text-amber-900 ring-1 ring-amber-200",
 };

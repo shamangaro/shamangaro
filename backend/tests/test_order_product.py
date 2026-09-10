@@ -78,7 +78,7 @@ def test_watches_whatsapp_includes_models_and_excludes_neo():
         {
             "customer_name": "Fatima",
             "city": "الدار البيضاء",
-            "total_price": 747.0,
+            "total_price": 750.0,
             "quantity": 3,
             "line_items": [
                 {
@@ -100,7 +100,7 @@ def test_watches_whatsapp_includes_models_and_excludes_neo():
     assert "• الساعة Navy Blue × 2" in message
     assert "• الساعة Burgundy × 1" in message
     assert "العدد الإجمالي: 3" in message
-    assert "747" in message
+    assert "750" in message
     assert "Neo Transat" not in message
     assert "كرسي" not in message
     assert "Pack Neo" not in message
@@ -140,7 +140,7 @@ def test_arabic_whatsapp_url_encoding_roundtrip():
         {
             "customer_name": "سارة",
             "city": "مراكش",
-            "total_price": 498.0,
+            "total_price": 500.0,
             "quantity": 2,
             "line_items": [
                 {
@@ -180,8 +180,8 @@ async def test_admin_product_filter_excludes_other_product(admin_client):
             "product_name": "Montres Femmes Élégantes",
             "selected_variant": "burgundy",
             "quantity": 1,
-            "unit_price": 249.0,
-            "total_amount": 249.0,
+            "unit_price": 250.0,
+            "total_amount": 250.0,
             "source_page": "/products/montres-femmes",
         },
     )

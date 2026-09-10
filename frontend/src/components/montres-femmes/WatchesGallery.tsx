@@ -35,7 +35,7 @@ export function WatchesGallery() {
                 onClick={() => setActive(i)}
                 className={cn(
                   "relative h-16 w-20 overflow-hidden rounded-lg border-2 sm:h-20 sm:w-24",
-                  active === i ? "border-[#1A5C42]" : "border-transparent opacity-70"
+                  active === i ? "border-[#134A35]" : "border-transparent opacity-70"
                 )}
               >
                 <Image src={src} alt={labels[i]} fill className="object-cover" sizes="96px" />

@@ -7,7 +7,7 @@ type WatchesFreeDeliveryBannerProps = {
   size?: "default" | "compact";
 };
 
-/** Carte livraison — hero (style Transat, palette orange féminine) */
+/** Carte livraison — palette LP khdar + or */
 export function WatchesFreeDeliveryBanner({
   className,
   size = "default",
@@ -18,8 +18,8 @@ export function WatchesFreeDeliveryBanner({
     <div
       className={cn(
         "watches-delivery-glow relative overflow-hidden rounded-2xl",
-        "border border-[#FDBA74]/80 bg-gradient-to-br from-[#FFF7ED]/95 via-white to-[#FFEDD5]/80",
-        "ring-1 ring-[#FB923C]/20",
+        "border border-[#B8924A]/50 bg-gradient-to-br from-[#F7F3EE] via-white to-[#E8F5ED]",
+        "ring-1 ring-[#B8924A]/25",
         compact ? "px-4 py-3.5" : "px-5 py-4 sm:px-6 sm:py-5",
         className
       )}
@@ -27,7 +27,7 @@ export function WatchesFreeDeliveryBanner({
       aria-label={WATCHES_DELIVERY.full}
     >
       <div
-        className="pointer-events-none absolute -start-8 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-[#FB923C]/15 blur-2xl"
+        className="pointer-events-none absolute -start-8 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-[#B8924A]/20 blur-2xl"
         aria-hidden
       />
 
@@ -35,8 +35,8 @@ export function WatchesFreeDeliveryBanner({
         <div
           className={cn(
             "flex shrink-0 items-center justify-center rounded-xl",
-            "bg-gradient-to-br from-[#EA580C] to-[#C2410C] text-white",
-            "shadow-[0_4px_14px_rgba(234,88,12,0.32)] ring-1 ring-[#FDBA74]/40",
+            "bg-gradient-to-br from-[#B8924A] to-[#8F6E2E] text-white",
+            "shadow-[0_4px_14px_rgba(184,146,74,0.35)] ring-1 ring-[#D4BC82]/50",
             compact ? "h-10 w-10" : "h-11 w-11 sm:h-12 sm:w-12"
           )}
         >
@@ -46,7 +46,7 @@ export function WatchesFreeDeliveryBanner({
         <div className="min-w-0 flex-1 text-start">
           <p
             className={cn(
-              "font-bold leading-snug text-[#7C2D12]",
+              "font-bold leading-snug text-[#0A2F23]",
               compact ? "text-[15px]" : "text-base sm:text-[17px]"
             )}
           >
@@ -54,7 +54,7 @@ export function WatchesFreeDeliveryBanner({
           </p>
           <p
             className={cn(
-              "mt-0.5 font-semibold text-[#EA580C]",
+              "mt-0.5 font-semibold text-[#B8924A]",
               compact ? "text-xs" : "text-sm"
             )}
           >
@@ -62,7 +62,7 @@ export function WatchesFreeDeliveryBanner({
           </p>
           <p
             className={cn(
-              "mt-1 text-[#9A3412]/70",
+              "mt-1 text-[#4A5C52]",
               compact ? "text-[11px]" : "text-xs sm:text-[13px]"
             )}
           >
@@ -78,33 +78,38 @@ type WatchesFreeDeliveryStripProps = {
   className?: string;
 };
 
-/** Barre pleine largeur — entre sections (orange, style Transat) */
+/** Barre pleine largeur — or LP, offre visible */
 export function WatchesFreeDeliveryStrip({
   className,
 }: WatchesFreeDeliveryStripProps) {
   return (
     <div
       className={cn(
-        "relative overflow-hidden border-y border-[#FDBA74]/35",
-        "bg-gradient-to-r from-[#C2410C] via-[#EA580C] to-[#C2410C]",
+        "relative overflow-hidden border-y border-[#D4BC82]/45",
+        "bg-gradient-to-r from-[#8F6E2E] via-[#B8924A] to-[#8F6E2E]",
         className
       )}
       role="note"
       aria-label={WATCHES_DELIVERY.full}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/55 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#0A2F23]/25 to-transparent" />
       <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent)]"
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-3 py-2 text-center sm:gap-x-5 sm:py-2.5">
+      <div className="relative z-10 mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-3 py-2.5 text-center sm:gap-x-5 sm:py-3">
         <span className="flex items-center gap-2 text-sm font-bold text-white sm:text-base">
-          <Truck size={18} strokeWidth={2.25} className="text-white" aria-hidden />
+          <Truck
+            size={18}
+            strokeWidth={2.25}
+            className="text-white drop-shadow-sm"
+            aria-hidden
+          />
           {WATCHES_DELIVERY.full}
         </span>
-        <span className="hidden h-4 w-px bg-white/35 sm:block" aria-hidden />
+        <span className="hidden h-4 w-px bg-white/40 sm:block" aria-hidden />
         <span className="text-xs font-semibold text-white/95 sm:text-sm">
           {WATCHES_DELIVERY.detail}
         </span>

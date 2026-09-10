@@ -9,7 +9,7 @@ export function MontresFemmesPromoBanner() {
       <Container>
         <Link
           href="/products/montres-femmes"
-          className="group relative block overflow-hidden rounded-2xl border border-[#B8924A]/35 bg-gradient-to-br from-[#0F2A1F] via-[#0F3D2E] to-[#1A5C42] shadow-[0_12px_40px_rgba(15,42,31,0.22)] ring-1 ring-[#B8924A]/25 transition hover:brightness-105"
+          className="group relative block overflow-hidden rounded-2xl border border-[#B8924A]/35 bg-gradient-to-br from-[#0F2A1F] via-[#0A2F23] to-[#134A35] shadow-[0_12px_40px_rgba(15,42,31,0.22)] ring-1 ring-[#B8924A]/25 transition hover:brightness-105"
         >
           <div
             className="pointer-events-none absolute -end-10 -top-10 h-40 w-40 rounded-full bg-[#B8924A]/20 blur-3xl"
@@ -30,10 +30,10 @@ export function MontresFemmesPromoBanner() {
                 بغiti ساعة أنيقة؟
               </h2>
               <p className="max-w-md text-sm leading-relaxed text-white/90 sm:text-base">
-                ساعات نسائية بخطوط ذهبية و علبة هدايا — 249 درهم · توصيل مجاني ·
+                ساعات نسائية بخطوط ذهبية و علبة هدايا — 250 درهم · توصيل مجاني ·
                 الدفع عند الإستلام
               </p>
-              <span className="inline-flex items-center gap-2 rounded-xl border border-[#B8924A]/40 bg-white px-4 py-2.5 text-sm font-bold text-[#1A5C42] shadow-md transition group-hover:bg-[#FAF7F2]">
+              <span className="inline-flex items-center gap-2 rounded-xl border border-[#B8924A]/40 bg-white px-4 py-2.5 text-sm font-bold text-[#134A35] shadow-md transition group-hover:bg-[#FAF7F2]">
                 اكتشفي الساعات
                 <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-0.5" aria-hidden />
               </span>

@@ -14,7 +14,8 @@ import { buildWatchesOrderPayload, createWatchesOrder } from "@/lib/watches-orde
 import { scrollToWatchesCheckout } from "@/lib/scroll-to-watches-order";
 import { ApiError } from "@/lib/api";
 import { useWatchesPage } from "./WatchesPageContext";
-import { formatWatchPrice } from "./config";
+import { Sparkles, Truck } from "lucide-react";
+import { formatWatchPrice, WATCHES_DELIVERY, WATCHES_PRODUCT } from "./config";
 import { WatchesSelectionSection } from "./WatchesSelectionSection";
 import { WatchesCityCombobox } from "./WatchesCityCombobox";
 import { WATCH_SELECTION_COPY } from "./watch-selection-utils";
@@ -59,7 +60,7 @@ export function WatchesOrderFlow() {
   const inputClass = (field: keyof WatchesFormErrors) =>
     cn(
       "w-full rounded-xl border bg-white px-3 py-2.5 text-[#0F2A1F] outline-none transition sm:px-4 sm:py-3",
-      "focus:border-[#1A5C42] focus:ring-2 focus:ring-[#1A5C42]/15",
+      "focus:border-[#134A35] focus:ring-2 focus:ring-[#134A35]/15",
       errors[field] ? "border-red-400" : "border-[#D8E8DC]"
     );
 
@@ -118,12 +119,56 @@ export function WatchesOrderFlow() {
     >
       <Container>
         <div className="mx-auto max-w-xl">
-          <div className="mb-4 text-center sm:mb-5">
-            <h2 className="text-xl font-bold text-[#0F2A1F] sm:text-2xl">
+          <div className="mb-6 text-center sm:mb-7">
+            <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-[#B8924A]/35 bg-gradient-to-r from-[#0A2F23] to-[#134A35] px-3 py-1 text-[11px] font-bold text-white">
+              <Sparkles className="h-3 w-3 text-[#D4BC82]" aria-hidden />
+              SHAMANGARO · Montres Femmes
+            </p>
+            <h1 className="text-3xl font-bold leading-snug text-[#0F2A1F] sm:text-4xl">
+              أناقة هادئة
+              <span className="text-[#134A35]"> على المعصم</span>
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-[#4A5C52] sm:text-base">
+              اختاري اللون اللي عجبك وكمّلي الطلب دابا.
+            </p>
+            <p className="mt-3 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
+              <span className="text-2xl font-bold leading-none text-[#134A35] sm:text-3xl">
+                {formatWatchPrice(WATCHES_PRODUCT.unitPrice)}
+              </span>
+              <span className="text-xs text-[#888] line-through">350 درهم</span>
+              <span className="rounded-md bg-[#B8924A]/15 px-2 py-0.5 text-[10px] font-bold text-[#134A35]">
+                عرض خاص
+              </span>
+            </p>
+            <p
+              className="watches-delivery-marquee mt-3 flex items-center justify-center gap-2 text-sm font-semibold text-[#134A35]"
+              role="note"
+              aria-label={WATCHES_DELIVERY.full}
+            >
+              <Truck
+                className="h-3.5 w-3.5 shrink-0 text-[#B8924A]"
+                strokeWidth={2.25}
+                aria-hidden
+              />
+              {WATCHES_DELIVERY.headline}
+              <span className="text-[8px] text-[#B8924A]/70" aria-hidden>
+                ◆
+              </span>
+              <span className="text-[#4A5C52]">{WATCHES_DELIVERY.subline}</span>
+            </p>
+            <div
+              className="mx-auto mb-1 mt-6 flex w-44 items-center gap-3"
+              aria-hidden
+            >
+              <span className="h-px flex-1 bg-gradient-to-l from-[#B8924A] to-transparent" />
+              <span className="h-1.5 w-1.5 rotate-45 bg-[#B8924A] shadow-[0_0_8px_rgba(184,146,74,0.55)]" />
+              <span className="h-px flex-1 bg-gradient-to-r from-[#B8924A] to-transparent" />
+            </div>
+            <h2 className="mt-5 text-lg font-bold text-[#0F2A1F] sm:text-xl">
               اختاري الساعة و كملي الطلب
             </h2>
             <p className="mt-1.5 text-sm text-[#4A5C52]">
-              تصفّحي الصور، زيدي للسلة، من بعد عمّري معلوماتك
+              شوفي الصور بوضوح، اختاري الموديل اللي عجبك، من بعد عمّري معلوماتك
             </p>
           </div>
           <div className="overflow-hidden rounded-2xl border border-[#A8C9B4] bg-[#FDFBF7] shadow-sm ring-1 ring-[#B8924A]/15">
@@ -232,14 +277,14 @@ export function WatchesOrderFlow() {
                               {line.watchName} × {line.quantity}
                             </p>
                           </div>
-                          <p className="font-semibold text-[#1A5C42]">
+                          <p className="font-semibold text-[#134A35]">
                             {formatWatchPrice(line.subtotal)}
                           </p>
                         </div>
                       ))}
                       <div className="flex justify-between gap-3 border-t border-[#D8E8DC] pt-2">
                         <span className="font-bold text-[#0F2A1F]">المجموع</span>
-                        <span className="text-lg font-bold text-[#1A5C42]">
+                        <span className="text-lg font-bold text-[#134A35]">
                           {formatWatchPrice(total)}
                         </span>
                       </div>
@@ -262,7 +307,7 @@ export function WatchesOrderFlow() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full rounded-xl bg-[#1A5C42] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#0F3D2E] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-xl bg-[#134A35] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#0A2F23] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {submitting
                       ? "كندوزو الطلب..."
@@ -276,7 +321,7 @@ export function WatchesOrderFlow() {
                         className="flex items-center justify-center gap-2"
                       >
                         <span
-                          className="h-1 w-1 rounded-full bg-[#247A58]"
+                          className="h-1 w-1 rounded-full bg-[#1A684A]"
                           aria-hidden
                         />
                         {line}
@@ -288,14 +333,14 @@ export function WatchesOrderFlow() {
                     بالضغط على «أكّدي الطلب» كتوافقين على{" "}
                     <Link
                       href="/terms"
-                      className="font-medium text-[#1A5C42] underline-offset-2 hover:underline"
+                      className="font-medium text-[#134A35] underline-offset-2 hover:underline"
                     >
                       الشروط و الأحكام
                     </Link>{" "}
                     و{" "}
                     <Link
                       href="/privacy"
-                      className="font-medium text-[#1A5C42] underline-offset-2 hover:underline"
+                      className="font-medium text-[#134A35] underline-offset-2 hover:underline"
                     >
                       سياسة الخصوصية
                     </Link>

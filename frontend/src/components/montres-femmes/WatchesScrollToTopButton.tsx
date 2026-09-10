@@ -52,7 +52,7 @@ export function WatchesScrollToTopButton() {
           onClick={scrollToTop}
           aria-label="الرجوع لأعلى الصفحة"
           className={cn(
-            "fixed start-4 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-[#1A5C42]/20 bg-white/90 text-[#1A5C42] shadow-md backdrop-blur-sm transition hover:bg-[#1A5C42] hover:text-white sm:start-6 sm:h-[3.25rem] sm:w-[3.25rem] lg:hidden",
+            "fixed start-4 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-[#134A35]/20 bg-white/90 text-[#134A35] shadow-md backdrop-blur-sm transition hover:bg-[#134A35] hover:text-white sm:start-6 sm:h-[3.25rem] sm:w-[3.25rem] lg:hidden",
             stickyCtaVisible ? "bottom-22 sm:bottom-24" : "bottom-4 sm:bottom-5"
           )}
         >

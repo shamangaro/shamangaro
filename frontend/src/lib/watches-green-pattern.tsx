@@ -73,7 +73,7 @@ export function WatchesGreenPattern({ className }: { className?: string }) {
 }
 
 export const watchesGreenSurfaceClassName =
-  "relative overflow-hidden border-[#B8924A]/25 bg-gradient-to-r from-[#0F3D2E] via-[#1A5C42] to-[#0F3D2E]";
+  "relative overflow-hidden border-[#B8924A]/25 bg-gradient-to-r from-[#0A2F23] via-[#134A35] to-[#0A2F23]";
 
 export const watchesGreenTopLineClassName =
   "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#B8924A]/50 to-transparent";

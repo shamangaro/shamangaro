@@ -16,7 +16,7 @@ export function WatchesGiftPackaging() {
             />
           </div>
           <div className="space-y-4">
-            <span className="inline-block rounded-full bg-[#247A58]/15 px-3 py-1 text-xs font-medium text-[#247A58]">
+            <span className="inline-block rounded-full bg-[#1A684A]/15 px-3 py-1 text-xs font-medium text-[#1A684A]">
               جاهزة باش تهادّي
             </span>
             <h2 className="text-2xl font-bold text-[#0F2A1F] sm:text-3xl">
@@ -28,15 +28,15 @@ export function WatchesGiftPackaging() {
             </p>
             <ul className="space-y-2 text-sm text-[#666]">
               <li className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#1A5C42]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#134A35]" />
                 علبة راقية بألوان دافية
               </li>
               <li className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#247A58]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#1A684A]" />
                 جاهزة باش تهدّيها مباشرة
               </li>
               <li className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#1A5C42]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#134A35]" />
                 مناسبة لأي مناسبة
               </li>
             </ul>

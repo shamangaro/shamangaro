@@ -2,6 +2,7 @@ import {
   WATCHES_PRODUCT,
   getWatchVariant,
   type WatchSlide,
+  type WatchVariant,
   type WatchVariantId,
 } from "./config";
 
@@ -60,6 +61,20 @@ export function watchSelectionFromSlide(slide: WatchSlide): WatchSelection {
     modelNumber: variant.label,
     caption: slide.caption,
     image: slide.src,
+    unitPrice: WATCHES_PRODUCT.unitPrice,
+  };
+}
+
+export function watchSelectionFromVariant(
+  variant: WatchVariant
+): WatchSelection {
+  return {
+    slideId: variant.id,
+    variantId: variant.id,
+    watchName: variant.labelAr,
+    modelNumber: variant.label,
+    caption: variant.labelAr,
+    image: variant.image,
     unitPrice: WATCHES_PRODUCT.unitPrice,
   };
 }
@@ -170,27 +185,27 @@ export function lineItemsToPayload(lines: SelectedWatchLine[]) {
 }
 
 export const WATCH_SELECTION_COPY = {
-  browseHint: "تصفّحي الصور و اختاري الساعة اللي عجباتك.",
+  browseHint: "اختاري الساعة من التصاور تحت.",
   selectWatch: "اختاري هاد الساعة",
   selectWatchAria: "اختاري هاد الساعة",
   addedWatch: "تمت الإضافة",
-  addedToast: "تمت إضافة الساعة إلى السلة",
+  addedToast: "تزادت الساعة فالسلة",
   selectedLabel: "مختارة",
   cartTitle: "السلة",
-  selectedTitle: "الساعات المختارة",
-  remove: "حذف",
-  unitPriceLabel: "ثمن الوحدة",
-  continueOrder: "إتمام الطلب",
-  selectAtLeastOne: "اختاري ساعة على الأقل",
+  selectedTitle: "الساعات اللي اختارتي",
+  remove: "مسح",
+  unitPriceLabel: "الثمن",
+  continueOrder: "كمّلي الطلب",
+  selectAtLeastOne: "اختاري ساعة وحدة على الأقل",
   modelsSelected: (count: number) =>
-    count === 1 ? "ساعة واحدة مختارة" : `${count} ساعات مختارة`,
+    count === 1 ? "ساعة وحدة مختارة" : `${count} ساعات مختارة`,
   totalQuantity: (count: number) =>
-    count === 1 ? "المجموع: ساعة واحدة" : `المجموع: ${count} ساعات`,
+    count === 1 ? "المجموع: ساعة وحدة" : `المجموع: ${count} ساعات`,
   totalPriceLabel: "المجموع",
   stepCheckout: "معلومات الطلب",
   stickySummary: (count: number) =>
     count === 1
-      ? "ساعة واحدة مختارة — شوفي الاختيار"
-      : `${count} ساعات مختارة — شوفi الاختيار`,
-  checkoutLocked: "اختاري ساعة على الأقل باش تكملي الطلب",
+      ? "ساعة وحدة مختارة — شوفي الاختيار"
+      : `${count} ساعات مختارة — شوفي الاختيار`,
+  checkoutLocked: "اختاري ساعة وحدة على الأقل باش تكمّلي الطلب",
 } as const;

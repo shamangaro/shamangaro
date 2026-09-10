@@ -8,19 +8,20 @@ import { Logo } from "@/components/shared/Logo";
 import { useCart } from "@/components/layout/cart-store";
 import { cn } from "@/lib/utils";
 import { WatchesTrustBar } from "./WatchesTrustBar";
+import { WATCHES_PRODUCT } from "./config";
 
 const watchesHomeHref = "#watches-lp-top";
 
 const navLinks = [
   { href: watchesHomeHref, label: "الرئيسية" },
-  { href: "#watches-order-flow", label: "الطلب" },
+  { href: "#watches-hero-photo", label: "الطلب" },
   { href: "/about", label: "من نحن" },
   { href: "/contact", label: "اتصل بنا" },
 ];
 
 const logoSubtitle = "Montres Femmes";
 const logoSubtitleClassName =
-  "font-semibold uppercase tracking-[0.14em] text-[#1A5C42]/55 text-[10px] sm:text-[11px] md:text-xs";
+  "whitespace-nowrap font-semibold uppercase tracking-[0.08em] text-[#B8924A] text-[10px] sm:text-[11px] md:text-xs";
 
 export function WatchesHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -60,35 +61,41 @@ export function WatchesHeader() {
         )}
       >
         <Container>
-          <div className="relative flex min-h-[3.75rem] items-center gap-2.5 sm:min-h-[4.25rem]">
+          <div className="relative flex min-h-[4.25rem] items-center justify-between gap-2 sm:min-h-[4.75rem]">
             <Logo
               size="md"
               href={watchesHomeHref}
               onClick={scrollToWatchesTop}
               priority
+              iconSrc={WATCHES_PRODUCT.logoIcon}
+              iconClassName="h-14 w-auto [mask-image:radial-gradient(circle_closest-side,#000_99.2%,transparent_100%)] [-webkit-mask-image:radial-gradient(circle_closest-side,#000_99.2%,transparent_100%)] sm:h-16"
               subtitle={logoSubtitle}
               subtitleClassName={logoSubtitleClassName}
-              className="min-w-0 max-w-[62%] shrink md:hidden"
+              textClassName="text-[#134A35]"
+              className="min-w-0 max-w-[70%] shrink gap-1.5 md:hidden"
             />
             <Logo
               size="lg"
               href={watchesHomeHref}
               onClick={scrollToWatchesTop}
               priority
+              iconSrc={WATCHES_PRODUCT.logoIcon}
+              iconClassName="h-16 w-auto [mask-image:radial-gradient(circle_closest-side,#000_99.2%,transparent_100%)] [-webkit-mask-image:radial-gradient(circle_closest-side,#000_99.2%,transparent_100%)] md:h-[4.5rem]"
               subtitle={logoSubtitle}
               subtitleClassName={logoSubtitleClassName}
-              className="hidden min-w-0 md:inline-flex"
+              textClassName="text-[#134A35]"
+              className="hidden min-w-0 gap-1.5 md:inline-flex"
             />
 
-            <div className="ms-auto -me-1 flex items-center gap-0.5 sm:-me-2 sm:gap-1">
+            <div className="-me-1 flex shrink-0 items-center gap-0.5 sm:-me-2 sm:gap-1">
               <Link
-                href="#watches-order-flow"
+                href="#watches-hero-photo"
                 aria-label="سلة التسوق"
-                className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#1A5C42] transition-colors hover:bg-[#1A5C42]/5 focus-visible:outline-2 focus-visible:outline-offset-2 sm:h-11 sm:w-11"
+                className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#134A35] transition-colors hover:bg-[#134A35]/5 focus-visible:outline-2 focus-visible:outline-offset-2 sm:h-11 sm:w-11"
               >
                 <ShoppingCart size={18} strokeWidth={1.75} />
                 {hydrated && itemCount > 0 ? (
-                  <span className="absolute -top-0.5 -start-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#1A5C42] px-0.5 text-[10px] font-bold text-white">
+                  <span className="absolute -top-0.5 -start-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#134A35] px-0.5 text-[10px] font-bold text-white">
                     {itemCount > 99 ? "99+" : itemCount}
                   </span>
                 ) : null}
@@ -100,7 +107,7 @@ export function WatchesHeader() {
                 aria-expanded={menuOpen}
                 aria-controls="watches-header-menu"
                 onClick={() => setMenuOpen((open) => !open)}
-                className="flex h-10 w-10 items-center justify-center rounded-full text-[#1A5C42] transition-colors hover:bg-[#1A5C42]/5 focus-visible:outline-2 focus-visible:outline-offset-2 sm:h-11 sm:w-11"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-[#134A35] transition-colors hover:bg-[#134A35]/5 focus-visible:outline-2 focus-visible:outline-offset-2 sm:h-11 sm:w-11"
               >
                 {menuOpen ? (
                   <X size={20} strokeWidth={1.75} />
@@ -118,13 +125,13 @@ export function WatchesHeader() {
           <button
             type="button"
             aria-label="إغلاق القائمة"
-            className="fixed inset-0 z-[100] bg-[#1A5C42]/15 backdrop-blur-[1px]"
+            className="fixed inset-0 z-[100] bg-[#134A35]/15 backdrop-blur-[1px]"
             onClick={() => setMenuOpen(false)}
           />
           <nav
             id="watches-header-menu"
             aria-label="التنقل الرئيسي"
-            className="fixed end-2 top-[4rem] z-[110] min-w-[12.5rem] overflow-hidden rounded-2xl border border-[#1A5C42]/10 bg-white py-2 shadow-xl shadow-[#1A5C42]/15 sm:end-4 sm:top-[4.5rem]"
+            className="fixed end-2 top-[4rem] z-[110] min-w-[12.5rem] overflow-hidden rounded-2xl border border-[#134A35]/10 bg-white py-2 shadow-xl shadow-[#134A35]/15 sm:end-4 sm:top-[4.5rem]"
           >
             {navLinks.map((link) => (
               <Link
@@ -136,7 +143,7 @@ export function WatchesHeader() {
                     scrollToWatchesTop(event);
                   }
                 }}
-                className="block px-4 py-3 text-sm font-semibold text-[#1A5C42]/75 transition-colors hover:bg-[#1A5C42]/[0.04] hover:text-[#1A5C42]"
+                className="block px-4 py-3 text-sm font-semibold text-[#134A35]/75 transition-colors hover:bg-[#134A35]/[0.04] hover:text-[#134A35]"
               >
                 {link.label}
               </Link>

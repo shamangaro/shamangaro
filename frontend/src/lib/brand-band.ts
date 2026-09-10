@@ -12,7 +12,7 @@ export const brandBandClasses = {
 
 /** Montres Femmes — même style LED que brand, dégradé vert malaki */
 export const feminineBandClasses = {
-  root: "relative overflow-hidden border-y border-[#B8924A]/25 bg-gradient-to-r from-[#0F3D2E] via-[#1A5C42] to-[#0F3D2E]",
+  root: "relative overflow-hidden border-y border-[#B8924A]/25 bg-gradient-to-r from-[#0A2F23] via-[#134A35] to-[#0A2F23]",
   topLine:
     "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#B8924A]/45 to-transparent",
   bottomLine:

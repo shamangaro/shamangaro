@@ -19,7 +19,7 @@ export interface WatchesOrderPayload {
   product_name: "Montres Femmes Élégantes";
   line_items: WatchOrderLineItemPayload[];
   quantity: number;
-  unit_price: 249;
+  unit_price: 250;
   total_amount: number;
   source_page: "/products/montres-femmes";
 }

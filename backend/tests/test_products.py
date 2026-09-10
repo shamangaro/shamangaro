@@ -31,7 +31,17 @@ def test_resolve_watches_order_quantity_two():
         quantity=2,
         source_page="/products/montres-femmes",
     )
-    assert order.total_price == 498.0
+    assert order.total_price == 500.0
+
+
+def test_resolve_watches_order_new_catalog_variant():
+    order = resolve_watches_order(
+        selected_variant="burgundy-oval",
+        quantity=1,
+        source_page="/products/montres-femmes",
+    )
+    assert order.selected_variant == "Burgundy Oval"
+    assert order.line_items[0].image.endswith("watch-05-burgundy-oval.jpg")
 
 
 def test_resolve_watches_order_invalid_variant():
@@ -49,7 +59,7 @@ def test_resolve_watches_order_quantity_three():
         quantity=3,
         source_page="/products/montres-femmes",
     )
-    assert order.total_price == 747.0
+    assert order.total_price == 750.0
     assert order.quantity == 3
 
 
@@ -59,7 +69,7 @@ def test_resolve_watches_order_fatima_case():
         quantity=2,
         source_page="/products/montres-femmes",
     )
-    assert order.total_price == 498.0
+    assert order.total_price == 500.0
     assert order.selected_variant == "Burgundy"
 
 
@@ -75,13 +85,13 @@ def test_telegram_fatima_burgundy_quantity_two():
         offer_id="montres-femmes",
         offer_name="Montres Femmes Élégantes — Burgundy",
         quantity=2,
-        unit_price=249.0,
-        total_price=498.0,
+        unit_price=250.0,
+        total_price=500.0,
         status=OrderStatus.NEW,
     )
     message = build_order_notification_message(order)
     assert "Montres Femmes Élégantes — Burgundy" in message
-    assert "498" in message
+    assert "500" in message
 
 
 def test_telegram_message_for_watches_order():
@@ -96,13 +106,13 @@ def test_telegram_message_for_watches_order():
         offer_id="montres-femmes",
         offer_name="Montres Femmes Élégantes — Burgundy",
         quantity=1,
-        unit_price=249.0,
-        total_price=249.0,
+        unit_price=250.0,
+        total_price=250.0,
         status=OrderStatus.NEW,
     )
     message = build_order_notification_message(order)
     assert "Montres Femmes Élégantes — Burgundy" in message
-    assert "249" in message
+    assert "250" in message
 
 
 def test_resolve_watches_multi_order_mixed():
@@ -114,7 +124,7 @@ def test_resolve_watches_multi_order_mixed():
         source_page="/products/montres-femmes",
     )
     assert order.quantity == 5
-    assert order.total_price == 1245.0
+    assert order.total_price == 1250.0
     assert len(order.line_items) == 2
     assert "Taupe×2" in order.offer_name
     assert "Burgundy×3" in order.offer_name

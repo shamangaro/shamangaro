@@ -16,7 +16,7 @@ const heroTrustPoints = [
   {
     label: "الدفع عند الإستلام",
     className:
-      "border-[#A8C9B4]/80 bg-gradient-to-r from-[#E8F5ED] to-[#D8EDE0] text-[#0F3D2E] ring-1 ring-[#1A5C42]/20",
+      "border-[#A8C9B4]/80 bg-gradient-to-r from-[#E8F5ED] to-[#D8EDE0] text-[#0A2F23] ring-1 ring-[#134A35]/20",
   },
   {
     label: "تغليف هدايا",
@@ -31,8 +31,8 @@ export function WatchesHero() {
     <section className="bg-gradient-to-b from-[#FAF7F2] to-[#F7F3EE] pb-4 pt-4 sm:pb-6 sm:pt-5">
       <Container>
         <div className="grid items-center gap-4 lg:grid-cols-2 lg:gap-8">
-          <div className="space-y-3 lg:order-1">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#B8924A]/35 bg-gradient-to-r from-[#0F3D2E] to-[#1A5C42] px-3 py-1 text-[11px] font-bold text-white">
+          <div className="min-w-0 space-y-3 text-start lg:order-1">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#B8924A]/35 bg-gradient-to-r from-[#0A2F23] to-[#134A35] px-3 py-1 text-[11px] font-bold text-white">
               <Sparkles className="h-3 w-3 text-[#B8924A]" aria-hidden />
               2026 · توصيل مجاني
             </span>
@@ -40,7 +40,7 @@ export function WatchesHero() {
             <div className="space-y-2">
               <h1 className="text-2xl font-bold leading-snug text-[#0F2A1F] sm:text-3xl">
                 لمسة أنيقة
-                <span className="text-[#1A5C42]"> كتدوم معاك</span>
+                <span className="text-[#134A35]"> كتدوم معاك</span>
               </h1>
               <p className="max-w-md space-y-1 text-sm leading-relaxed text-[#4A5C52] sm:text-base">
                 <span className="block">الوقت كيدوز… وأناقتك كتبقى ✨</span>
@@ -50,7 +50,7 @@ export function WatchesHero() {
               </p>
             </div>
 
-            <ul className="flex flex-wrap gap-2">
+            <ul className="flex flex-wrap justify-start gap-2">
               {heroTrustPoints.map((point) => (
                 <li
                   key={point.label}
@@ -61,12 +61,12 @@ export function WatchesHero() {
               ))}
             </ul>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-[#888] line-through">399 درهم</span>
-              <span className="text-2xl font-bold text-[#1A5C42] sm:text-3xl">
+            <div className="flex flex-wrap items-baseline justify-start gap-x-2 gap-y-1">
+              <span className="text-2xl font-bold leading-none text-[#134A35] sm:text-3xl">
                 {formatWatchPrice(WATCHES_PRODUCT.unitPrice)}
               </span>
-              <span className="rounded-md bg-[#B8924A]/15 px-2 py-0.5 text-[10px] font-bold text-[#1A5C42]">
+              <span className="text-xs text-[#888] line-through">350 درهم</span>
+              <span className="rounded-md bg-[#B8924A]/15 px-2 py-0.5 text-[10px] font-bold text-[#134A35]">
                 عرض خاص
               </span>
             </div>

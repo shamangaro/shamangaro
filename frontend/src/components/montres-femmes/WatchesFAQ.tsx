@@ -31,7 +31,7 @@ export function WatchesFAQ() {
                 <span className="font-medium text-[#0F2A1F]">{item.q}</span>
                 <ChevronDown
                   className={cn(
-                    "h-5 w-5 shrink-0 text-[#1A5C42] transition",
+                    "h-5 w-5 shrink-0 text-[#134A35] transition",
                     open === i && "rotate-180"
                   )}
                 />

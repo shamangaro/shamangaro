@@ -33,6 +33,8 @@ export interface LogoProps {
   className?: string;
   textClassName?: string;
   subtitleClassName?: string;
+  iconSrc?: string;
+  iconClassName?: string;
   priority?: boolean;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
 }
@@ -42,15 +44,17 @@ function LogoIcon({
   className,
   priority,
   decorative,
+  src,
 }: {
   size: LogoSize;
   className?: string;
   priority?: boolean;
   decorative?: boolean;
+  src: string;
 }) {
   return (
     <img
-      src={LOGO_ICON_SRC}
+      src={src}
       alt={decorative ? "" : "SHAMANGARO"}
       aria-hidden={decorative ? true : undefined}
       width={LOGO_ICON_WIDTH}
@@ -70,21 +74,35 @@ export function Logo({
   className,
   textClassName,
   subtitleClassName,
+  iconSrc = LOGO_ICON_SRC,
+  iconClassName,
   priority = false,
   onClick,
 }: LogoProps) {
   const content =
     variant === "icon" ? (
-      <LogoIcon size={size} className={className} priority={priority} />
+      <LogoIcon
+        size={size}
+        className={cn(className, iconClassName)}
+        priority={priority}
+        src={iconSrc}
+      />
     ) : (
-      <span className={cn("inline-flex items-center gap-2.5", className)}>
-        <LogoIcon size={size} priority={priority} decorative />
-        <span className="flex flex-col items-start leading-tight">
+      <span className={cn("inline-flex items-center gap-2", className)}>
+        <LogoIcon
+          size={size}
+          className={iconClassName}
+          priority={priority}
+          decorative
+          src={iconSrc}
+        />
+        <span className="flex flex-col items-start justify-center leading-none">
           <span
             className={cn(
-              "translate-y-0.5 font-extrabold tracking-wide text-navy",
+              "font-extrabold tracking-wide text-navy",
               textSizeClasses[size],
-              textClassName
+              textClassName,
+              subtitle ? "leading-none" : "translate-y-0.5 leading-tight"
             )}
           >
             SHAMANGARO
@@ -92,7 +110,7 @@ export function Logo({
           {subtitle ? (
             <span
               className={cn(
-                "text-xs font-medium text-muted-foreground",
+                "mt-1 text-xs font-medium text-muted-foreground",
                 subtitleClassName
               )}
             >

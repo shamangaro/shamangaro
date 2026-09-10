@@ -120,13 +120,13 @@
     0%,
     100% {
       box-shadow:
-        0 1px 2px rgba(234, 88, 12, 0.1),
-        0 6px 22px rgba(251, 146, 60, 0.14);
+        0 1px 2px rgba(184, 146, 74, 0.12),
+        0 6px 22px rgba(184, 146, 74, 0.16);
     }
     50% {
       box-shadow:
-        0 1px 3px rgba(234, 88, 12, 0.16),
-        0 10px 32px rgba(251, 146, 60, 0.22);
+        0 1px 3px rgba(184, 146, 74, 0.2),
+        0 10px 32px rgba(184, 146, 74, 0.26);
     }
   }
 
@@ -134,12 +134,58 @@
     animation: watches-delivery-glow 3.5s ease-in-out infinite;
   }
 
+  @keyframes watches-delivery-marquee {
+    from {
+      transform: translateX(14px);
+    }
+    to {
+      transform: translateX(-14px);
+    }
+  }
+
+  .watches-delivery-marquee {
+    animation: watches-delivery-marquee 2.8s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  @keyframes watches-select-cta {
+    0%,
+    72% {
+      transform: scale(1);
+      box-shadow: 0 4px 14px rgba(184, 146, 74, 0.28);
+    }
+    80% {
+      transform: scale(1.04);
+      box-shadow: 0 8px 22px rgba(184, 146, 74, 0.5);
+    }
+    88% {
+      transform: scale(1);
+      box-shadow: 0 4px 14px rgba(184, 146, 74, 0.28);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .watches-select-cta {
+    animation: watches-select-cta 3.6s ease-in-out infinite;
+    will-change: transform;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .watches-delivery-glow {
       animation: none;
       box-shadow:
-        0 1px 2px rgba(234, 88, 12, 0.1),
-        0 8px 26px rgba(251, 146, 60, 0.16);
+        0 1px 2px rgba(184, 146, 74, 0.12),
+        0 8px 26px rgba(184, 146, 74, 0.18);
+    }
+
+    .watches-delivery-marquee {
+      animation: none;
+    }
+
+    .watches-select-cta {
+      animation: none;
     }
   }
 }

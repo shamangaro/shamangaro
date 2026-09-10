@@ -1,4 +1,10 @@
-export type WatchVariantId = "taupe" | "burgundy" | "navy-blue";
+export type WatchVariantId =
+  | "two-tone-white"
+  | "two-tone-brown"
+  | "gold-brown"
+  | "navy-leather"
+  | "burgundy-oval"
+  | "cream-leather";
 
 export interface WatchVariant {
   id: WatchVariantId;
@@ -21,12 +27,13 @@ export interface WatchSlide {
 export const WATCHES_PRODUCT = {
   name: "Montres Femmes Élégantes",
   slug: "montres-femmes",
-  unitPrice: 249,
+  unitPrice: 250,
   sourcePage: "/products/montres-femmes",
+  logoIcon: "/images/montres-femmes/logo-mark.png?v=ladies",
 } as const;
 
 /** Couleur par défaut — confirmée au téléphone avec la cliente */
-export const DEFAULT_WATCH_VARIANT: WatchVariantId = "taupe";
+export const DEFAULT_WATCH_VARIANT: WatchVariantId = "two-tone-white";
 
 /** Copy livraison — cohérent sur toute la LP Montres Femmes */
 export const WATCHES_DELIVERY = {
@@ -38,9 +45,9 @@ export const WATCHES_DELIVERY = {
 
 /** LP palette — khdar malaki + or sur les cadres */
 export const WATCHES_THEME = {
-  green: "#1A5C42",
-  greenDark: "#0F3D2E",
-  greenMid: "#247A58",
+  green: "#134A35",
+  greenDark: "#0A2F23",
+  greenMid: "#1A684A",
   gold: "#B8924A",
   goldLight: "#D4BC82",
   greenLight: "#E8F5ED",
@@ -56,75 +63,62 @@ export const WATCHES_THEME = {
 
 export const WATCH_VARIANTS: WatchVariant[] = [
   {
-    id: "taupe",
-    label: "Taupe",
-    labelAr: "توب",
-    color: "#B8A898",
-    ringColor: "#9A8878",
-    image: "/images/montres-femmes/slide-01-packaging.png",
+    id: "two-tone-white",
+    label: "Two-tone White",
+    labelAr: "أبيض",
+    color: "#D4AF37",
+    ringColor: "#C0C0C0",
+    image: "/images/montres-femmes/watch-01-twotone-white.jpg",
   },
   {
-    id: "burgundy",
-    label: "Burgundy",
-    labelAr: "عنابي",
-    color: "#7B2D42",
-    ringColor: "#5C2233",
-    image: "/images/montres-femmes/slide-04-burgundy.png",
+    id: "two-tone-brown",
+    label: "Two-tone Brown",
+    labelAr: "بني",
+    color: "#5C3317",
+    ringColor: "#C9A227",
+    image: "/images/montres-femmes/watch-02-twotone-brown.jpg",
   },
   {
-    id: "navy-blue",
-    label: "Navy Blue",
-    labelAr: "أزرق بحري",
-    color: "#1E3A5F",
-    ringColor: "#152A45",
-    image: "/images/montres-femmes/slide-02-navy.png",
-  },
-];
-
-export const WATCH_SLIDES: WatchSlide[] = [
-  {
-    id: "taupe-packaging",
-    src: "/images/montres-femmes/slide-01-packaging.png",
-    alt: "ساعة نسائية ذهبية مع علبة هدايا",
-    caption: "علبة هدايا فاخرة",
-    variantId: "taupe",
+    id: "gold-brown",
+    label: "Gold Brown",
+    labelAr: "ذهبي",
+    color: "#C9A227",
+    ringColor: "#A8841C",
+    image: "/images/montres-femmes/watch-03-gold-brown.jpg",
   },
   {
     id: "navy-leather",
-    src: "/images/montres-femmes/slide-02-navy.png",
-    alt: "ساعة بسوار جلد أزرق بحري",
-    caption: "سوار جلد أنيق",
-    variantId: "navy-blue",
+    label: "Navy Leather",
+    labelAr: "أزرق",
+    color: "#2F5F8A",
+    ringColor: "#C9A227",
+    image: "/images/montres-femmes/watch-04-navy-leather.jpg",
   },
   {
-    id: "taupe-twotone",
-    src: "/images/montres-femmes/slide-03-twotone.png",
-    alt: "ساعة بسوار معدني ذهبي وفضي",
-    caption: "سوار معدني فاخر",
-    variantId: "taupe",
+    id: "burgundy-oval",
+    label: "Burgundy Oval",
+    labelAr: "بنفسجي",
+    color: "#6B1F5A",
+    ringColor: "#C9A227",
+    image: "/images/montres-femmes/watch-05-burgundy-oval.jpg",
   },
   {
-    id: "burgundy-wrist",
-    src: "/images/montres-femmes/slide-04-burgundy.png",
-    alt: "ساعة عنابي على المعصم",
-    caption: "لمسة أنثوية راقية",
-    variantId: "burgundy",
-  },
-  {
-    id: "taupe-cream",
-    src: "/images/montres-femmes/slide-05-cream.png",
-    alt: "ساعة بسوار جلد كريمي",
-    caption: "ستايل كلاسيكي",
-    variantId: "taupe",
-  },
-  {
-    id: "taupe-detail",
-    src: "/images/montres-femmes/slide-06-detail.png",
-    alt: "تفاصيل الساعة والعلبة",
-    caption: "جودة وتفاصيل دقيقة",
-    variantId: "taupe",
+    id: "cream-leather",
+    label: "Cream Leather",
+    labelAr: "كريمي",
+    color: "#E8D5B7",
+    ringColor: "#C9A227",
+    image: "/images/montres-femmes/watch-06-cream-leather.jpg",
   },
 ];
+
+export const WATCH_SLIDES: WatchSlide[] = WATCH_VARIANTS.map((variant) => ({
+  id: variant.id,
+  src: variant.image,
+  alt: `ساعة نسائية ${variant.labelAr}`,
+  caption: variant.labelAr,
+  variantId: variant.id,
+}));
 
 export const WATCH_GALLERY = [
   "/images/montres-femmes/gallery-detail.svg",
@@ -151,7 +145,7 @@ export const WATCH_BENEFITS = [
 export const WATCH_FAQ = [
   {
     q: "شحال الثمن؟",
-    a: "249 درهم لساعة وحدة. المجموع = 249 × العدد. التوصيل مجاني.",
+    a: "250 درهم لساعة وحدة. المجموع = 250 × العدد. التوصيل مجاني.",
   },
   {
     q: "كيفاش نخلّص؟",
@@ -172,13 +166,13 @@ export const WATCH_FAQ = [
 ];
 
 export function getWatchVariant(id: WatchVariantId): WatchVariant {
-  return WATCH_VARIANTS.find((v) => v.id === id) ?? WATCH_VARIANTS[1];
+  return WATCH_VARIANTS.find((v) => v.id === id) ?? WATCH_VARIANTS[0];
 }
 
 export const WATCH_QUANTITY_OPTIONS = [
-  { quantity: 1 as const, label: "ساعة وحدة", total: 249 },
-  { quantity: 2 as const, label: "جوج ساعات", total: 498 },
-  { quantity: 3 as const, label: "3 ساعات", total: 747 },
+  { quantity: 1 as const, label: "ساعة وحدة", total: 250 },
+  { quantity: 2 as const, label: "جوج ساعات", total: 500 },
+  { quantity: 3 as const, label: "3 ساعات", total: 750 },
 ];
 
 export const MOROCCAN_CITIES = [

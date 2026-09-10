@@ -4,7 +4,9 @@ function getStickyHeaderOffset() {
 }
 
 export function scrollToWatchesOrder(behavior: ScrollBehavior = "smooth") {
-  const target = document.getElementById("watches-order-flow");
+  const target =
+    document.getElementById("watches-hero-photo") ??
+    document.getElementById("watches-order-flow");
   if (!target) return;
 
   const top = target.getBoundingClientRect().top + window.scrollY - getStickyHeaderOffset();

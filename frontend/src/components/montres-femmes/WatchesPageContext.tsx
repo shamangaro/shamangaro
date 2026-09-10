@@ -82,13 +82,9 @@ export function WatchesPageProvider({ children }: { children: ReactNode }) {
         return next.lines;
       });
 
-      if (outcome.result === "added") {
-        window.requestAnimationFrame(() => scrollToCart());
-      }
-
       return outcome.result;
     },
-    [commitLines, scrollToCart]
+    [commitLines]
   );
 
   const incrementLineQuantity = useCallback(

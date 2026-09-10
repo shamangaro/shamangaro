@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { WatchesPageProvider } from "@/components/montres-femmes/WatchesPageContext";
 import { WatchesHeader } from "@/components/montres-femmes/WatchesHeader";
-import { WatchesHero } from "@/components/montres-femmes/WatchesHero";
 import { WatchesFreeDeliveryStrip } from "@/components/montres-femmes/WatchesFreeDelivery";
 import { WatchesOrderFlow } from "@/components/montres-femmes/WatchesOrderFlow";
 import { WatchesReviews } from "@/components/montres-femmes/WatchesReviews";
@@ -14,11 +13,11 @@ import { WatchesScrollToTopButton } from "@/components/montres-femmes/WatchesScr
 import { WatchesFooter } from "@/components/montres-femmes/WatchesFooter";
 
 export const metadata: Metadata = {
-  title: "Montres Femmes Élégantes — 249 DH | SHAMANGARO",
+  title: "Montres Femmes Élégantes — 250 DH | SHAMANGARO",
   description:
-    "ساعات نسائية أنيقة — 249 DH، توصيل مجاني، الدفع عند الإستلام، كاين التبديل.",
+    "ساعات نسائية أنيقة — 250 DH، توصيل مجاني، الدفع عند الإستلام، كاين التبديل.",
   openGraph: {
-    title: "Montres Femmes Élégantes — 249 DH",
+    title: "Montres Femmes Élégantes — 250 DH",
     description:
       "ساعات نسائية أنيقة — توصيل مجاني · الدفع عند الإستلام · كاين التبديل",
     images: [{ url: "/images/montres-femmes/hero.png", width: 800, height: 1000 }],
@@ -29,18 +28,17 @@ export default function MontresFemmesPage() {
   return (
     <WatchesPageProvider>
       <WatchesHeader />
-      <main className="pb-28 lg:pb-0">
-        <WatchesHero />
-        <WatchesFreeDeliveryStrip />
-        <WatchesBenefits />
-        <WatchesTrust />
-        <WatchesOrderingSteps />
+      <main>
         <WatchesOrderFlow />
+        <WatchesTrust />
+        <WatchesBenefits />
+        <WatchesFreeDeliveryStrip />
+        <WatchesOrderingSteps />
         <WatchesFreeDeliveryStrip />
         <WatchesReviews />
         <WatchesFAQ />
+        <WatchesFooter />
       </main>
-      <WatchesFooter />
       <WatchesStickyCTA />
       <WatchesScrollToTopButton />
     </WatchesPageProvider>

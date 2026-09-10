@@ -193,8 +193,7 @@ export function LedTickerBand({
       ) : (
         <div
           className={cn(
-            "relative mx-auto flex max-w-3xl items-center justify-center overflow-hidden px-10",
-            compact ? "h-6 sm:h-7" : "h-7 sm:h-8"
+            "relative mx-auto flex max-w-3xl items-center justify-center overflow-hidden px-10 h-7 sm:h-8"
           )}
         >
           {!isVertical || isFeminineBrand ? (
@@ -228,14 +227,14 @@ export function LedTickerBand({
               {...motionProps}
               className={cn(
                 "flex items-center justify-center gap-2 sm:gap-2.5",
-                isVertical && "absolute inset-x-0 px-3 sm:px-6"
+                isVertical && "absolute inset-0 px-3 sm:px-6"
               )}
             >
               <span
                 className={cn(
                   "flex items-center justify-center rounded-sm border bg-gold/10",
                   iconBoxClass,
-                  compact ? "h-6 w-6 sm:h-7 sm:w-7" : "h-7 w-7"
+                  compact ? "h-5 w-5 sm:h-6 sm:w-6" : "h-7 w-7"
                 )}
               >
                 <Icon size={compact ? 12 : 14} className={iconClass} strokeWidth={2.25} />

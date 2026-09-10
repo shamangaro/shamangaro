@@ -36,7 +36,7 @@ export function WatchesStickyCTA() {
           <button
             type="button"
             onClick={() => scrollToWatchesOrder()}
-            className="mx-auto flex w-full max-w-lg items-center justify-center rounded-xl border border-[#B8924A]/45 bg-[#1A5C42] px-5 py-3 text-sm font-bold text-white shadow-md ring-1 ring-[#B8924A]/30 transition hover:bg-[#0F3D2E]"
+            className="mx-auto flex w-full max-w-lg items-center justify-center rounded-xl border border-[#B8924A]/45 bg-[#134A35] px-5 py-3 text-sm font-bold text-white shadow-md ring-1 ring-[#B8924A]/30 transition hover:bg-[#0A2F23]"
           >
             اختاري الساعة — {formatWatchPrice(WATCHES_PRODUCT.unitPrice)}
           </button>

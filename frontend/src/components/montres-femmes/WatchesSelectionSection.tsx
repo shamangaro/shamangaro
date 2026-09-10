@@ -113,7 +113,7 @@ export function WatchesSelectionSection({
 
                 <div className="flex items-center gap-2.5">
 
-                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg ring-1 ring-[#B8924A]/20">
+                  <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg ring-1 ring-[#B8924A]/20">
 
                     <Image
 
@@ -125,7 +125,7 @@ export function WatchesSelectionSection({
 
                       className="object-cover"
 
-                      sizes="56px"
+                      sizes="80px"
 
                     />
 
@@ -134,10 +134,7 @@ export function WatchesSelectionSection({
                   <div className="min-w-0 flex-1">
 
                     <p className="truncate text-sm font-bold text-[#0F2A1F]">
-                      {line.caption}
-                    </p>
-                    <p className="text-[11px] text-[#666]">
-                      {line.watchName} · {line.modelNumber}
+                      {line.watchName}
                     </p>
 
                     <p className="text-[11px] text-[#666]">
@@ -148,7 +145,7 @@ export function WatchesSelectionSection({
 
                     </p>
 
-                    <p className="text-[11px] font-semibold text-[#1A5C42]">
+                    <p className="text-[11px] font-semibold text-[#134A35]">
 
                       {formatWatchPrice(line.subtotal)}
 
@@ -174,7 +171,7 @@ export function WatchesSelectionSection({
 
                       disabled={line.quantity <= 1}
 
-                      className="flex h-10 w-10 items-center justify-center rounded-full border border-[#A8C9B4] bg-white text-[#1A5C42] disabled:opacity-40"
+                      className="flex h-10 w-10 items-center justify-center rounded-full border border-[#A8C9B4] bg-white text-[#134A35] disabled:opacity-40"
 
                     >
 
@@ -196,7 +193,7 @@ export function WatchesSelectionSection({
 
                       onClick={() => incrementLineQuantity(line.slideId)}
 
-                      className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1A5C42] text-white"
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-[#134A35] text-white"
 
                     >
 
@@ -240,7 +237,7 @@ export function WatchesSelectionSection({
 
             </span>
 
-            <span className="font-bold text-[#1A5C42]">
+            <span className="font-bold text-[#134A35]">
 
               {WATCH_SELECTION_COPY.totalPriceLabel}: {formatWatchPrice(total)}
 
@@ -262,25 +259,15 @@ export function WatchesSelectionSection({
 
 
 
-      <button
-
-        type="button"
-
-        onClick={handleContinue}
-
-        disabled={!isSelectionComplete}
-
-        className="w-full rounded-xl bg-[#1A5C42] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#0F3D2E] disabled:cursor-not-allowed disabled:bg-[#A8C9B4] disabled:shadow-none"
-
-      >
-
-        {isSelectionComplete
-
-          ? WATCH_SELECTION_COPY.continueOrder
-
-          : WATCH_SELECTION_COPY.selectAtLeastOne}
-
-      </button>
+      {isSelectionComplete ? (
+        <button
+          type="button"
+          onClick={handleContinue}
+          className="w-full rounded-xl bg-[#134A35] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#0A2F23]"
+        >
+          {WATCH_SELECTION_COPY.continueOrder}
+        </button>
+      ) : null}
 
     </div>
 
