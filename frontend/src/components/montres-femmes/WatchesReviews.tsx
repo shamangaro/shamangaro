@@ -21,7 +21,7 @@ const WATCH_REVIEWS = [
 
 export function WatchesReviews() {
   return (
-    <section className="bg-[#FAF7F2] py-6 sm:py-8">
+    <section className="bg-transparent py-6 sm:py-8">
       <Container>
         <div className="mb-4 text-center">
           <div className="flex items-center justify-center gap-0.5">

@@ -172,6 +172,107 @@
     will-change: transform;
   }
 
+  @keyframes watches-hand-spin {
+    from {
+      transform: translateX(-50%) rotate(0deg);
+    }
+    to {
+      transform: translateX(-50%) rotate(360deg);
+    }
+  }
+
+  .watches-hand-hour,
+  .watches-hand-minute {
+    transform-origin: 50% 100%;
+    animation-name: watches-hand-spin;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+
+  @keyframes watches-pendulum {
+    from {
+      transform: rotate(-7deg);
+    }
+    to {
+      transform: rotate(7deg);
+    }
+  }
+
+  .watches-pendulum {
+    transform-box: fill-box;
+    transform-origin: 50% 0%;
+    animation: watches-pendulum 2.8s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  @keyframes watches-footer-kenburns {
+    from {
+      transform: translateX(-5.5%);
+    }
+    to {
+      transform: translateX(5.5%);
+    }
+  }
+
+  .watches-footer-kenburns {
+    animation: watches-footer-kenburns 8s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  @keyframes watches-footer-float-a {
+    from {
+      transform: translateY(8px) rotate(-3deg);
+    }
+    to {
+      transform: translateY(-14px) rotate(3deg);
+    }
+  }
+
+  @keyframes watches-footer-float-b {
+    from {
+      transform: translateY(-10px) rotate(4deg);
+    }
+    to {
+      transform: translateY(12px) rotate(-3deg);
+    }
+  }
+
+  .watches-footer-float-a {
+    animation: watches-footer-float-a 4.2s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  .watches-footer-float-b {
+    animation: watches-footer-float-b 5s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+
+  @keyframes watches-logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .watches-logo-hour,
+  .watches-logo-minute {
+    transform-origin: 0px 0px;
+    animation-name: watches-logo-spin;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .watches-logo-hour {
+    animation-duration: 48s;
+  }
+
+  .watches-logo-minute {
+    animation-duration: 8s;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .watches-delivery-glow {
       animation: none;
@@ -185,6 +286,26 @@
     }
 
     .watches-select-cta {
+      animation: none;
+    }
+
+    .watches-hand-hour,
+    .watches-hand-minute {
+      animation: none;
+    }
+
+    .watches-pendulum {
+      animation: none;
+    }
+
+    .watches-footer-kenburns,
+    .watches-footer-float-a,
+    .watches-footer-float-b {
+      animation: none;
+    }
+
+    .watches-logo-hour,
+    .watches-logo-minute {
       animation: none;
     }
   }

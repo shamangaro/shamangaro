@@ -10,7 +10,7 @@ export function WatchesFAQ() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="bg-[#F7F3EE] py-6 sm:py-8">
+    <section className="bg-transparent pt-6 pb-24 sm:pt-8 sm:pb-32">
       <Container>
         <div className="mb-4 text-center">
           <h2 className="text-xl font-bold text-[#0F2A1F] sm:text-2xl">

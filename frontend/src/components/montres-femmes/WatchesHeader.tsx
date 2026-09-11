@@ -8,7 +8,7 @@ import { Logo } from "@/components/shared/Logo";
 import { useCart } from "@/components/layout/cart-store";
 import { cn } from "@/lib/utils";
 import { WatchesTrustBar } from "./WatchesTrustBar";
-import { WATCHES_PRODUCT } from "./config";
+import { WatchesLogoMark } from "./WatchesLogoMark";
 
 const watchesHomeHref = "#watches-lp-top";
 
@@ -30,9 +30,7 @@ export function WatchesHeader() {
 
   const scrollToWatchesTop = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    document
-      .getElementById("watches-lp-top")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -61,26 +59,26 @@ export function WatchesHeader() {
         )}
       >
         <Container>
-          <div className="relative flex min-h-[4.25rem] items-center justify-between gap-2 sm:min-h-[4.75rem]">
+          <div className="relative flex min-h-12 items-center justify-between gap-2 py-1 sm:min-h-[3.25rem]">
             <Logo
               size="md"
               href={watchesHomeHref}
               onClick={scrollToWatchesTop}
               priority
-              iconSrc={WATCHES_PRODUCT.logoIcon}
-              iconClassName="h-14 w-auto [mask-image:radial-gradient(circle_closest-side,#000_99.2%,transparent_100%)] [-webkit-mask-image:radial-gradient(circle_closest-side,#000_99.2%,transparent_100%)] sm:h-16"
+              icon={<WatchesLogoMark className="h-10 w-auto sm:h-11" />}
+              iconClassName=""
               subtitle={logoSubtitle}
               subtitleClassName={logoSubtitleClassName}
               textClassName="text-[#134A35]"
               className="min-w-0 max-w-[70%] shrink gap-1.5 md:hidden"
             />
             <Logo
-              size="lg"
+              size="md"
               href={watchesHomeHref}
               onClick={scrollToWatchesTop}
               priority
-              iconSrc={WATCHES_PRODUCT.logoIcon}
-              iconClassName="h-16 w-auto [mask-image:radial-gradient(circle_closest-side,#000_99.2%,transparent_100%)] [-webkit-mask-image:radial-gradient(circle_closest-side,#000_99.2%,transparent_100%)] md:h-[4.5rem]"
+              icon={<WatchesLogoMark className="h-11 w-auto" />}
+              iconClassName=""
               subtitle={logoSubtitle}
               subtitleClassName={logoSubtitleClassName}
               textClassName="text-[#134A35]"
@@ -91,7 +89,7 @@ export function WatchesHeader() {
               <Link
                 href="#watches-hero-photo"
                 aria-label="سلة التسوق"
-                className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#134A35] transition-colors hover:bg-[#134A35]/5 focus-visible:outline-2 focus-visible:outline-offset-2 sm:h-11 sm:w-11"
+                className="relative flex h-9 w-9 items-center justify-center rounded-full text-[#134A35] transition-colors hover:bg-[#134A35]/5 focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 <ShoppingCart size={18} strokeWidth={1.75} />
                 {hydrated && itemCount > 0 ? (
@@ -107,7 +105,7 @@ export function WatchesHeader() {
                 aria-expanded={menuOpen}
                 aria-controls="watches-header-menu"
                 onClick={() => setMenuOpen((open) => !open)}
-                className="flex h-10 w-10 items-center justify-center rounded-full text-[#134A35] transition-colors hover:bg-[#134A35]/5 focus-visible:outline-2 focus-visible:outline-offset-2 sm:h-11 sm:w-11"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-[#134A35] transition-colors hover:bg-[#134A35]/5 focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 {menuOpen ? (
                   <X size={20} strokeWidth={1.75} />
@@ -131,7 +129,7 @@ export function WatchesHeader() {
           <nav
             id="watches-header-menu"
             aria-label="التنقل الرئيسي"
-            className="fixed end-2 top-[4rem] z-[110] min-w-[12.5rem] overflow-hidden rounded-2xl border border-[#134A35]/10 bg-white py-2 shadow-xl shadow-[#134A35]/15 sm:end-4 sm:top-[4.5rem]"
+            className="fixed end-2 top-12 z-[110] min-w-[12.5rem] overflow-hidden rounded-2xl border border-[#134A35]/10 bg-white py-2 shadow-xl shadow-[#134A35]/15 sm:end-4 sm:top-[3.25rem]"
           >
             {navLinks.map((link) => (
               <Link

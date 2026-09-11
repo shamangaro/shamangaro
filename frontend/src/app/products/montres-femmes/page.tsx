@@ -11,6 +11,7 @@ import { WatchesFAQ } from "@/components/montres-femmes/WatchesFAQ";
 import { WatchesStickyCTA } from "@/components/montres-femmes/WatchesStickyCTA";
 import { WatchesScrollToTopButton } from "@/components/montres-femmes/WatchesScrollToTopButton";
 import { WatchesFooter } from "@/components/montres-femmes/WatchesFooter";
+import { WatchesFaceBackdrop } from "@/components/montres-femmes/WatchesFaceBackdrop";
 
 export const metadata: Metadata = {
   title: "Montres Femmes Élégantes — 250 DH | SHAMANGARO",
@@ -27,20 +28,25 @@ export const metadata: Metadata = {
 export default function MontresFemmesPage() {
   return (
     <WatchesPageProvider>
-      <WatchesHeader />
-      <main>
-        <WatchesOrderFlow />
-        <WatchesTrust />
-        <WatchesBenefits />
-        <WatchesFreeDeliveryStrip />
-        <WatchesOrderingSteps />
-        <WatchesFreeDeliveryStrip />
-        <WatchesReviews />
-        <WatchesFAQ />
-        <WatchesFooter />
-      </main>
-      <WatchesStickyCTA />
-      <WatchesScrollToTopButton />
+      <div className="relative bg-[#FAF7F2]">
+        <WatchesFaceBackdrop />
+        <div className="relative z-10">
+          <WatchesHeader />
+          <main>
+            <WatchesOrderFlow />
+            <WatchesTrust />
+            <WatchesBenefits />
+            <WatchesFreeDeliveryStrip />
+            <WatchesOrderingSteps />
+            <WatchesFreeDeliveryStrip />
+            <WatchesReviews />
+            <WatchesFAQ />
+            <WatchesFooter />
+          </main>
+          <WatchesStickyCTA />
+          <WatchesScrollToTopButton />
+        </div>
+      </div>
     </WatchesPageProvider>
   );
 }

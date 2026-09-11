@@ -115,7 +115,7 @@ export function WatchesOrderFlow() {
   return (
     <section
       id="watches-order-flow"
-      className="scroll-mt-16 border-t border-[#D8E8DC] bg-[#FAF7F2] py-8 sm:py-10"
+      className="scroll-mt-16 border-t border-[#D8E8DC]/70 bg-transparent py-8 sm:py-10"
     >
       <Container>
         <div className="mx-auto max-w-xl">

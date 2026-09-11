@@ -27,7 +27,7 @@ const items = [
 
 export function WatchesTrust() {
   return (
-    <section className="bg-[#E8F5ED] py-6 sm:py-8">
+    <section className="bg-[#E8F5ED]/45 py-6 sm:py-8">
       <Container>
         <div className="mx-auto w-full max-w-md rounded-2xl bg-gradient-to-br from-[#0A2F23] to-[#134A35] p-4 shadow-sm ring-1 ring-[#B8924A]/25 sm:p-5">
           <div className="grid grid-cols-2 gap-3">

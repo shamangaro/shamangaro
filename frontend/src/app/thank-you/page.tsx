@@ -5,7 +5,7 @@ import { Logo } from "@/components/shared/Logo";
 import { getServerApiBase } from "@/lib/api-server";
 import type { OrderPublic } from "@/lib/orders";
 import { getWatchesThankYouHomeHref, isWatchesPublicOrder } from "@/lib/watches-orders";
-import { WATCHES_PRODUCT } from "@/components/montres-femmes/config";
+import { WatchesLogoMark } from "@/components/montres-femmes/WatchesLogoMark";
 
 interface ThankYouPageProps {
   searchParams: Promise<{ order?: string }>;
@@ -42,7 +42,11 @@ export default async function ThankYouPage({ searchParams }: ThankYouPageProps) 
                   variant="wordmark"
                   size="md"
                   href={homeHref}
-                  iconSrc={isWatchesOrder ? WATCHES_PRODUCT.logoIcon : undefined}
+                  icon={
+                    isWatchesOrder ? (
+                      <WatchesLogoMark tone="white" className="h-16 w-auto" />
+                    ) : undefined
+                  }
                   subtitle={isWatchesOrder ? "Montres Femmes" : undefined}
                   textClassName="text-white"
                   subtitleClassName={

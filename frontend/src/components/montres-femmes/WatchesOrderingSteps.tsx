@@ -25,7 +25,7 @@ const steps = [
 
 export function WatchesOrderingSteps() {
   return (
-    <section className="bg-white py-6 sm:py-8">
+    <section className="bg-white/50 py-6 sm:py-8">
       <Container>
         <div className="mb-4 text-center">
           <h2 className="text-xl font-bold text-[#0F2A1F] sm:text-2xl">

@@ -2,26 +2,24 @@
 
 import Link from "next/link";
 import type { MouseEvent } from "react";
-import { Mail } from "lucide-react";
 import { Container } from "@/components/shared/Container";
-import { contactInfo } from "@/config/legal";
+import { Logo } from "@/components/shared/Logo";
 import { footerQuickLinkGroups } from "@/config/site";
 import { cn } from "@/lib/utils";
 import {
   WatchesGreenPattern,
   watchesGreenSurfaceClassName,
 } from "@/lib/watches-green-pattern";
+import { WatchesLogoMark } from "./WatchesLogoMark";
 
 const logoSubtitle = "Montres Femmes";
 const logoSubtitleClassName =
-  "font-semibold uppercase tracking-[0.14em] text-[#B8924A] text-[10px] sm:text-xs";
+  "whitespace-nowrap font-semibold uppercase tracking-[0.08em] text-white text-xs sm:text-sm";
 const watchesHomeHref = "#watches-lp-top";
 
 function scrollToWatchesTop(event: MouseEvent<HTMLAnchorElement>) {
   event.preventDefault();
-  document
-    .getElementById("watches-lp-top")
-    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 export function WatchesFooter() {
@@ -31,28 +29,27 @@ export function WatchesFooter() {
     <footer
       className={cn(
         watchesGreenSurfaceClassName,
-        "-mt-px border-0 pb-20 text-white/80 lg:pb-6"
+        "-mt-16 border-0 pb-20 text-white/80 sm:-mt-20 lg:pb-6"
       )}
     >
       <WatchesGreenPattern />
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-16 bg-gradient-to-b from-[#F7F3EE] via-[#F7F3EE]/25 to-transparent sm:h-20"
+        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-36 bg-gradient-to-b from-[#FAF7F2] from-0% via-[#FAF7F2]/80 via-40% to-transparent to-100% sm:h-44"
         aria-hidden
       />
 
-      <Container className="relative z-10 pb-4 pt-10 sm:pb-5 sm:pt-12">
+      <Container className="relative z-10 pb-4 pt-16 sm:pb-5 sm:pt-20">
         <div className="flex justify-center">
-          <Link
+          <Logo
+            size="lg"
             href={watchesHomeHref}
             onClick={scrollToWatchesTop}
-            className="inline-flex flex-col items-center text-center"
-            aria-label="SHAMANGARO Montres Femmes"
-          >
-            <span className="text-2xl font-extrabold tracking-wide text-white">
-              SHAMANGARO
-            </span>
-            <span className={logoSubtitleClassName}>{logoSubtitle}</span>
-          </Link>
+            icon={<WatchesLogoMark tone="white" className="h-14 w-auto sm:h-16" />}
+            subtitle={logoSubtitle}
+            subtitleClassName={logoSubtitleClassName}
+            textClassName="text-white"
+            className="min-w-0 gap-2"
+          />
         </div>
 
         <nav
@@ -84,34 +81,7 @@ export function WatchesFooter() {
           ))}
         </nav>
 
-        <div className="mx-auto mt-10 max-w-lg rounded-2xl border border-[#B8924A]/25 bg-white/[0.06] px-5 py-6 text-center shadow-[0_12px_40px_rgba(0,0,0,0.18)] ring-1 ring-white/10 sm:px-8 sm:py-7">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#B8924A]">
-            تواصل معانا
-          </p>
-          <div
-            className="mx-auto mb-4 mt-3 flex w-16 items-center gap-2"
-            aria-hidden
-          >
-            <span className="h-px flex-1 bg-gradient-to-l from-[#B8924A] to-transparent" />
-            <span className="h-1 w-1 rotate-45 bg-[#B8924A]" />
-            <span className="h-px flex-1 bg-gradient-to-r from-[#B8924A] to-transparent" />
-          </div>
-          <a
-            href={`mailto:${contactInfo.email}`}
-            className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-wide text-white transition hover:text-[#D4BC82] sm:text-base"
-            dir="ltr"
-          >
-            <Mail className="h-4 w-4 text-[#B8924A]" strokeWidth={1.75} aria-hidden />
-            {contactInfo.email}
-          </a>
-          <div className="mt-4 flex flex-col items-center gap-1.5 text-[12px] font-medium text-white/65 sm:flex-row sm:justify-center sm:gap-3">
-            <span>{contactInfo.businessHours}</span>
-            <span className="hidden h-3 w-px bg-[#B8924A]/40 sm:block" aria-hidden />
-            <span>الرد خلال {contactInfo.responseTime}</span>
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-col items-center gap-2 border-t border-white/10 pt-4 text-center sm:flex-row sm:justify-between sm:text-start">
+        <div className="mt-10 flex flex-col items-center gap-2 border-t border-white/10 pt-4 text-center sm:flex-row sm:justify-between sm:text-start">
           <p className="text-xs text-white/50">
             © {year} SHAMANGARO. جميع الحقوق محفوظة.
           </p>

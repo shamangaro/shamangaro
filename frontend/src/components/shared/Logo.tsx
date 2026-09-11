@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { MouseEventHandler } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const LOGO_ICON_SRC = "/images/logo-icon.png";
@@ -34,6 +34,7 @@ export interface LogoProps {
   textClassName?: string;
   subtitleClassName?: string;
   iconSrc?: string;
+  icon?: ReactNode;
   iconClassName?: string;
   priority?: boolean;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
@@ -75,27 +76,36 @@ export function Logo({
   textClassName,
   subtitleClassName,
   iconSrc = LOGO_ICON_SRC,
+  icon,
   iconClassName,
   priority = false,
   onClick,
 }: LogoProps) {
   const content =
     variant === "icon" ? (
-      <LogoIcon
-        size={size}
-        className={cn(className, iconClassName)}
-        priority={priority}
-        src={iconSrc}
-      />
-    ) : (
-      <span className={cn("inline-flex items-center gap-2", className)}>
+      icon ? (
+        <span className={cn(className, iconClassName)}>{icon}</span>
+      ) : (
         <LogoIcon
           size={size}
-          className={iconClassName}
+          className={cn(className, iconClassName)}
           priority={priority}
-          decorative
           src={iconSrc}
         />
+      )
+    ) : (
+      <span className={cn("inline-flex items-center gap-2", className)}>
+        {icon ? (
+          <span className={iconClassName}>{icon}</span>
+        ) : (
+          <LogoIcon
+            size={size}
+            className={iconClassName}
+            priority={priority}
+            decorative
+            src={iconSrc}
+          />
+        )}
         <span className="flex flex-col items-start justify-center leading-none">
           <span
             className={cn(

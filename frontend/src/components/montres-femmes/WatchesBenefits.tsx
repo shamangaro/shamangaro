@@ -6,7 +6,7 @@ const icons = [Sparkles, Feather, Gift];
 
 export function WatchesBenefits() {
   return (
-    <section className="bg-[#E8F5ED] py-6 sm:py-8">
+    <section className="bg-[#E8F5ED]/55 py-6 sm:py-8">
       <Container>
         <div className="mb-4 text-center">
           <h2 className="text-xl font-bold text-[#0F2A1F] sm:text-2xl">

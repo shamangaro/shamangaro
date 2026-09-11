@@ -29,7 +29,7 @@ export const WATCHES_PRODUCT = {
   slug: "montres-femmes",
   unitPrice: 250,
   sourcePage: "/products/montres-femmes",
-  logoIcon: "/images/montres-femmes/logo-mark.png?v=ladies",
+  logoIcon: "/images/montres-femmes/logo-watch-mark.svg?v=square",
 } as const;
 
 /** Couleur par défaut — confirmée au téléphone avec la cliente */
