@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FR_COPY } from "./copy";
 
 const SHOW_AFTER_PX = 280;
 
-export function WatchesScrollToTopButton() {
+export function FrWatchesScrollToTopButton() {
   const [visible, setVisible] = useState(false);
   const [stickyCtaVisible, setStickyCtaVisible] = useState(true);
 
@@ -56,7 +57,7 @@ export function WatchesScrollToTopButton() {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "auto" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -69,7 +70,7 @@ export function WatchesScrollToTopButton() {
           exit={{ opacity: 0, y: 16, scale: 0.9 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
           onClick={scrollToTop}
-          aria-label="الرجوع لأعلى الصفحة"
+          aria-label={FR_COPY.scrollTopAria}
           className={cn(
             "fixed start-4 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-[#134A35]/20 bg-white/90 text-[#134A35] shadow-md backdrop-blur-sm transition hover:bg-[#134A35] hover:text-white sm:start-6 sm:h-[3.25rem] sm:w-[3.25rem] lg:hidden",
             stickyCtaVisible ? "bottom-22 sm:bottom-24" : "bottom-4 sm:bottom-5"

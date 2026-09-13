@@ -7,25 +7,18 @@ import { Container } from "@/components/shared/Container";
 import { Logo } from "@/components/shared/Logo";
 import { useCart } from "@/components/layout/cart-store";
 import { cn } from "@/lib/utils";
+import { WatchesLogoMark } from "@/components/montres-femmes/WatchesLogoMark";
 import { WatchesLanguageGate } from "@/components/montres-femmes-language/WatchesLanguageGate";
 import { WatchesLanguageSwitcher } from "@/components/montres-femmes-language/WatchesLanguageSwitcher";
-import { WatchesTrustBar } from "./WatchesTrustBar";
-import { WatchesLogoMark } from "./WatchesLogoMark";
+import { FrWatchesTrustBar } from "./FrWatchesTrustBar";
+import { FR_COPY, FR_NAV } from "./copy";
 
 const watchesHomeHref = "#watches-lp-top";
 
-const navLinks = [
-  { href: watchesHomeHref, label: "الرئيسية" },
-  { href: "#watches-hero-photo", label: "الطلب" },
-  { href: "/about", label: "من نحن" },
-  { href: "/contact", label: "اتصل بنا" },
-];
-
-const logoSubtitle = "Montres Femmes";
 const logoSubtitleClassName =
   "whitespace-nowrap font-semibold uppercase tracking-[0.08em] text-[#B8924A] text-[10px] sm:text-[11px] md:text-xs";
 
-export function WatchesHeader() {
+export function FrWatchesHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { itemCount, hydrated } = useCart();
@@ -69,7 +62,7 @@ export function WatchesHeader() {
               priority
               icon={<WatchesLogoMark className="h-10 w-auto sm:h-11" />}
               iconClassName=""
-              subtitle={logoSubtitle}
+              subtitle={FR_COPY.logoSubtitle}
               subtitleClassName={logoSubtitleClassName}
               textClassName="text-[#134A35]"
               className="min-w-0 max-w-[70%] shrink gap-1.5 md:hidden"
@@ -81,17 +74,17 @@ export function WatchesHeader() {
               priority
               icon={<WatchesLogoMark className="h-11 w-auto" />}
               iconClassName=""
-              subtitle={logoSubtitle}
+              subtitle={FR_COPY.logoSubtitle}
               subtitleClassName={logoSubtitleClassName}
               textClassName="text-[#134A35]"
               className="hidden min-w-0 gap-1.5 md:inline-flex"
             />
 
             <div className="-me-1 flex shrink-0 items-center gap-0.5 sm:-me-2 sm:gap-1">
-              <WatchesLanguageSwitcher current="darija" />
+              <WatchesLanguageSwitcher current="fr" />
               <Link
                 href="#watches-hero-photo"
-                aria-label="سلة التسوق"
+                aria-label={FR_COPY.cartAria}
                 className="relative flex h-9 w-9 items-center justify-center rounded-full text-[#134A35] transition-colors hover:bg-[#134A35]/5 focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 <ShoppingCart size={18} strokeWidth={1.75} />
@@ -104,7 +97,7 @@ export function WatchesHeader() {
 
               <button
                 type="button"
-                aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+                aria-label={menuOpen ? FR_COPY.closeMenu : FR_COPY.openMenu}
                 aria-expanded={menuOpen}
                 aria-controls="watches-header-menu"
                 onClick={() => setMenuOpen((open) => !open)}
@@ -125,16 +118,16 @@ export function WatchesHeader() {
         <>
           <button
             type="button"
-            aria-label="إغلاق القائمة"
+            aria-label={FR_COPY.closeMenu}
             className="fixed inset-0 z-[100] bg-[#134A35]/15 backdrop-blur-[1px]"
             onClick={() => setMenuOpen(false)}
           />
           <nav
             id="watches-header-menu"
-            aria-label="التنقل الرئيسي"
+            aria-label={FR_COPY.mainNav}
             className="fixed end-2 top-12 z-[110] min-w-[12.5rem] overflow-hidden rounded-2xl border border-[#134A35]/10 bg-white py-2 shadow-xl shadow-[#134A35]/15 sm:end-4 sm:top-[3.25rem]"
           >
-            {navLinks.map((link) => (
+            {FR_NAV.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -153,8 +146,8 @@ export function WatchesHeader() {
         </>
       ) : null}
 
-      <WatchesTrustBar />
-      <WatchesLanguageGate current="darija" />
+      <FrWatchesTrustBar />
+      <WatchesLanguageGate current="fr" />
     </div>
   );
 }

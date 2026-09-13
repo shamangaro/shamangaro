@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { formatWatchPrice, WATCHES_PRODUCT } from "./config";
+import { WATCHES_PRODUCT } from "@/components/montres-femmes/config";
 import { scrollToWatchesOrder } from "@/lib/scroll-to-watches-order";
+import { FR_COPY, formatWatchPriceFr } from "./copy";
 
-export function WatchesStickyCTA() {
+export function FrWatchesStickyCTA() {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export function WatchesStickyCTA() {
             onClick={() => scrollToWatchesOrder()}
             className="mx-auto flex w-full max-w-lg items-center justify-center rounded-xl border border-[#B8924A]/45 bg-[#134A35] px-5 py-3 text-sm font-bold text-white shadow-md ring-1 ring-[#B8924A]/30 transition hover:bg-[#0A2F23]"
           >
-            اختاري الساعة — {formatWatchPrice(WATCHES_PRODUCT.unitPrice)}
+            {FR_COPY.stickyCta(formatWatchPriceFr(WATCHES_PRODUCT.unitPrice))}
           </button>
         </motion.div>
       )}
