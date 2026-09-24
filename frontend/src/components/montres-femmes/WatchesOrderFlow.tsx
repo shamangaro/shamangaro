@@ -298,14 +298,14 @@ export function WatchesOrderFlow() {
                   <p className="mt-4 text-center text-[11px] leading-relaxed text-[#888]">
                     بالضغط على «أكّدي الطلب» كتوافقين على{" "}
                     <Link
-                      href="/terms"
+                      href="/products/montres-femmes/terms"
                       className="font-medium text-[#134A35] underline-offset-2 hover:underline"
                     >
                       الشروط و الأحكام
                     </Link>{" "}
                     و{" "}
                     <Link
-                      href="/privacy"
+                      href="/products/montres-femmes/privacy"
                       className="font-medium text-[#134A35] underline-offset-2 hover:underline"
                     >
                       سياسة الخصوصية

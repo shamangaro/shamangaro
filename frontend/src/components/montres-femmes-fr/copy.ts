@@ -62,8 +62,8 @@ export const FR_CITY_OPTIONS = MOROCCAN_CITIES.map((value) => ({
 export const FR_NAV = [
   { href: "#watches-lp-top", label: "Accueil" },
   { href: "#watches-hero-photo", label: "Commande" },
-  { href: "/about", label: "À propos" },
-  { href: "/contact", label: "Contact" },
+  { href: "/fr/about", label: "À propos" },
+  { href: "/fr/contact", label: "Contact" },
 ];
 
 export const FR_COPY = {
@@ -216,23 +216,23 @@ export const FR_COPY = {
     {
       title: "Le site",
       links: [
-        { href: "/about", label: "À propos" },
-        { href: "/contact", label: "Contact" },
+        { href: "/fr/about", label: "À propos" },
+        { href: "/fr/contact", label: "Contact" },
       ],
     },
     {
       title: "Légal",
       links: [
-        { href: "/privacy", label: "Politique de confidentialité" },
-        { href: "/terms", label: "Conditions générales" },
+        { href: "/fr/privacy", label: "Politique de confidentialité" },
+        { href: "/fr/terms", label: "Conditions générales" },
       ],
     },
     {
       title: "Politiques",
       links: [
-        { href: "/shipping", label: "Politique de livraison" },
-        { href: "/returns", label: "Politique de retour et d’échange" },
-        { href: "/warranty", label: "Politique de garantie" },
+        { href: "/fr/shipping", label: "Politique de livraison" },
+        { href: "/fr/returns", label: "Politique de retour et d’échange" },
+        { href: "/fr/warranty", label: "Politique de garantie" },
       ],
     },
   ],

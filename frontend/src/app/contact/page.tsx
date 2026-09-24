@@ -75,20 +75,12 @@ export default function ContactPage() {
 
       <LegalCard icon={Mail} title="للطلبات و الاستفسارات">
         <p>
-          لطلب منتج من {businessInfo.name}، ارجع إلى صفحة المنتج
-          المناسبة على الموقع — مثلاً{" "}
+          لطلب Neo Transat، ارجع إلى{" "}
           <Link
             href="/"
             className="font-semibold text-navy underline-offset-2 hover:underline"
           >
-            Neo Transat
-          </Link>{" "}
-          أو{" "}
-          <Link
-            href="/products/montres-femmes"
-            className="font-semibold text-navy underline-offset-2 hover:underline"
-          >
-            Montres Femmes
+            الصفحة الرئيسية
           </Link>
           . للأسئلة المتعلقة بمعالجة بياناتك، راجع{" "}
           <Link

@@ -291,14 +291,14 @@ export function FrWatchesOrderFlow() {
                   <p className="mt-4 text-center text-[11px] leading-relaxed text-[#888]">
                     {FR_COPY.termsPrefix}
                     <Link
-                      href="/terms"
+                      href="/fr/terms"
                       className="font-medium text-[#134A35] underline-offset-2 hover:underline"
                     >
                       {FR_COPY.terms}
                     </Link>
                     {FR_COPY.termsAnd}
                     <Link
-                      href="/privacy"
+                      href="/fr/privacy"
                       className="font-medium text-[#134A35] underline-offset-2 hover:underline"
                     >
                       {FR_COPY.privacy}

@@ -31,10 +31,9 @@ export default function AboutPage() {
           الحياة اليومية و في أوقات الراحة.
         </p>
         <p>
-          حالياً نقدّم عائلات منتجات منها{" "}
-          <strong className="text-navy">Neo Transat</strong> و{" "}
-          <strong className="text-navy">Montres Femmes</strong>. قد
-          تُضاف منتجات أخرى لاحقاً. تفاصيل كل منتج ظاهرة على صفحته.
+          هاد الصفحات القانونية خاصة بـ{" "}
+          <strong className="text-navy">Neo Transat</strong> — كرسي
+          الاسترخاء. تفاصيل المنتج ظاهرة على الصفحة الرئيسية.
         </p>
       </LegalCard>
 
@@ -88,13 +87,7 @@ export default function AboutPage() {
             href="/"
             className="inline-flex rounded-full bg-navy px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-navy-light"
           >
-            Neo Transat
-          </Link>
-          <Link
-            href="/products/montres-femmes"
-            className="inline-flex rounded-full border-2 border-navy px-6 py-3 text-sm font-bold text-navy transition-colors hover:bg-navy/5"
-          >
-            Montres Femmes
+            رجوع لـ Neo Transat
           </Link>
         </p>
       </LegalCard>

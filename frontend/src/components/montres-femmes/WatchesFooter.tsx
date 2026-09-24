@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { MouseEvent } from "react";
 import { Container } from "@/components/shared/Container";
 import { Logo } from "@/components/shared/Logo";
-import { footerQuickLinkGroups } from "@/config/site";
+import { watchesArFooterGroups } from "@/config/legal-watches-ar";
 import { cn } from "@/lib/utils";
 import {
   WatchesGreenPattern,
@@ -57,7 +57,7 @@ export function WatchesFooter() {
           className="mx-auto mt-10 grid w-full max-w-3xl grid-cols-3 gap-x-3 gap-y-6 sm:gap-x-10"
           dir="rtl"
         >
-          {footerQuickLinkGroups.map((group) => (
+          {watchesArFooterGroups.map((group) => (
             <div
               key={group.title}
               className="flex min-w-0 flex-col items-center text-center"

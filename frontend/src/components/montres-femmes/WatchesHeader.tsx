@@ -17,8 +17,8 @@ const watchesHomeHref = "#watches-lp-top";
 const navLinks = [
   { href: watchesHomeHref, label: "الرئيسية" },
   { href: "#watches-hero-photo", label: "الطلب" },
-  { href: "/about", label: "من نحن" },
-  { href: "/contact", label: "اتصل بنا" },
+  { href: "/products/montres-femmes/about", label: "من نحن" },
+  { href: "/products/montres-femmes/contact", label: "اتصل بنا" },
 ];
 
 const logoSubtitle = "Montres Femmes";

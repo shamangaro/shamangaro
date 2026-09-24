@@ -41,7 +41,7 @@ export const legalPages: LegalPageMeta[] = [
     title: "من نحن",
     subtitle: "علامة مغربية لمنتجات مختارة",
     description:
-      "تعرف على SHAMANGARO — علامة مغربية تقدم عدة عائلات منتجات، منها Neo Transat و Montres Femmes.",
+      "تعرف على SHAMANGARO — علامة مغربية تقدّم Neo Transat، كرسي الاسترخاء Premium فالمغرب.",
     icon: Info,
   },
   {

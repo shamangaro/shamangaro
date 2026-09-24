@@ -15,14 +15,28 @@ import { WatchesFooter } from "@/components/montres-femmes/WatchesFooter";
 import { WatchesFaceBackdrop } from "@/components/montres-femmes/WatchesFaceBackdrop";
 
 export const metadata: Metadata = {
-  title: "Montres Femmes Élégantes — 260 DH | SHAMANGARO",
+  title: { absolute: "Montres Femmes Élégantes — 260 DH | SHAMANGARO" },
   description:
     "ساعات نسائية أنيقة — 260 DH، توصيل مجاني، الدفع عند الإستلام، كاين التبديل.",
+  keywords: [
+    "SHAMANGARO",
+    "Montres Femmes",
+    "ساعات نسائية المغرب",
+    "ساعات نسائية 260 درهم",
+  ],
   openGraph: {
     title: "Montres Femmes Élégantes — 260 DH",
     description:
       "ساعات نسائية أنيقة — توصيل مجاني · الدفع عند الإستلام · كاين التبديل",
+    locale: "ar_MA",
+    siteName: "SHAMANGARO Montres Femmes",
     images: [{ url: "/images/montres-femmes/hero.png", width: 800, height: 1000 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Montres Femmes Élégantes — 260 DH",
+    description:
+      "ساعات نسائية أنيقة — توصيل مجاني · الدفع عند الإستلام · كاين التبديل",
   },
 };
 
