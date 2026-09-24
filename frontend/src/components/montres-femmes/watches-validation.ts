@@ -27,13 +27,12 @@ export interface WatchesFormErrors {
 
 export function validateWatchesCheckout(
   selectedLines: SelectedWatchLine[],
-  checkoutUnlocked: boolean,
   form: WatchesFormValues
 ): WatchesFormErrors {
   const errors: WatchesFormErrors = {};
   const selectedCount = countSelectedWatches(selectedLines);
 
-  if (!checkoutUnlocked || selectedCount < 1) {
+  if (selectedCount < 1) {
     errors.selection = WATCHES_VALIDATION.selection;
   }
   if (!form.name.trim() || form.name.trim().length < 2) {

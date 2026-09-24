@@ -3,10 +3,15 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { formatWatchPrice, WATCHES_PRODUCT } from "./config";
-import { scrollToWatchesOrder } from "@/lib/scroll-to-watches-order";
+import { useWatchesPage } from "./WatchesPageContext";
+import {
+  scrollToWatchesCheckout,
+  scrollToWatchesOrder,
+} from "@/lib/scroll-to-watches-order";
 
 export function WatchesStickyCTA() {
   const [visible, setVisible] = useState(true);
+  const { isSelectionComplete, total } = useWatchesPage();
 
   useEffect(() => {
     const form = document.getElementById("watches-order-form");
@@ -40,7 +45,7 @@ export function WatchesStickyCTA() {
       observer?.disconnect();
       mutations.disconnect();
     };
-  }, []);
+  }, [isSelectionComplete]);
 
   return (
     <AnimatePresence>
@@ -54,10 +59,16 @@ export function WatchesStickyCTA() {
         >
           <button
             type="button"
-            onClick={() => scrollToWatchesOrder()}
+            onClick={() =>
+              isSelectionComplete
+                ? scrollToWatchesCheckout()
+                : scrollToWatchesOrder()
+            }
             className="mx-auto flex w-full max-w-lg items-center justify-center rounded-xl border border-[#B8924A]/45 bg-[#134A35] px-5 py-3 text-sm font-bold text-white shadow-md ring-1 ring-[#B8924A]/30 transition hover:bg-[#0A2F23]"
           >
-            اختاري الساعة — {formatWatchPrice(WATCHES_PRODUCT.unitPrice)}
+            {isSelectionComplete
+              ? `أكّدي الطلب — ${formatWatchPrice(total)}`
+              : `اختاري الساعة — ${formatWatchPrice(WATCHES_PRODUCT.unitPrice)}`}
           </button>
         </motion.div>
       )}

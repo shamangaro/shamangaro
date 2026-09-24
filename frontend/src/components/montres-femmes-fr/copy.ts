@@ -5,8 +5,6 @@ export function formatWatchPriceFr(amount: number): string {
   return `${amount} DH`;
 }
 
-export const FR_CROSSED_PRICE = "350 DH";
-
 export const FR_VARIANT_LABELS: Record<WatchVariantId, string> = {
   "two-tone-white": "Blanc",
   "two-tone-brown": "Marron",
@@ -14,6 +12,23 @@ export const FR_VARIANT_LABELS: Record<WatchVariantId, string> = {
   "navy-leather": "Bleu",
   "burgundy-oval": "Violet",
   "cream-leather": "Crème",
+  "silver-blue": "Argent bleu",
+  "twotone-green": "Bicolore vert",
+  "gold-green-stones": "Or vert strass",
+  "twotone-white-gold": "Bicolore blanc",
+  "leopard-panther": "Léopard",
+  "twotone-white-alt": "Bicolore blanc",
+  "oval-gold-black": "Ovale or noir",
+  "oval-silver-black": "Ovale argent noir",
+  "square-gold-green": "Carré or vert",
+  "oval-gold-cream": "Ovale or crème",
+  "square-gold-white": "Carré or blanc",
+  "square-gold-brown": "Carré or marron",
+  "octagon-silver": "Octogone argent",
+  "cushion-navy": "Coussin marine",
+  "cushion-cream": "Coussin crème",
+  "square-gold-ivory": "Carré or ivoire",
+  "silver-pink": "Argent rose",
 };
 
 export const FR_CITY_LABELS: Record<string, string> = {
@@ -68,7 +83,7 @@ export const FR_COPY = {
   h1Lead: "Élégance discrète",
   h1Rest: " au poignet",
   heroSub: "Choisissez la couleur que vous aimez et terminez votre commande maintenant.",
-  specialOffer: "Offre spéciale",
+  cashOnDelivery: "Paiement à la livraison",
   deliveryHeadline: "Livraison gratuite",
   deliverySubline: "dans toutes les villes du Maroc",
   deliveryDetail: "1–3 jours ouvrés · sans frais supplémentaires",
@@ -119,6 +134,7 @@ export const FR_COPY = {
     "Échange possible",
   ],
   stickyCta: (price: string) => `Choisissez la montre — ${price}`,
+  stickyConfirmCta: (price: string) => `Confirmer la commande — ${price}`,
   scrollTopAria: "Retour en haut de la page",
   trust: [
     { title: "Paiement à la livraison", subline: "Sans paiement en ligne" },
@@ -128,7 +144,7 @@ export const FR_COPY = {
       sublineClassName: "font-semibold text-emerald-300",
     },
     { title: "Échange possible", subline: "Changez de couleur facilement" },
-    { title: "Service garanti", subline: "Confirmation avant l’expédition" },
+    { title: "Confirmation", subline: "Nous vous appelons avant l’expédition" },
   ],
   benefitsTitle: "Pourquoi choisir cette montre ?",
   benefits: [
@@ -169,29 +185,14 @@ export const FR_COPY = {
       description: "Livraison en 1–3 jours — paiement à la porte.",
     },
   ],
-  reviewsTitle: "Avis des clientes",
-  reviews: [
-    {
-      name: "Sara M.",
-      city: "Casablanca",
-      text: "La montre est très élégante et la boîte était prête pour un cadeau. La livraison est arrivée en deux jours.",
-    },
-    {
-      name: "Amina L.",
-      city: "Rabat",
-      text: "Légère au poignet et elle va avec tout. J’ai payé à la réception, aucun souci.",
-    },
-    {
-      name: "Fatima B.",
-      city: "Marrakech",
-      text: "Cadeau pour ma sœur, elle a beaucoup aimé. Bonne qualité et prix raisonnable.",
-    },
-  ],
+  confirmCallTitle: "Nous confirmons par téléphone",
+  confirmCallBody:
+    "Nous vous appelons avant l’expédition. Paiement à la livraison — pas de paiement en ligne.",
   faqTitle: "Questions fréquentes",
   faq: [
     {
       q: "Quel est le prix ?",
-      a: `250 DH la montre. Le total = 250 × la quantité. Livraison gratuite.`,
+      a: `260 DH la montre. Le total = 260 × la quantité. Livraison gratuite.`,
     },
     {
       q: "Comment payer ?",

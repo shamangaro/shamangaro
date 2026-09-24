@@ -48,11 +48,11 @@ const WatchesPageContext = createContext<WatchesPageState | null>(null);
 
 export function WatchesPageProvider({ children }: { children: ReactNode }) {
   const [selectedLines, setSelectedLines] = useState<SelectedWatchLine[]>([]);
-  const [checkoutUnlocked, setCheckoutUnlocked] = useState(false);
 
   const selectedCount = countSelectedWatches(selectedLines);
   const totalModels = countSelectedModels(selectedLines);
   const isSelectionComplete = selectedLines.length > 0;
+  const checkoutUnlocked = isSelectionComplete;
   const total = computeWatchTotalFromLines(selectedLines);
 
   const commitLines = useCallback(
@@ -73,8 +73,6 @@ export function WatchesPageProvider({ children }: { children: ReactNode }) {
 
   const selectWatch = useCallback(
     (watch: WatchSelection): SelectWatchResult => {
-      setCheckoutUnlocked(false);
-
       const outcome: { result: SelectWatchResult } = { result: "unchanged" };
       commitLines((lines) => {
         const next = selectWatchLine(lines, watch);
@@ -89,7 +87,6 @@ export function WatchesPageProvider({ children }: { children: ReactNode }) {
 
   const incrementLineQuantity = useCallback(
     (slideId: string) => {
-      setCheckoutUnlocked(false);
       commitLines((lines) => {
         if (countSelectedWatches(lines) >= MAX_WATCH_LINE_QUANTITY) return lines;
         return incrementWatchLineQuantity(lines, slideId);
@@ -100,7 +97,6 @@ export function WatchesPageProvider({ children }: { children: ReactNode }) {
 
   const decrementLineQuantity = useCallback(
     (slideId: string) => {
-      setCheckoutUnlocked(false);
       commitLines((lines) => decrementWatchLineQuantity(lines, slideId));
     },
     [commitLines]
@@ -108,17 +104,14 @@ export function WatchesPageProvider({ children }: { children: ReactNode }) {
 
   const removeSelectedWatch = useCallback(
     (slideId: string) => {
-      setCheckoutUnlocked(false);
       commitLines((lines) => removeWatchLine(lines, slideId));
     },
     [commitLines]
   );
 
   const unlockCheckout = useCallback(() => {
-    if (selectedLines.length > 0) {
-      setCheckoutUnlocked(true);
-    }
-  }, [selectedLines.length]);
+    /* Checkout is visible as soon as a watch is selected. */
+  }, []);
 
   const value = useMemo<WatchesPageState>(
     () => ({

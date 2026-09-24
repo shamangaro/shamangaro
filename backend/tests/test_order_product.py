@@ -180,8 +180,8 @@ async def test_admin_product_filter_excludes_other_product(admin_client):
             "product_name": "Montres Femmes Élégantes",
             "selected_variant": "burgundy",
             "quantity": 1,
-            "unit_price": 250.0,
-            "total_amount": 250.0,
+            "unit_price": 260.0,
+            "total_amount": 260.0,
             "source_page": "/products/montres-femmes",
         },
     )

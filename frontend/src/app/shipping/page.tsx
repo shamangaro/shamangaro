@@ -9,7 +9,11 @@ import {
 import { LegalPageShell } from "@/components/legal/LegalPageShell";
 import { LegalCard } from "@/components/legal/LegalCard";
 import { LegalLastUpdated } from "@/components/legal/LegalLastUpdated";
-import { businessInfo, getLegalPage } from "@/config/legal";
+import {
+  businessInfo,
+  getLegalPage,
+  productPageConditionsNotice,
+} from "@/config/legal";
 import { buildLegalMetadata } from "@/lib/legal-metadata";
 
 const page = getLegalPage("/shipping")!;
@@ -23,46 +27,48 @@ export default function ShippingPage() {
       subtitle={page.subtitle}
       icon={page.icon}
     >
-      <LegalCard icon={MapPin} title="التوصيل لجميع المغرب">
+      <LegalCard icon={MapPin} title="التوصيل داخل المغرب">
         <p>
-          نوصل {businessInfo.product} إلى جميع مدن المملكة المغربية
-          — الدار البيضاء، الرباط، مراكش، طنجة، أكادير، فاس، و
-          باقي المدن.
+          نوصل طلبات {businessInfo.name} إلى مدن المملكة المغربية —
+          الدار البيضاء، الرباط، مراكش، طنجة، أكادير، فاس، و باقي
+          المدن المعروضة عند الطلب.
         </p>
+        <p>{productPageConditionsNotice}</p>
         <p>
-          التوصيل <strong className="text-navy">مجاني</strong> — لا
-          توجد رسوم إضافية على الشحن.
+          إذا كانت صفحة المنتج تعلن توصيلاً مجانياً، لا تُضاف رسوم
+          شحن زيادة على الثمن الظاهر هناك.
         </p>
       </LegalCard>
 
-      <LegalCard icon={Clock} title="مدة التوصيل: 2 إلى 5 أيام عمل">
+      <LegalCard icon={Clock} title="مدة التوصيل">
         <p>
-          مدة التوصيل من{" "}
-          <strong className="text-navy">2 إلى 5 أيام عمل</strong>{" "}
-          حسب مدينتك. المدن الكبرى عادةً 2–3 أيام، و قد تصل
-          المدة إلى 5 أيام في بعض المناطق.
+          مدة التوصيل تختلف حسب المنتج و المدينة. المدة المعتمدة
+          هي اللي ظاهرة على صفحة المنتج وقت الطلب — مثلاً بعض
+          المنتجات تُعلن 1 إلى 3 أيام عمل، و أخرى 2 إلى 5 أيام عمل.
         </p>
         <p>
           الأيام المذكورة أيام عمل (لا تشمل أيام الأحد و العطل
-          الرسمية إن وقعت ضمن المدة).
+          الرسمية إن وقعت ضمن المدة)، إلا إذا ذُكر غير ذلك على صفحة
+          المنتج.
         </p>
         <p>
-          نتواصل معك عبر واتساب لتأكيد الطلب قبل إرساله إلى شركة
-          التوصيل.
+          نتواصل معك عبر الهاتف أو واتساب لتأكيد الطلب قبل إرساله
+          إلى شركة التوصيل.
         </p>
       </LegalCard>
 
       <LegalCard icon={Wallet} title="الدفع عند الاستلام">
         <p>
-          طريقة الدفع المعتمدة هي{" "}
-          <strong className="text-navy">الدفع عند الاستلام</strong>.
-          لا نطلب أي دفع مسبق — تدفع فقط عند استلام المنتج.
+          طريقة الدفع المعتمدة على الموقع هي{" "}
+          <strong className="text-navy">الدفع عند الاستلام</strong>،
+          إلا إذا ظهر على صفحة المنتج وقت الطلب طريقة أخرى. لا نطلب
+          دفعاً مسبقاً عبر الموقع في مسار الطلب الحالي.
         </p>
       </LegalCard>
 
       <LegalCard icon={PhoneCall} title="الرد على مكالمة التوصيل">
         <p>
-          شركة التوصيل ستتصل بك قبل الوصول. تأكد أن رقم الهاتف
+          شركة التوصيل قد تتصل بك قبل الوصول. تأكد أن رقم الهاتف
           المدخل في الطلب صحيح و متاح.
         </p>
         <p>
@@ -74,7 +80,7 @@ export default function ShippingPage() {
 
       <LegalCard icon={Package} title="عند استلام الطرد">
         <p>
-          افحص الطرد أمام الموزّع. إذا لاحظت تلفاً واضحاً في
+          افحص الطرد أمام الموزّع إن أمكن. إذا لاحظت تلفاً واضحاً في
           التغليف، يمكنك رفض الاستلام أو توثيق الحالة فوراً.
         </p>
         <p>

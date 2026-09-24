@@ -3,11 +3,16 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { WATCHES_PRODUCT } from "@/components/montres-femmes/config";
-import { scrollToWatchesOrder } from "@/lib/scroll-to-watches-order";
+import { useWatchesPage } from "@/components/montres-femmes/WatchesPageContext";
+import {
+  scrollToWatchesCheckout,
+  scrollToWatchesOrder,
+} from "@/lib/scroll-to-watches-order";
 import { FR_COPY, formatWatchPriceFr } from "./copy";
 
 export function FrWatchesStickyCTA() {
   const [visible, setVisible] = useState(true);
+  const { isSelectionComplete, total } = useWatchesPage();
 
   useEffect(() => {
     const form = document.getElementById("watches-order-form");
@@ -41,7 +46,7 @@ export function FrWatchesStickyCTA() {
       observer?.disconnect();
       mutations.disconnect();
     };
-  }, []);
+  }, [isSelectionComplete]);
 
   return (
     <AnimatePresence>
@@ -55,10 +60,16 @@ export function FrWatchesStickyCTA() {
         >
           <button
             type="button"
-            onClick={() => scrollToWatchesOrder()}
+            onClick={() =>
+              isSelectionComplete
+                ? scrollToWatchesCheckout()
+                : scrollToWatchesOrder()
+            }
             className="mx-auto flex w-full max-w-lg items-center justify-center rounded-xl border border-[#B8924A]/45 bg-[#134A35] px-5 py-3 text-sm font-bold text-white shadow-md ring-1 ring-[#B8924A]/30 transition hover:bg-[#0A2F23]"
           >
-            {FR_COPY.stickyCta(formatWatchPriceFr(WATCHES_PRODUCT.unitPrice))}
+            {isSelectionComplete
+              ? FR_COPY.stickyConfirmCta(formatWatchPriceFr(total))
+              : FR_COPY.stickyCta(formatWatchPriceFr(WATCHES_PRODUCT.unitPrice))}
           </button>
         </motion.div>
       )}

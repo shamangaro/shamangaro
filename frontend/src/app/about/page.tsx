@@ -26,44 +26,45 @@ export default function AboutPage() {
     >
       <LegalCard icon={Sparkles} title="قصة SHAMANGARO">
         <p>
-          {businessInfo.name} ولدت من حب المغرب و الحياة الخارجية.
-          نسعى لبناء علامة مغربية premium تجمع بين الأناقة، الراحة،
-          و الجودة — منتجات ترافقك على الشاطئ، التراس، الكامبينغ،
-          و أي مكان تريد فيه الاسترخاء.
+          {businessInfo.name} علامة مغربية. نسعى لبناء علامة premium
+          تجمع بين الأناقة، الراحة، و الجودة — بمنتجات ترافقك في
+          الحياة اليومية و في أوقات الراحة.
         </p>
         <p>
-          {businessInfo.product} هي أول منتجاتنا — كرسي استرخاء
-          خفيف، أنيق، و عملي يُفتح في 30 ثانية و يُطوى بسهولة.
-        </p>
-      </LegalCard>
-
-      <LegalCard icon={Mountain} title="راحة أينما ذهبت">
-        <p>
-          فلسفتنا بسيطة: الراحة لا يجب أن تكون مكلفة أو معقدة.{" "}
-          {businessInfo.product} مصمم ليمنحك تجربة استرخاء ممتازة —
-          على الشاطئ، في الحديقة، على التراس، أو أثناء التخييم.
+          حالياً نقدّم عائلات منتجات منها{" "}
+          <strong className="text-navy">Neo Transat</strong> و{" "}
+          <strong className="text-navy">Montres Femmes</strong>. قد
+          تُضاف منتجات أخرى لاحقاً. تفاصيل كل منتج ظاهرة على صفحته.
         </p>
       </LegalCard>
 
-      <LegalCard icon={Gem} title="مواد عالية الجودة">
+      <LegalCard icon={Mountain} title="راحة و أناقة حسب المنتج">
         <p>
-          نختار مواد premium: خشب طبيعي متين، قماش مقاوم للماء و
-          الشمس، و تصميم يدوم معك سنوات. كل تفصيلة مدروسة بعناية.
+          فلسفتنا بسيطة: الراحة و الأناقة ما خصهمش يكونو معقّدين.
+          كل منتج مصمم لاستعماله المعلن على صفحته — سواء للخارج،
+          للبيت، أو للإطلالة اليومية.
+        </p>
+      </LegalCard>
+
+      <LegalCard icon={Gem} title="جودة مختارة">
+        <p>
+          نختار مواد و تشطيبات مناسبة لكل منتج. المواصفات المعتمدة
+          هي اللي ظاهرة على صفحة المنتج وقت الطلب.
         </p>
       </LegalCard>
 
       <LegalCard icon={Heart} title="تصميم أنيق و بسيط">
         <p>
           {businessInfo.name} تؤمن بالبساطة و الأناقة. تصاميمنا
-          minimal و modern — تتناسب مع أي أسلوب و أي مكان.
+          واضحة و عملية — كل خط منتج بأسلوبه.
         </p>
       </LegalCard>
 
       <LegalCard icon={Users} title="رضا الزبون أولاً">
         <p>
           الزبون في قلب {businessInfo.name}. الدفع عند الاستلام،
-          توصيل مجاني، ضمان سنة، و فريق دعم يرد بسرعة — كل ذلك
-          لمنحك تجربة شراء واثقة.
+          توصيل داخل المغرب حسب صفحة المنتج، و فريق دعم يرد بسرعة —
+          كل ذلك لمنحك تجربة شراء واثقة.
         </p>
         <p>
           عندك سؤال؟{" "}
@@ -79,16 +80,21 @@ export default function AboutPage() {
 
       <LegalCard icon={Star} title="علامة مغربية نفتخر بها">
         <p>
-          نفتخر بكوننا علامة مغربية premium. {businessInfo.name}{" "}
-          Lifestyle — جودة، راحة، و أناقة للمغاربة و لكل من يقدّر
-          الحياة الخارجية.
+          نفتخر بكوننا علامة مغربية. {businessInfo.name} — جودة،
+          راحة، و أناقة لمن يقدّر منتجات مختارة.
         </p>
-        <p>
+        <p className="flex flex-wrap gap-3">
           <Link
-            href="/#order"
+            href="/"
             className="inline-flex rounded-full bg-navy px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-navy-light"
           >
-            اطلب {businessInfo.product} الآن
+            Neo Transat
+          </Link>
+          <Link
+            href="/products/montres-femmes"
+            className="inline-flex rounded-full border-2 border-navy px-6 py-3 text-sm font-bold text-navy transition-colors hover:bg-navy/5"
+          >
+            Montres Femmes
           </Link>
         </p>
       </LegalCard>

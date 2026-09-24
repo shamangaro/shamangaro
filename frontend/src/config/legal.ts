@@ -19,9 +19,12 @@ export const contactInfo = {
 
 export const businessInfo = {
   name: "SHAMANGARO",
-  product: "Neo Transat",
   country: "المغرب",
 };
+
+/** Shared legal fallback when product pages differ (price, delivery, exchange, warranty). */
+export const productPageConditionsNotice =
+  "الثمن، شروط التوصيل، التبديل، الضمان، و تفاصيل المنتج المعتمدة هي اللي ظاهرة على صفحة المنتج المعنية وقت الطلب.";
 
 export interface LegalPageMeta {
   slug: string;
@@ -36,9 +39,9 @@ export const legalPages: LegalPageMeta[] = [
   {
     slug: "/about",
     title: "من نحن",
-    subtitle: "علامة مغربية للحياة الخارجية",
+    subtitle: "علامة مغربية لمنتجات مختارة",
     description:
-      "تعرف على SHAMANGARO — علامة مغربية متخصصة في منتجات الراحة والحياة الخارجية، بما فيها Neo Transat.",
+      "تعرف على SHAMANGARO — علامة مغربية تقدم عدة عائلات منتجات، منها Neo Transat و Montres Femmes.",
     icon: Info,
   },
   {
@@ -52,9 +55,9 @@ export const legalPages: LegalPageMeta[] = [
   {
     slug: "/shipping",
     title: "سياسة الشحن",
-    subtitle: "توصيل مجاني لجميع مدن المغرب",
+    subtitle: "توصيل داخل المغرب حسب صفحة المنتج",
     description:
-      "سياسة الشحن و التوصيل المجاني في المغرب — من 2 إلى 5 أيام عمل، مع الدفع عند الاستلام.",
+      "سياسة الشحن لـ SHAMANGARO في المغرب — الدفع عند الاستلام، و مدة التوصيل حسب ما هو ظاهر على صفحة المنتج وقت الطلب.",
     icon: Truck,
   },
   {
@@ -62,15 +65,15 @@ export const legalPages: LegalPageMeta[] = [
     title: "سياسة الاسترجاع والاستبدال",
     subtitle: "حقك محفوظ و راحتك أولاً",
     description:
-      "سياسة الاسترجاع و الاستبدال لـ Neo Transat — منتج معيب أو تالف: تواصل معنا خلال 48 ساعة.",
+      "سياسة الاسترجاع و الاستبدال لطلبات SHAMANGARO — منتج معيب أو تالف: تواصل معنا خلال 48 ساعة. شروط التبديل حسب صفحة المنتج.",
     icon: RefreshCw,
   },
   {
     slug: "/warranty",
     title: "سياسة الضمان",
-    subtitle: "ضمان سنة ضد عيوب الصنع",
+    subtitle: "الضمان حسب المنتج المطلوب",
     description:
-      "ضمان سنة على Neo Transat ضد عيوب التصنيع — لا يشمل سوء الاستخدام أو الأضرار العرضية.",
+      "سياسة الضمان لـ SHAMANGARO — التغطية هي اللي ظاهرة على صفحة المنتج وقت الطلب. لا يشمل سوء الاستخدام أو الأضرار العرضية إلا إذا ذُكر غير ذلك.",
     icon: BadgeCheck,
   },
   {
@@ -78,7 +81,7 @@ export const legalPages: LegalPageMeta[] = [
     title: "سياسة الخصوصية",
     subtitle: "نحترم خصوصيتك و نحمي معلوماتك",
     description:
-      "سياسة الخصوصية لـ SHAMANGARO — كيف نجمع و نستعمل و نحمي معلوماتك عند طلب Neo Transat.",
+      "سياسة الخصوصية لـ SHAMANGARO — كيف نجمع و نستعمل و نحمي معلوماتك عند الطلب من أي صفحة منتج على الموقع.",
     icon: Shield,
   },
   {
@@ -86,7 +89,7 @@ export const legalPages: LegalPageMeta[] = [
     title: "الشروط والأحكام",
     subtitle: "قواعد الطلب و الاستخدام",
     description:
-      "الشروط و الأحكام العامة لموقع SHAMANGARO و طلبات Neo Transat داخل المغرب.",
+      "الشروط و الأحكام العامة لموقع SHAMANGARO و طلبات المنتجات داخل المغرب.",
     icon: FileText,
   },
 ];

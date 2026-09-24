@@ -15,7 +15,7 @@ import { scrollToWatchesCheckout } from "@/lib/scroll-to-watches-order";
 import { ApiError } from "@/lib/api";
 import { useWatchesPage } from "@/components/montres-femmes/WatchesPageContext";
 import { WATCHES_PRODUCT } from "@/components/montres-femmes/config";
-import { Sparkles, Truck } from "lucide-react";
+import { Banknote, Sparkles, Truck } from "lucide-react";
 import {
   normalizeWatchesPhone,
   type WatchesFormErrors,
@@ -24,14 +24,13 @@ import {
 import { FrWatchesSelectionSection } from "./FrWatchesSelectionSection";
 import { FrWatchesCityCombobox } from "./FrWatchesCityCombobox";
 import { validateFrenchWatchesCheckout } from "./validate-checkout";
-import { FR_COPY, FR_CROSSED_PRICE, formatWatchPriceFr } from "./copy";
+import { FR_COPY, formatWatchPriceFr } from "./copy";
 
 export function FrWatchesOrderFlow() {
   const router = useRouter();
   const checkoutRef = useRef<HTMLDivElement>(null);
   const {
     selectedLines,
-    checkoutUnlocked,
     total,
     isSelectionComplete,
   } = useWatchesPage();
@@ -64,11 +63,7 @@ export function FrWatchesOrderFlow() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const nextErrors = validateFrenchWatchesCheckout(
-      selectedLines,
-      checkoutUnlocked,
-      form
-    );
+    const nextErrors = validateFrenchWatchesCheckout(selectedLines, form);
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       if (nextErrors.selection) {
@@ -106,63 +101,32 @@ export function FrWatchesOrderFlow() {
   return (
     <section
       id="watches-order-flow"
-      className="scroll-mt-16 border-t border-[#D8E8DC]/70 bg-transparent py-8 sm:py-10"
+      className="scroll-mt-16 border-t border-[#D8E8DC]/70 bg-transparent py-3 sm:py-10"
     >
       <Container>
         <div className="mx-auto max-w-xl">
-          <div className="mb-6 text-center sm:mb-7">
-            <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-[#B8924A]/35 bg-gradient-to-r from-[#0A2F23] to-[#134A35] px-3 py-1 text-[11px] font-bold text-white">
+          <div className="mb-3 text-center sm:mb-7">
+            <p className="mb-1.5 inline-flex items-center justify-center gap-1.5 rounded-full border border-[#B8924A]/35 bg-gradient-to-r from-[#0A2F23] to-[#134A35] px-3 py-1 text-[11px] font-bold text-white">
               <Sparkles className="h-3 w-3 text-[#D4BC82]" aria-hidden />
               {FR_COPY.eyebrow}
             </p>
-            <h1 className="text-3xl font-bold leading-snug text-[#0F2A1F] sm:text-4xl">
+            <h1 className="text-[1.35rem] font-bold leading-tight text-[#0F2A1F] sm:text-4xl sm:leading-snug">
               {FR_COPY.h1Lead}
               <span className="text-[#134A35]">{FR_COPY.h1Rest}</span>
             </h1>
-            <p className="mt-2 text-sm leading-relaxed text-[#4A5C52] sm:text-base">
-              {FR_COPY.heroSub}
-            </p>
-            <p className="mt-3 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
-              <span className="text-2xl font-bold leading-none text-[#134A35] sm:text-3xl">
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 sm:mt-3 sm:gap-2">
+              <span className="rounded-full bg-[#134A35] px-3 py-1 text-sm font-bold text-white sm:text-lg">
                 {formatWatchPriceFr(WATCHES_PRODUCT.unitPrice)}
               </span>
-              <span className="text-xs text-[#888] line-through">
-                {FR_CROSSED_PRICE}
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#A8C9B4] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#134A35] sm:text-sm">
+                <Truck className="h-3.5 w-3.5 text-[#B8924A]" aria-hidden />
+                {FR_COPY.deliveryHeadline}
               </span>
-              <span className="rounded-md bg-[#B8924A]/15 px-2 py-0.5 text-[10px] font-bold text-[#134A35]">
-                {FR_COPY.specialOffer}
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#A8C9B4] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#134A35] sm:text-sm">
+                <Banknote className="h-3.5 w-3.5 text-[#B8924A]" aria-hidden />
+                {FR_COPY.cashOnDelivery}
               </span>
-            </p>
-            <p
-              className="watches-delivery-marquee mt-3 flex flex-nowrap items-center justify-center gap-1.5 whitespace-nowrap text-[12px] font-semibold text-[#134A35] sm:gap-2 sm:text-sm"
-              role="note"
-              aria-label={FR_COPY.deliveryFull}
-            >
-              <Truck
-                className="h-3.5 w-3.5 shrink-0 text-[#B8924A]"
-                strokeWidth={2.25}
-                aria-hidden
-              />
-              <span className="shrink-0">{FR_COPY.deliveryHeadline}</span>
-              <span className="shrink-0 text-[8px] text-[#B8924A]/70" aria-hidden>
-                ◆
-              </span>
-              <span className="shrink-0 text-[#4A5C52]">
-                {FR_COPY.deliverySubline}
-              </span>
-            </p>
-            <div
-              className="mx-auto mb-1 mt-6 flex w-44 items-center gap-3"
-              aria-hidden
-            >
-              <span className="h-px flex-1 bg-gradient-to-l from-[#B8924A] to-transparent" />
-              <span className="h-1.5 w-1.5 rotate-45 bg-[#B8924A] shadow-[0_0_8px_rgba(184,146,74,0.55)]" />
-              <span className="h-px flex-1 bg-gradient-to-r from-[#B8924A] to-transparent" />
             </div>
-            <h2 className="mt-5 text-lg font-bold text-[#0F2A1F] sm:text-xl">
-              {FR_COPY.orderTitle}
-            </h2>
-            <p className="mt-1.5 text-sm text-[#4A5C52]">{FR_COPY.orderSub}</p>
           </div>
           <div className="overflow-hidden rounded-2xl border border-[#A8C9B4] bg-[#FDFBF7] shadow-sm ring-1 ring-[#B8924A]/15">
             <form
@@ -172,10 +136,10 @@ export function FrWatchesOrderFlow() {
               className="divide-y divide-[#D8E8DC]"
             >
               <div className="p-3 sm:p-4">
-                <FrWatchesSelectionSection onContinue={scrollToCheckout} />
+                <FrWatchesSelectionSection />
               </div>
 
-              {checkoutUnlocked && (
+              {isSelectionComplete && (
                 <div ref={checkoutRef} id="watches-checkout">
                 <div className="p-3 sm:p-4">
                   <h3 className="mb-3 text-center text-base font-bold text-[#0F2A1F]">

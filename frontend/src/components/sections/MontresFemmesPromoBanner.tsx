@@ -30,7 +30,7 @@ export function MontresFemmesPromoBanner() {
                 بغiti ساعة أنيقة؟
               </h2>
               <p className="max-w-md text-sm leading-relaxed text-white/90 sm:text-base">
-                ساعات نسائية بخطوط ذهبية و علبة هدايا — 250 درهم · توصيل مجاني ·
+                ساعات نسائية بخطوط ذهبية و علبة هدايا — 260 درهم · توصيل مجاني ·
                 الدفع عند الإستلام
               </p>
               <span className="inline-flex items-center gap-2 rounded-xl border border-[#B8924A]/40 bg-white px-4 py-2.5 text-sm font-bold text-[#134A35] shadow-md transition group-hover:bg-[#FAF7F2]">

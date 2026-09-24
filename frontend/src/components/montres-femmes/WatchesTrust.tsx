@@ -20,8 +20,8 @@ const items = [
   },
   {
     icon: Shield,
-    title: "خدمة مضمونة",
-    subline: "تأكيد قبل الشحن",
+    title: "تأكيد الطلب",
+    subline: "نتاصلو بك قبل الشحن",
   },
 ];
 

@@ -3,6 +3,7 @@ import { WatchesPageProvider } from "@/components/montres-femmes/WatchesPageCont
 import { WatchesHeader } from "@/components/montres-femmes/WatchesHeader";
 import { WatchesFreeDeliveryStrip } from "@/components/montres-femmes/WatchesFreeDelivery";
 import { WatchesOrderFlow } from "@/components/montres-femmes/WatchesOrderFlow";
+import { WatchesProofSection } from "@/components/montres-femmes/WatchesProofSection";
 import { WatchesReviews } from "@/components/montres-femmes/WatchesReviews";
 import { WatchesBenefits } from "@/components/montres-femmes/WatchesBenefits";
 import { WatchesTrust } from "@/components/montres-femmes/WatchesTrust";
@@ -14,11 +15,11 @@ import { WatchesFooter } from "@/components/montres-femmes/WatchesFooter";
 import { WatchesFaceBackdrop } from "@/components/montres-femmes/WatchesFaceBackdrop";
 
 export const metadata: Metadata = {
-  title: "Montres Femmes Élégantes — 250 DH | SHAMANGARO",
+  title: "Montres Femmes Élégantes — 260 DH | SHAMANGARO",
   description:
-    "ساعات نسائية أنيقة — 250 DH، توصيل مجاني، الدفع عند الإستلام، كاين التبديل.",
+    "ساعات نسائية أنيقة — 260 DH، توصيل مجاني، الدفع عند الإستلام، كاين التبديل.",
   openGraph: {
-    title: "Montres Femmes Élégantes — 250 DH",
+    title: "Montres Femmes Élégantes — 260 DH",
     description:
       "ساعات نسائية أنيقة — توصيل مجاني · الدفع عند الإستلام · كاين التبديل",
     images: [{ url: "/images/montres-femmes/hero.png", width: 800, height: 1000 }],
@@ -34,6 +35,7 @@ export default function MontresFemmesPage() {
           <WatchesHeader />
           <main>
             <WatchesOrderFlow />
+            <WatchesProofSection />
             <WatchesTrust />
             <WatchesBenefits />
             <WatchesFreeDeliveryStrip />

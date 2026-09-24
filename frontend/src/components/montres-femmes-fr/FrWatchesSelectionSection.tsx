@@ -6,29 +6,17 @@ import { useWatchesPage } from "@/components/montres-femmes/WatchesPageContext";
 import { FrWatchesProductSlider } from "./FrWatchesProductSlider";
 import { FR_COPY, formatWatchPriceFr } from "./copy";
 
-export function FrWatchesSelectionSection({
-  onContinue,
-}: {
-  onContinue: () => void;
-}) {
+export function FrWatchesSelectionSection() {
   const {
     selectedLines,
     selectedCount,
     totalModels,
-    isSelectionComplete,
     total,
     unitPrice,
     incrementLineQuantity,
     decrementLineQuantity,
     removeSelectedWatch,
-    unlockCheckout,
   } = useWatchesPage();
-
-  const handleContinue = () => {
-    if (!isSelectionComplete) return;
-    unlockCheckout();
-    onContinue();
-  };
 
   return (
     <div className="space-y-3">
@@ -128,16 +116,6 @@ export function FrWatchesSelectionSection({
           </p>
         </div>
       )}
-
-      {isSelectionComplete ? (
-        <button
-          type="button"
-          onClick={handleContinue}
-          className="w-full rounded-xl bg-[#134A35] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#0A2F23]"
-        >
-          {FR_COPY.continueOrder}
-        </button>
-      ) : null}
     </div>
   );
 }

@@ -9,13 +9,12 @@ import { FR_COPY } from "./copy";
 
 export function validateFrenchWatchesCheckout(
   selectedLines: SelectedWatchLine[],
-  checkoutUnlocked: boolean,
   form: WatchesFormValues
 ): WatchesFormErrors {
   const errors: WatchesFormErrors = {};
   const selectedCount = countSelectedWatches(selectedLines);
 
-  if (!checkoutUnlocked || selectedCount < 1) {
+  if (selectedCount < 1) {
     errors.selection = FR_COPY.validation.selection;
   }
   if (!form.name.trim() || form.name.trim().length < 2) {

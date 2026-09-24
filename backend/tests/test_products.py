@@ -85,8 +85,8 @@ def test_telegram_fatima_burgundy_quantity_two():
         offer_id="montres-femmes",
         offer_name="Montres Femmes Élégantes — Burgundy",
         quantity=2,
-        unit_price=250.0,
-        total_price=500.0,
+        unit_price=260.0,
+        total_price=520.0,
         status=OrderStatus.NEW,
     )
     message = build_order_notification_message(order)
@@ -106,13 +106,13 @@ def test_telegram_message_for_watches_order():
         offer_id="montres-femmes",
         offer_name="Montres Femmes Élégantes — Burgundy",
         quantity=1,
-        unit_price=250.0,
-        total_price=250.0,
+        unit_price=260.0,
+        total_price=260.0,
         status=OrderStatus.NEW,
     )
     message = build_order_notification_message(order)
     assert "Montres Femmes Élégantes — Burgundy" in message
-    assert "250" in message
+    assert "260" in message
 
 
 def test_resolve_watches_multi_order_mixed():
@@ -124,7 +124,7 @@ def test_resolve_watches_multi_order_mixed():
         source_page="/products/montres-femmes",
     )
     assert order.quantity == 5
-    assert order.total_price == 1250.0
+    assert order.total_price == 1300.0
     assert len(order.line_items) == 2
     assert "Taupe×2" in order.offer_name
     assert "Burgundy×3" in order.offer_name

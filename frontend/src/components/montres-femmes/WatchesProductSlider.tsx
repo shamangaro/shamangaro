@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DEFAULT_WATCH_VARIANT,
@@ -23,7 +23,6 @@ export function WatchesProductSlider() {
     useState<WatchVariantId>(DEFAULT_WATCH_VARIANT);
   const [toast, setToast] = useState("");
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const thumbsRef = useRef<HTMLDivElement>(null);
 
   const variant =
     WATCH_VARIANTS.find((item) => item.id === activeId) ?? WATCH_VARIANTS[0];
@@ -34,12 +33,6 @@ export function WatchesProductSlider() {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     };
   }, []);
-
-  const scrollThumbs = (direction: -1 | 1) => {
-    const scroller = thumbsRef.current;
-    if (!scroller) return;
-    scroller.scrollBy({ left: direction * 96, behavior: "smooth" });
-  };
 
   const handleSelectWatch = useCallback(() => {
     const result = selectWatch(watch);
@@ -70,24 +63,19 @@ export function WatchesProductSlider() {
             {toast}
           </p>
         ) : null}
-        <div className="relative aspect-[4/5] w-full overflow-hidden bg-white">
+        <div className="relative aspect-square w-full overflow-hidden bg-white sm:aspect-[4/5]">
           <Image
             src={variant.image}
             alt={variant.labelAr}
             fill
             priority
-            className="object-contain object-center p-3"
+            className="object-contain object-center p-1.5 sm:p-3"
             sizes="(max-width: 640px) 100vw, 576px"
           />
         </div>
       </div>
 
-      <div className="relative">
-        <div
-          ref={thumbsRef}
-          dir="ltr"
-          className="flex gap-1.5 overflow-x-auto scroll-smooth px-8 py-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
+      <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8">
           {WATCH_VARIANTS.map((item) => {
             const isActive = item.id === variant.id;
             const isInCart = selectedLines.some(
@@ -102,7 +90,7 @@ export function WatchesProductSlider() {
                 aria-pressed={isActive}
                 aria-label={`${item.labelAr} — ${item.label}`}
                 className={cn(
-                  "h-12 w-12 shrink-0 overflow-hidden rounded-lg border bg-white transition",
+                  "aspect-square overflow-hidden rounded-lg border bg-white transition",
                   isActive
                     ? "border-[#134A35] ring-2 ring-[#134A35]"
                     : "border-[#D8E8DC] hover:border-[#134A35]/40"
@@ -114,7 +102,7 @@ export function WatchesProductSlider() {
                     alt=""
                     fill
                     className="object-cover object-center"
-                    sizes="48px"
+                    sizes="64px"
                   />
                   {isInCart ? (
                     <span className="absolute start-0.5 top-0.5 flex h-3.5 w-4 items-center justify-center rounded-full bg-[#134A35] text-white">
@@ -126,24 +114,6 @@ export function WatchesProductSlider() {
             );
           })}
         </div>
-
-        <button
-          type="button"
-          onClick={() => scrollThumbs(-1)}
-          aria-label="الساعات السابقة"
-          className="absolute end-0 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-[#A8C9B4] bg-white text-[#134A35] shadow-sm"
-        >
-          <ChevronLeft className="h-3.5 w-3.5" />
-        </button>
-        <button
-          type="button"
-          onClick={() => scrollThumbs(1)}
-          aria-label="الساعات التالية"
-          className="absolute start-0 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-[#A8C9B4] bg-white text-[#134A35] shadow-sm"
-        >
-          <ChevronRight className="h-3.5 w-3.5" />
-        </button>
-      </div>
 
       <button
         type="button"

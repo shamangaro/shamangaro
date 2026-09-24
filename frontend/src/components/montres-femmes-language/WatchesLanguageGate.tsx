@@ -18,6 +18,10 @@ export function WatchesLanguageGate({ current }: { current: WatchesLang }) {
     if (!stored.ok) return;
 
     if (!stored.value) {
+      if (current === "darija") {
+        writeWatchesLang("darija");
+        return;
+      }
       setPopupOpen(true);
       return;
     }

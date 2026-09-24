@@ -9,7 +9,11 @@ import {
 import { LegalPageShell } from "@/components/legal/LegalPageShell";
 import { LegalCard } from "@/components/legal/LegalCard";
 import { LegalLastUpdated } from "@/components/legal/LegalLastUpdated";
-import { businessInfo, getLegalPage } from "@/config/legal";
+import {
+  businessInfo,
+  getLegalPage,
+  productPageConditionsNotice,
+} from "@/config/legal";
 import { buildLegalMetadata } from "@/lib/legal-metadata";
 
 const page = getLegalPage("/warranty")!;
@@ -23,17 +27,25 @@ export default function WarrantyPage() {
       subtitle={page.subtitle}
       icon={page.icon}
     >
-      <LegalCard icon={ShieldCheck} title="ضمان سنة كاملة">
+      <LegalCard icon={ShieldCheck} title="الضمان حسب المنتج">
+        <p>{productPageConditionsNotice}</p>
         <p>
-          {businessInfo.product} من {businessInfo.name} يأتي بضمان{" "}
-          <strong className="text-navy">سنة واحدة (12 شهراً)</strong>{" "}
-          ضد عيوب الصنع — أي مشكل في الخشب، القماش، أو الهيكل ناتج
-          عن التصنيع.
+          لا نعد بمدة ضمان موحّدة لكل المنتجات. اللي ظاهر على صفحة
+          المنتج وقت الطلب هو المعتمد.
         </p>
-        <p>يبدأ الضمان من تاريخ استلام المنتج.</p>
       </LegalCard>
 
-      <LegalCard icon={Calendar} title="ما يغطيه الضمان">
+      <LegalCard icon={Calendar} title="مثال: Neo Transat">
+        <p>
+          بالنسبة لـ{" "}
+          <strong className="text-navy">Neo Transat</strong>، الضمان
+          الحالي المعلن هو{" "}
+          <strong className="text-navy">سنة واحدة (12 شهراً)</strong>{" "}
+          ضد عيوب الصنع — مشكل في الخشب، القماش، أو الهيكل ناتج عن
+          التصنيع — يبدأ من تاريخ الاستلام، ما دام ذلك معلناً على
+          صفحة المنتج.
+        </p>
+        <p>ما يغطيه هذا الضمان عند تطبيقه:</p>
         <ul className="list-inside list-disc space-y-1">
           <li>عيوب في الخياطة أو القماش</li>
           <li>مشاكل في الهيكل الخشبي (كسر أو تشقق من عند المصنع)</li>
@@ -41,8 +53,8 @@ export default function WarrantyPage() {
         </ul>
       </LegalCard>
 
-      <LegalCard icon={XCircle} title="ما لا يغطيه الضمان">
-        <p>الضمان لا يشمل:</p>
+      <LegalCard icon={XCircle} title="ما لا يغطيه الضمان عادةً">
+        <p>ما لم تذكر صفحة المنتج غير ذلك، الضمان لا يشمل:</p>
         <ul className="list-inside list-disc space-y-1">
           <li>سوء الاستخدام أو الإجهاد غير المبرر على المنتج</li>
           <li>الأضرار العرضية (سقوط، حرق، قطع، إلخ)</li>
@@ -53,7 +65,7 @@ export default function WarrantyPage() {
 
       <LegalCard icon={Wrench} title="كيفية استعمال الضمان">
         <p>
-          إذا لاحظت عيباً في الصنع خلال السنة، تواصل معنا عبر{" "}
+          إذا لاحظت عيباً مشمولاً حسب صفحة منتجك، تواصل معنا عبر{" "}
           <Link
             href="/contact"
             className="font-semibold text-navy underline-offset-2 hover:underline"
@@ -63,8 +75,8 @@ export default function WarrantyPage() {
           مع صور و وصف واضح للمشكل.
         </p>
         <p>
-          بعد التحقق، قد نعرض استبدالاً أو إصلاحاً حسب الحالة و
-          توفر القطع.
+          بعد التحقق، قد نعرض استبدالاً أو إصلاحاً حسب الحالة، توفر
+          القطع، و شروط المنتج.
         </p>
       </LegalCard>
 

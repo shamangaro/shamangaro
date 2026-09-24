@@ -3,6 +3,7 @@ import { WatchesFaceBackdrop } from "@/components/montres-femmes/WatchesFaceBack
 import { FrWatchesHeader } from "./FrWatchesHeader";
 import { FrWatchesFreeDeliveryStrip } from "./FrWatchesFreeDelivery";
 import { FrWatchesOrderFlow } from "./FrWatchesOrderFlow";
+import { WatchesProofSection } from "@/components/montres-femmes/WatchesProofSection";
 import { FrWatchesReviews } from "./FrWatchesReviews";
 import { FrWatchesBenefits } from "./FrWatchesBenefits";
 import { FrWatchesTrust } from "./FrWatchesTrust";
@@ -21,6 +22,7 @@ export function FrWatchesLanding() {
           <FrWatchesHeader />
           <main>
             <FrWatchesOrderFlow />
+            <WatchesProofSection lang="fr" />
             <FrWatchesTrust />
             <FrWatchesBenefits />
             <FrWatchesFreeDeliveryStrip />

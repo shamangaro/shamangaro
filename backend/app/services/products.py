@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 WATCHES_PRODUCT_SLUG = "montres-femmes"
 WATCHES_PRODUCT_NAME = "Montres Femmes Élégantes"
-WATCHES_UNIT_PRICE = 250.0
+WATCHES_UNIT_PRICE = 260.0
 WATCHES_SOURCE_PAGE = "/products/montres-femmes"
 WATCHES_MAX_QUANTITY = 99
 
@@ -16,6 +16,23 @@ WATCH_VARIANTS: dict[str, str] = {
     "navy-leather": "Navy Leather",
     "burgundy-oval": "Burgundy Oval",
     "cream-leather": "Cream Leather",
+    "silver-blue": "Silver Blue",
+    "twotone-green": "Two-tone Green",
+    "gold-green-stones": "Gold Green Stones",
+    "twotone-white-gold": "Two-tone White Gold",
+    "leopard-panther": "Leopard Panther",
+    "twotone-white-alt": "Two-tone White Alt",
+    "oval-gold-black": "Oval Gold Black",
+    "oval-silver-black": "Oval Silver Black",
+    "square-gold-green": "Square Gold Green",
+    "oval-gold-cream": "Oval Gold Cream",
+    "square-gold-white": "Square Gold White",
+    "square-gold-brown": "Square Gold Brown",
+    "octagon-silver": "Octagon Silver",
+    "cushion-navy": "Cushion Navy",
+    "cushion-cream": "Cushion Cream",
+    "square-gold-ivory": "Square Gold Ivory",
+    "silver-pink": "Silver Pink",
 }
 
 WATCH_VARIANT_IMAGES: dict[str, str] = {
@@ -28,6 +45,23 @@ WATCH_VARIANT_IMAGES: dict[str, str] = {
     "navy-leather": "/images/montres-femmes/watch-04-navy-leather.jpg",
     "burgundy-oval": "/images/montres-femmes/watch-05-burgundy-oval.jpg",
     "cream-leather": "/images/montres-femmes/watch-06-cream-leather.jpg",
+    "silver-blue": "/images/montres-femmes/gallery-01-silver-blue.jpg",
+    "twotone-green": "/images/montres-femmes/gallery-02-twotone-green.jpg",
+    "gold-green-stones": "/images/montres-femmes/gallery-03-gold-green-stones.jpg",
+    "twotone-white-gold": "/images/montres-femmes/gallery-04-twotone-white.jpg",
+    "leopard-panther": "/images/montres-femmes/gallery-05-leopard-panther.jpg",
+    "twotone-white-alt": "/images/montres-femmes/gallery-06-twotone-white-alt.jpg",
+    "oval-gold-black": "/images/montres-femmes/gallery-07-oval-gold-black.jpg",
+    "oval-silver-black": "/images/montres-femmes/gallery-08-oval-silver-black.jpg",
+    "square-gold-green": "/images/montres-femmes/gallery-09-square-gold-green.jpg",
+    "oval-gold-cream": "/images/montres-femmes/gallery-10-oval-gold-cream.jpg",
+    "square-gold-white": "/images/montres-femmes/gallery-11-square-gold-white.jpg",
+    "square-gold-brown": "/images/montres-femmes/gallery-12-square-gold-brown.jpg",
+    "octagon-silver": "/images/montres-femmes/gallery-13-octagon-silver.jpg",
+    "cushion-navy": "/images/montres-femmes/gallery-14-cushion-navy.jpg",
+    "cushion-cream": "/images/montres-femmes/gallery-15-cushion-cream.jpg",
+    "square-gold-ivory": "/images/montres-femmes/gallery-16-square-gold-ivory.jpg",
+    "silver-pink": "/images/montres-femmes/gallery-17-silver-pink.jpg",
 }
 
 

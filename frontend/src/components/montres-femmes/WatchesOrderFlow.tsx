@@ -14,7 +14,7 @@ import { buildWatchesOrderPayload, createWatchesOrder } from "@/lib/watches-orde
 import { scrollToWatchesCheckout } from "@/lib/scroll-to-watches-order";
 import { ApiError } from "@/lib/api";
 import { useWatchesPage } from "./WatchesPageContext";
-import { Sparkles, Truck } from "lucide-react";
+import { Banknote, Sparkles, Truck } from "lucide-react";
 import { formatWatchPrice, WATCHES_DELIVERY, WATCHES_PRODUCT } from "./config";
 import { WatchesSelectionSection } from "./WatchesSelectionSection";
 import { WatchesCityCombobox } from "./WatchesCityCombobox";
@@ -38,7 +38,6 @@ export function WatchesOrderFlow() {
   const checkoutRef = useRef<HTMLDivElement>(null);
   const {
     selectedLines,
-    checkoutUnlocked,
     total,
     isSelectionComplete,
   } = useWatchesPage();
@@ -71,11 +70,7 @@ export function WatchesOrderFlow() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const nextErrors = validateWatchesCheckout(
-      selectedLines,
-      checkoutUnlocked,
-      form
-    );
+    const nextErrors = validateWatchesCheckout(selectedLines, form);
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       if (nextErrors.selection) {
@@ -115,61 +110,32 @@ export function WatchesOrderFlow() {
   return (
     <section
       id="watches-order-flow"
-      className="scroll-mt-16 border-t border-[#D8E8DC]/70 bg-transparent py-8 sm:py-10"
+      className="scroll-mt-16 border-t border-[#D8E8DC]/70 bg-transparent py-3 sm:py-10"
     >
       <Container>
         <div className="mx-auto max-w-xl">
-          <div className="mb-6 text-center sm:mb-7">
-            <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-[#B8924A]/35 bg-gradient-to-r from-[#0A2F23] to-[#134A35] px-3 py-1 text-[11px] font-bold text-white">
+          <div className="mb-3 text-center sm:mb-7">
+            <p className="mb-1.5 inline-flex items-center justify-center gap-1.5 rounded-full border border-[#B8924A]/35 bg-gradient-to-r from-[#0A2F23] to-[#134A35] px-3 py-1 text-[11px] font-bold text-white">
               <Sparkles className="h-3 w-3 text-[#D4BC82]" aria-hidden />
               SHAMANGARO · Montres Femmes
             </p>
-            <h1 className="text-3xl font-bold leading-snug text-[#0F2A1F] sm:text-4xl">
+            <h1 className="text-[1.35rem] font-bold leading-tight text-[#0F2A1F] sm:text-4xl sm:leading-snug">
               أناقة هادئة
               <span className="text-[#134A35]"> على المعصم</span>
             </h1>
-            <p className="mt-2 text-sm leading-relaxed text-[#4A5C52] sm:text-base">
-              اختاري اللون اللي عجبك وكمّلي الطلب دابا.
-            </p>
-            <p className="mt-3 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
-              <span className="text-2xl font-bold leading-none text-[#134A35] sm:text-3xl">
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 sm:mt-3 sm:gap-2">
+              <span className="rounded-full bg-[#134A35] px-3 py-1 text-sm font-bold text-white sm:text-lg">
                 {formatWatchPrice(WATCHES_PRODUCT.unitPrice)}
               </span>
-              <span className="text-xs text-[#888] line-through">350 درهم</span>
-              <span className="rounded-md bg-[#B8924A]/15 px-2 py-0.5 text-[10px] font-bold text-[#134A35]">
-                عرض خاص
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#A8C9B4] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#134A35] sm:text-sm">
+                <Truck className="h-3.5 w-3.5 text-[#B8924A]" aria-hidden />
+                {WATCHES_DELIVERY.headline}
               </span>
-            </p>
-            <p
-              className="watches-delivery-marquee mt-3 flex items-center justify-center gap-2 text-sm font-semibold text-[#134A35]"
-              role="note"
-              aria-label={WATCHES_DELIVERY.full}
-            >
-              <Truck
-                className="h-3.5 w-3.5 shrink-0 text-[#B8924A]"
-                strokeWidth={2.25}
-                aria-hidden
-              />
-              {WATCHES_DELIVERY.headline}
-              <span className="text-[8px] text-[#B8924A]/70" aria-hidden>
-                ◆
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#A8C9B4] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#134A35] sm:text-sm">
+                <Banknote className="h-3.5 w-3.5 text-[#B8924A]" aria-hidden />
+                الدفع عند الاستلام
               </span>
-              <span className="text-[#4A5C52]">{WATCHES_DELIVERY.subline}</span>
-            </p>
-            <div
-              className="mx-auto mb-1 mt-6 flex w-44 items-center gap-3"
-              aria-hidden
-            >
-              <span className="h-px flex-1 bg-gradient-to-l from-[#B8924A] to-transparent" />
-              <span className="h-1.5 w-1.5 rotate-45 bg-[#B8924A] shadow-[0_0_8px_rgba(184,146,74,0.55)]" />
-              <span className="h-px flex-1 bg-gradient-to-r from-[#B8924A] to-transparent" />
             </div>
-            <h2 className="mt-5 text-lg font-bold text-[#0F2A1F] sm:text-xl">
-              اختاري الساعة و كملي الطلب
-            </h2>
-            <p className="mt-1.5 text-sm text-[#4A5C52]">
-              شوفي الصور بوضوح، اختاري الموديل اللي عجبك، من بعد عمّري معلوماتك
-            </p>
           </div>
           <div className="overflow-hidden rounded-2xl border border-[#A8C9B4] bg-[#FDFBF7] shadow-sm ring-1 ring-[#B8924A]/15">
             <form
@@ -179,10 +145,10 @@ export function WatchesOrderFlow() {
               className="divide-y divide-[#D8E8DC]"
             >
               <div className="p-3 sm:p-4">
-                <WatchesSelectionSection onContinue={scrollToCheckout} />
+                <WatchesSelectionSection />
               </div>
 
-              {checkoutUnlocked && (
+              {isSelectionComplete && (
                 <div ref={checkoutRef} id="watches-checkout">
                 <div className="p-3 sm:p-4">
                   <h3 className="mb-3 text-center text-base font-bold text-[#0F2A1F]">
