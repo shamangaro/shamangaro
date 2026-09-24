@@ -12,6 +12,12 @@ import { FrWatchesFAQ } from "./FrWatchesFAQ";
 import { FrWatchesStickyCTA } from "./FrWatchesStickyCTA";
 import { FrWatchesScrollToTopButton } from "./FrWatchesScrollToTopButton";
 import { FrWatchesFooter } from "./FrWatchesFooter";
+import { WatchesHeroPhoto } from "@/components/montres-femmes/WatchesHeroPhoto";
+import {
+  DEFAULT_WATCH_VARIANT,
+  WATCH_VARIANTS,
+} from "@/components/montres-femmes/config";
+import { FR_VARIANT_LABELS } from "./copy";
 
 export function FrWatchesLanding() {
   return (
@@ -21,7 +27,15 @@ export function FrWatchesLanding() {
         <div className="relative z-10">
           <FrWatchesHeader />
           <main>
-            <FrWatchesOrderFlow />
+            <FrWatchesOrderFlow
+              lcpHero={
+                <WatchesHeroPhoto
+                  variantId={DEFAULT_WATCH_VARIANT}
+                  src={WATCH_VARIANTS[0].image}
+                  alt={FR_VARIANT_LABELS[DEFAULT_WATCH_VARIANT]}
+                />
+              }
+            />
             <WatchesProofSection lang="fr" />
             <FrWatchesTrust />
             <FrWatchesBenefits />

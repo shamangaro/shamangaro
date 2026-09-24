@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -33,7 +33,11 @@ const reassurance = [
   "التبديل متوفر",
 ];
 
-export function WatchesOrderFlow() {
+export function WatchesOrderFlow({
+  lcpHero,
+}: {
+  lcpHero: ReactNode;
+}) {
   const router = useRouter();
   const checkoutRef = useRef<HTMLDivElement>(null);
   const {
@@ -145,7 +149,7 @@ export function WatchesOrderFlow() {
               className="divide-y divide-[#D8E8DC]"
             >
               <div className="p-3 sm:p-4">
-                <WatchesSelectionSection />
+                <WatchesSelectionSection lcpHero={lcpHero} />
               </div>
 
               {isSelectionComplete && (

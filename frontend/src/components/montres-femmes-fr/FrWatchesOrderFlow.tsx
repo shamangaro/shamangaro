@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -26,7 +26,11 @@ import { FrWatchesCityCombobox } from "./FrWatchesCityCombobox";
 import { validateFrenchWatchesCheckout } from "./validate-checkout";
 import { FR_COPY, formatWatchPriceFr } from "./copy";
 
-export function FrWatchesOrderFlow() {
+export function FrWatchesOrderFlow({
+  lcpHero,
+}: {
+  lcpHero: ReactNode;
+}) {
   const router = useRouter();
   const checkoutRef = useRef<HTMLDivElement>(null);
   const {
@@ -136,7 +140,7 @@ export function FrWatchesOrderFlow() {
               className="divide-y divide-[#D8E8DC]"
             >
               <div className="p-3 sm:p-4">
-                <FrWatchesSelectionSection />
+                <FrWatchesSelectionSection lcpHero={lcpHero} />
               </div>
 
               {isSelectionComplete && (

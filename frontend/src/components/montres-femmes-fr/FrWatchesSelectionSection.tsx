@@ -1,12 +1,17 @@
 "use client";
 
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { Minus, Plus } from "lucide-react";
 import { useWatchesPage } from "@/components/montres-femmes/WatchesPageContext";
 import { FrWatchesProductSlider } from "./FrWatchesProductSlider";
 import { FR_COPY, formatWatchPriceFr } from "./copy";
 
-export function FrWatchesSelectionSection() {
+export function FrWatchesSelectionSection({
+  lcpHero,
+}: {
+  lcpHero: ReactNode;
+}) {
   const {
     selectedLines,
     selectedCount,
@@ -20,7 +25,7 @@ export function FrWatchesSelectionSection() {
 
   return (
     <div className="space-y-3">
-      <FrWatchesProductSlider />
+      <FrWatchesProductSlider lcpHero={lcpHero} />
 
       {selectedLines.length === 0 ? (
         <p className="rounded-xl border border-dashed border-[#A8C9B4] bg-[#FAF7F2]/80 px-3 py-2.5 text-center text-xs text-[#666]">

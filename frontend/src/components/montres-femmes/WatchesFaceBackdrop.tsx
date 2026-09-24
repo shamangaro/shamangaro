@@ -71,7 +71,7 @@ function WatchDial({
 export function WatchesFaceBackdrop() {
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden [contain:paint]"
       aria-hidden
     >
       <WatchDial
@@ -82,14 +82,14 @@ export function WatchesFaceBackdrop() {
         minuteDelay="-4s"
       />
       <WatchDial
-        className="absolute -end-20 top-[38%] h-[18rem] w-[18rem] opacity-50 sm:end-8 sm:h-[24rem] sm:w-[24rem]"
+        className="absolute -end-20 top-[38%] hidden h-[18rem] w-[18rem] opacity-50 sm:block sm:end-8 sm:h-[24rem] sm:w-[24rem]"
         hourSeconds={120}
         minuteSeconds={22}
         hourDelay="-40s"
         minuteDelay="-9s"
       />
       <WatchDial
-        className="absolute -start-10 bottom-[-4rem] h-[16rem] w-[16rem] opacity-40 sm:start-[18%] sm:h-[20rem] sm:w-[20rem]"
+        className="absolute -start-10 bottom-[-4rem] hidden h-[16rem] w-[16rem] opacity-40 sm:block sm:start-[18%] sm:h-[20rem] sm:w-[20rem]"
         hourSeconds={84}
         minuteSeconds={16}
         hourDelay="-28s"

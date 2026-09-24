@@ -62,7 +62,7 @@ function LogoIcon({
       height={LOGO_ICON_HEIGHT}
       className={cn("block shrink-0 object-contain", iconSizeClasses[size], className)}
       decoding="async"
-      fetchPriority={priority ? "high" : "auto"}
+      fetchPriority={priority ? "high" : "low"}
     />
   );
 }

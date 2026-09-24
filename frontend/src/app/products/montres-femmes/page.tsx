@@ -13,6 +13,11 @@ import { WatchesStickyCTA } from "@/components/montres-femmes/WatchesStickyCTA";
 import { WatchesScrollToTopButton } from "@/components/montres-femmes/WatchesScrollToTopButton";
 import { WatchesFooter } from "@/components/montres-femmes/WatchesFooter";
 import { WatchesFaceBackdrop } from "@/components/montres-femmes/WatchesFaceBackdrop";
+import { WatchesHeroPhoto } from "@/components/montres-femmes/WatchesHeroPhoto";
+import {
+  DEFAULT_WATCH_VARIANT,
+  WATCH_VARIANTS,
+} from "@/components/montres-femmes/config";
 
 export const metadata: Metadata = {
   title: { absolute: "Montres Femmes Élégantes — 260 DH | SHAMANGARO" },
@@ -48,7 +53,15 @@ export default function MontresFemmesPage() {
         <div className="relative z-10">
           <WatchesHeader />
           <main>
-            <WatchesOrderFlow />
+            <WatchesOrderFlow
+              lcpHero={
+                <WatchesHeroPhoto
+                  variantId={DEFAULT_WATCH_VARIANT}
+                  src={WATCH_VARIANTS[0].image}
+                  alt={WATCH_VARIANTS[0].labelAr}
+                />
+              }
+            />
             <WatchesProofSection />
             <WatchesTrust />
             <WatchesBenefits />

@@ -66,7 +66,6 @@ export function WatchesHeader() {
               size="md"
               href={watchesHomeHref}
               onClick={scrollToWatchesTop}
-              priority
               icon={<WatchesLogoMark className="h-10 w-auto sm:h-11" />}
               iconClassName=""
               subtitle={logoSubtitle}
@@ -78,7 +77,6 @@ export function WatchesHeader() {
               size="md"
               href={watchesHomeHref}
               onClick={scrollToWatchesTop}
-              priority
               icon={<WatchesLogoMark className="h-11 w-auto" />}
               iconClassName=""
               subtitle={logoSubtitle}

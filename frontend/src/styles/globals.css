@@ -169,7 +169,6 @@
 
   .watches-select-cta {
     animation: watches-select-cta 3.6s ease-in-out infinite;
-    will-change: transform;
   }
 
   @keyframes watches-hand-spin {
@@ -187,7 +186,6 @@
     animation-name: watches-hand-spin;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
-    will-change: transform;
   }
 
   @keyframes watches-pendulum {
@@ -203,7 +201,6 @@
     transform-box: fill-box;
     transform-origin: 50% 0%;
     animation: watches-pendulum 2.8s ease-in-out infinite alternate;
-    will-change: transform;
   }
 
   @keyframes watches-footer-kenburns {
@@ -217,7 +214,6 @@
 
   .watches-footer-kenburns {
     animation: watches-footer-kenburns 8s ease-in-out infinite alternate;
-    will-change: transform;
   }
 
   @keyframes watches-footer-float-a {
@@ -240,12 +236,10 @@
 
   .watches-footer-float-a {
     animation: watches-footer-float-a 4.2s ease-in-out infinite alternate;
-    will-change: transform;
   }
 
   .watches-footer-float-b {
     animation: watches-footer-float-b 5s ease-in-out infinite alternate;
-    will-change: transform;
   }
 
   @keyframes watches-logo-spin {
@@ -306,6 +300,13 @@
 
     .watches-logo-hour,
     .watches-logo-minute {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .watches-hand-hour,
+    .watches-hand-minute {
       animation: none;
     }
   }

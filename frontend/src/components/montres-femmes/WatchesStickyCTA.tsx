@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { formatWatchPrice, WATCHES_PRODUCT } from "./config";
 import { useWatchesPage } from "./WatchesPageContext";
 import {
@@ -48,30 +48,29 @@ export function WatchesStickyCTA() {
   }, [isSelectionComplete]);
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          initial={{ y: 80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 80, opacity: 0 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
-          className="fixed bottom-0 left-0 right-0 z-40 px-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden"
-        >
-          <button
-            type="button"
-            onClick={() =>
-              isSelectionComplete
-                ? scrollToWatchesCheckout()
-                : scrollToWatchesOrder()
-            }
-            className="mx-auto flex w-full max-w-lg items-center justify-center rounded-xl border border-[#B8924A]/45 bg-[#134A35] px-5 py-3 text-sm font-bold text-white shadow-md ring-1 ring-[#B8924A]/30 transition hover:bg-[#0A2F23]"
-          >
-            {isSelectionComplete
-              ? `أكّدي الطلب — ${formatWatchPrice(total)}`
-              : `اختاري الساعة — ${formatWatchPrice(WATCHES_PRODUCT.unitPrice)}`}
-          </button>
-        </motion.div>
+    <div
+      className={cn(
+        "fixed bottom-0 left-0 right-0 z-40 px-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-[transform,opacity] duration-300 ease-out lg:hidden",
+        visible
+          ? "translate-y-0 opacity-100"
+          : "pointer-events-none translate-y-20 opacity-0"
       )}
-    </AnimatePresence>
+      aria-hidden={!visible}
+    >
+      <button
+        type="button"
+        tabIndex={visible ? 0 : -1}
+        onClick={() =>
+          isSelectionComplete
+            ? scrollToWatchesCheckout()
+            : scrollToWatchesOrder()
+        }
+        className="mx-auto flex w-full max-w-lg items-center justify-center rounded-xl border border-[#B8924A]/45 bg-[#134A35] px-5 py-3 text-sm font-bold text-white shadow-md ring-1 ring-[#B8924A]/30 transition hover:bg-[#0A2F23]"
+      >
+        {isSelectionComplete
+          ? `أكّدي الطلب — ${formatWatchPrice(total)}`
+          : `اختاري الساعة — ${formatWatchPrice(WATCHES_PRODUCT.unitPrice)}`}
+      </button>
+    </div>
   );
 }

@@ -6,7 +6,7 @@ import "@/styles/globals.css";
 const tajawal = Tajawal({
   variable: "--font-tajawal",
   subsets: ["arabic", "latin"],
-  weight: ["300", "400", "500", "700", "800"],
+  weight: ["400", "500", "700", "800"],
   display: "swap",
 });
 
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/images/logo-icon.png",
+        url: "/images/favicon-32.png",
         type: "image/png",
         sizes: "32x32",
       },
@@ -82,7 +82,7 @@ export const metadata: Metadata = {
         type: "image/png",
       },
     ],
-    shortcut: "/images/logo-icon.png",
+    shortcut: "/images/favicon-32.png",
   },
 };
 

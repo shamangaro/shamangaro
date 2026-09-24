@@ -1,13 +1,18 @@
 "use client";
 
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { Minus, Plus } from "lucide-react";
 import { formatWatchPrice } from "./config";
 import { useWatchesPage } from "./WatchesPageContext";
 import { WatchesProductSlider } from "./WatchesProductSlider";
 import { WATCH_SELECTION_COPY } from "./watch-selection-utils";
 
-export function WatchesSelectionSection() {
+export function WatchesSelectionSection({
+  lcpHero,
+}: {
+  lcpHero: ReactNode;
+}) {
   const {
     selectedLines,
     selectedCount,
@@ -21,7 +26,7 @@ export function WatchesSelectionSection() {
 
   return (
     <div className="space-y-3">
-      <WatchesProductSlider />
+      <WatchesProductSlider lcpHero={lcpHero} />
 
       {selectedLines.length === 0 ? (
         <p className="rounded-xl border border-dashed border-[#A8C9B4] bg-[#FAF7F2]/80 px-3 py-2.5 text-center text-xs text-[#666]">

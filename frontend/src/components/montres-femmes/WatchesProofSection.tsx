@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Image from "next/image";
 import { Camera } from "lucide-react";
 import { Container } from "@/components/shared/Container";
 import { WATCH_PROOF_SLOTS } from "./config";
@@ -55,15 +56,8 @@ function ProofSlot({
   optional: boolean;
   optionalLabel: string;
 }) {
-  const [missing, setMissing] = useState(true);
+  const [missing, setMissing] = useState(false);
   const src = `${PROOF_DIR}/${file}`;
-
-  useEffect(() => {
-    const image = new window.Image();
-    image.onload = () => setMissing(false);
-    image.onerror = () => setMissing(true);
-    image.src = src;
-  }, [src]);
 
   if (missing) {
     return (
@@ -71,7 +65,6 @@ function ProofSlot({
         <Camera className="h-6 w-6 text-[#B8924A]" aria-hidden />
         <p className="mt-2 text-xs font-bold text-[#0F2A1F]">{label}</p>
         <p className="mt-1 text-[10px] leading-snug text-[#4A5C52]">{hint}</p>
-        <p className="mt-2 break-all font-mono text-[10px] text-[#888]">{file}</p>
         {optional ? (
           <p className="mt-1 text-[10px] font-semibold text-[#B8924A]">
             {optionalLabel}
@@ -84,11 +77,13 @@ function ProofSlot({
   return (
     <figure className="overflow-hidden rounded-xl border border-[#A8C9B4] bg-white shadow-sm ring-1 ring-[#B8924A]/10">
       <div className="relative aspect-[4/5] bg-[#FAF7F2]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={src}
           alt={label}
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          loading="lazy"
+          sizes="(max-width: 640px) 50vw, 33vw"
+          className="object-cover"
           onError={() => setMissing(true)}
         />
       </div>

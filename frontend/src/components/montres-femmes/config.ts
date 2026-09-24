@@ -52,6 +52,12 @@ export const WATCHES_PRODUCT = {
 /** Couleur par défaut — confirmée au téléphone avec la cliente */
 export const DEFAULT_WATCH_VARIANT: WatchVariantId = "two-tone-white";
 
+/** Static LCP hero (default SKU). Bypasses /_next/image AVIF decode delay. */
+export const WATCH_HERO_LCP_IMAGE =
+  "/images/montres-femmes/watch-01-twotone-white-lcp.webp";
+export const WATCH_HERO_LCP_WIDTH = 800;
+export const WATCH_HERO_LCP_HEIGHT = 960;
+
 /** Copy livraison — cohérent sur toute la LP Montres Femmes */
 export const WATCHES_DELIVERY = {
   headline: "توصيل مجاني",

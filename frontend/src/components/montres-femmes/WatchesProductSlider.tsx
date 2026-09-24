@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Check } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { WatchesHeroPhoto } from "./WatchesHeroPhoto";
+import { WatchesHeroSlideButtons } from "./WatchesHeroSlideButtons";
 import {
   DEFAULT_WATCH_VARIANT,
   WATCH_VARIANTS,
@@ -17,16 +19,29 @@ import {
 
 const TOAST_DURATION_MS = 2200;
 
-export function WatchesProductSlider() {
+export function WatchesProductSlider({
+  lcpHero,
+}: {
+  lcpHero: ReactNode;
+}) {
   const { selectedLines, selectWatch } = useWatchesPage();
   const [activeId, setActiveId] =
     useState<WatchVariantId>(DEFAULT_WATCH_VARIANT);
   const [toast, setToast] = useState("");
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const variant =
-    WATCH_VARIANTS.find((item) => item.id === activeId) ?? WATCH_VARIANTS[0];
+  const variantIndex = Math.max(
+    0,
+    WATCH_VARIANTS.findIndex((item) => item.id === activeId)
+  );
+  const variant = WATCH_VARIANTS[variantIndex] ?? WATCH_VARIANTS[0];
   const watch = watchSelectionFromVariant(variant);
+
+  const slideBy = useCallback((delta: number) => {
+    const nextIndex =
+      (variantIndex + delta + WATCH_VARIANTS.length) % WATCH_VARIANTS.length;
+    setActiveId(WATCH_VARIANTS[nextIndex].id);
+  }, [variantIndex]);
   const selected = selectedLines.some((line) => line.variantId === variant.id);
   useEffect(() => {
     return () => {
@@ -64,13 +79,22 @@ export function WatchesProductSlider() {
           </p>
         ) : null}
         <div className="relative aspect-square w-full overflow-hidden bg-white sm:aspect-[4/5]">
-          <Image
-            src={variant.image}
-            alt={variant.labelAr}
-            fill
-            priority
-            className="object-contain object-center p-1.5 sm:p-3"
-            sizes="(max-width: 640px) 100vw, 576px"
+          {variant.id === DEFAULT_WATCH_VARIANT ? (
+            lcpHero
+          ) : (
+            <WatchesHeroPhoto
+              variantId={variant.id}
+              src={variant.image}
+              alt={variant.labelAr}
+            />
+          )}
+          <WatchesHeroSlideButtons
+            onPrev={() => slideBy(-1)}
+            onNext={() => slideBy(1)}
+            prevLabel="الساعة السابقة"
+            nextLabel="الساعة الموالية"
+            current={variantIndex + 1}
+            total={WATCH_VARIANTS.length}
           />
         </div>
       </div>
@@ -101,8 +125,9 @@ export function WatchesProductSlider() {
                     src={item.image}
                     alt=""
                     fill
+                    loading="lazy"
                     className="object-cover object-center"
-                    sizes="64px"
+                    sizes="48px"
                   />
                   {isInCart ? (
                     <span className="absolute start-0.5 top-0.5 flex h-3.5 w-4 items-center justify-center rounded-full bg-[#134A35] text-white">
