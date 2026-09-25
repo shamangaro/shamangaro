@@ -19,7 +19,7 @@ const PURCHASE_STORAGE_KEY = "shamangaro_meta_purchase_orders";
 export class MetaPurchaseTracker {
   private tracked = new Set<string>();
 
-  constructor(private readonly storage: Storage | null = getSessionStorage()) {
+  constructor(private readonly storage: Storage | null = getLocalStorage()) {
     this.loadFromStorage();
   }
 
@@ -98,13 +98,13 @@ export class MetaPurchaseTracker {
   }
 }
 
-function getSessionStorage(): Storage | null {
+function getLocalStorage(): Storage | null {
   if (typeof window === "undefined") {
     return null;
   }
 
   try {
-    return window.sessionStorage;
+    return window.localStorage;
   } catch {
     return null;
   }
@@ -162,12 +162,24 @@ export function toMetaPurchasePayload(
   };
 }
 
+function isTrackablePurchase(event: MetaPurchaseEvent): boolean {
+  return (
+    event.orderNumber.trim().length > 0 &&
+    Number.isFinite(event.value)
+  );
+}
+
 /**
  * Fire Meta Pixel Purchase once per successful order number.
  * Returns true only when fbq was called for a new order.
+ * Dedupes by order ID in localStorage so thank-you refreshes cannot re-fire.
  */
 export function trackMetaPurchase(event: MetaPurchaseEvent): boolean {
   if (typeof window === "undefined" || typeof window.fbq !== "function") {
+    return false;
+  }
+
+  if (!isTrackablePurchase(event)) {
     return false;
   }
 
@@ -175,6 +187,8 @@ export function trackMetaPurchase(event: MetaPurchaseEvent): boolean {
     return false;
   }
 
-  window.fbq("track", "Purchase", toMetaPurchasePayload(event));
+  window.fbq("track", "Purchase", toMetaPurchasePayload(event), {
+    eventID: event.orderNumber,
+  });
   return true;
 }

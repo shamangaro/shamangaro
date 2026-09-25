@@ -93,16 +93,30 @@ describe("Meta Pixel Purchase", () => {
     expect(trackMetaPurchase(event)).toBe(false);
     expect(trackMetaPurchase(event)).toBe(false);
     expect(fbq).toHaveBeenCalledTimes(1);
-    expect(fbq).toHaveBeenCalledWith("track", "Purchase", {
-      value: 657,
-      currency: "MAD",
-      content_type: "product",
-      content_ids: ["family"],
-      num_items: 3,
-    });
+    expect(fbq).toHaveBeenCalledWith(
+      "track",
+      "Purchase",
+      {
+        value: 657,
+        currency: "MAD",
+        content_type: "product",
+        content_ids: ["family"],
+        num_items: 3,
+      },
+      { eventID: "SH-000404" }
+    );
   });
 
-  it("persists dedupe state across rerenders via session storage", () => {
+  it("does not fire Purchase without a unique order ID", () => {
+    const fbq = vi.fn();
+    vi.stubGlobal("window", { fbq });
+
+    const event = buildNeoTransatPurchaseEvent("", "solo", 229);
+    expect(trackMetaPurchase(event)).toBe(false);
+    expect(fbq).not.toHaveBeenCalled();
+  });
+
+  it("persists dedupe state across reloads via local storage", () => {
     const storage = new MemoryStorage();
     const tracker = new MetaPurchaseTracker(storage);
 
