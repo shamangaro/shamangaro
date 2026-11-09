@@ -44,6 +44,7 @@ from app.services.order_notifications import enqueue_status_side_effects
 from app.services.order_product import (
     OrderProductType,
     classify_order_model,
+    etendoir_product_sql_condition,
     neo_transat_product_sql_condition,
     watches_product_sql_condition,
 )
@@ -215,6 +216,8 @@ def _apply_product_filter(filters, product: str | None):
         return and_(filters, neo_transat_product_sql_condition())
     if normalized == OrderProductType.WATCHES.value:
         return and_(filters, watches_product_sql_condition())
+    if normalized == OrderProductType.ETENDOIR.value:
+        return and_(filters, etendoir_product_sql_condition())
     return filters
 
 
@@ -236,11 +239,20 @@ async def _product_counts(db: AsyncSession, base_filters) -> OrderProductCounts:
         )
         or 0
     )
-    unknown_count = max(0, all_count - neo_count - watches_count)
+    etendoir_count = (
+        await db.scalar(
+            select(func.count(Order.id)).where(
+                and_(base_filters, etendoir_product_sql_condition())
+            )
+        )
+        or 0
+    )
+    unknown_count = max(0, all_count - neo_count - watches_count - etendoir_count)
     return OrderProductCounts(
         all=all_count,
         neo_transat=neo_count,
         watches=watches_count,
+        etendoir=etendoir_count,
         unknown=unknown_count,
     )
 

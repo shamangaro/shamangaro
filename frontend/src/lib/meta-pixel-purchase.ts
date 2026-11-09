@@ -135,6 +135,21 @@ export function buildNeoTransatPurchaseEvent(
   };
 }
 
+export function buildEtendoirPurchaseEvent(
+  orderNumber: string,
+  totalPrice: number,
+  quantity = 1
+): MetaPurchaseEvent {
+  return {
+    orderNumber,
+    value: totalPrice,
+    currency: "MAD",
+    content_type: "product",
+    content_ids: ["etendoir-mural"],
+    num_items: quantity,
+  };
+}
+
 export function buildWatchesPurchaseEvent(
   orderNumber: string,
   lineItems: WatchPurchaseLineItem[],

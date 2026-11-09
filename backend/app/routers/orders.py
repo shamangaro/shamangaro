@@ -14,7 +14,12 @@ from app.schemas.order import (
 )
 from app.services.customer_risk import analyze_customer_risk, get_blacklist_entry
 from app.services.offers import get_offer
-from app.services.products import resolve_watches_multi_order, resolve_watches_order
+from app.services.products import (
+    HANGER_PRODUCT_SLUG,
+    resolve_hanger_order,
+    resolve_watches_multi_order,
+    resolve_watches_order,
+)
 from app.services.city import extract_city_from_address
 from app.services.order_lifecycle import log_order_created
 from app.services.order_notifications import enqueue_order_created
@@ -122,6 +127,29 @@ async def create_order(
         internal_notes = merge_internal_notes(
             f"product_slug={payload.product_slug}",
             line_items_note,
+            f"source_page={product_order.source_page}",
+            "address_pending_call=1" if address_pending else None,
+        )
+    elif payload.product_slug == HANGER_PRODUCT_SLUG:
+        try:
+            product_order = resolve_hanger_order(
+                quantity=payload.quantity or 1,
+                source_page=payload.source_page,
+            )
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        offer_id = product_order.offer_id
+        offer_name = product_order.offer_name
+        quantity = product_order.quantity
+        unit_price = product_order.unit_price
+        total_price = product_order.total_price
+        hanger_city = (payload.city or "").strip()
+        address_pending = not payload.address or payload.address.strip() == hanger_city
+        internal_notes = merge_internal_notes(
+            f"product_slug={payload.product_slug}",
             f"source_page={product_order.source_page}",
             "address_pending_call=1" if address_pending else None,
         )

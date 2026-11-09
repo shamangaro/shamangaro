@@ -3,12 +3,40 @@
 import pytest
 
 from app.services.products import (
+    HANGER_PRODUCT_NAME,
+    HANGER_UNIT_PRICE,
     WATCHES_PRODUCT_NAME,
     WATCHES_UNIT_PRICE,
+    resolve_hanger_order,
     resolve_watches_multi_order,
     resolve_watches_order,
 )
 from app.services.watch_line_items import parse_line_items, serialize_line_items, WatchLineItemData
+
+
+def test_resolve_hanger_order_fixed_price():
+    order = resolve_hanger_order(source_page="/products/etendoir-mural")
+    assert order.offer_id == "etendoir-mural"
+    assert order.offer_name == HANGER_PRODUCT_NAME
+    assert order.quantity == 1
+    assert order.unit_price == HANGER_UNIT_PRICE
+    assert order.total_price == 349.0
+    assert order.line_items == ()
+
+
+def test_resolve_hanger_order_quantity_offers():
+    pair = resolve_hanger_order(quantity=2, source_page="/products/etendoir-mural")
+    triple = resolve_hanger_order(quantity=3, source_page="/products/etendoir-mural")
+    assert pair.quantity == 2
+    assert pair.unit_price == HANGER_UNIT_PRICE
+    assert pair.total_price == 599.0
+    assert triple.quantity == 3
+    assert triple.total_price == 799.0
+
+
+def test_resolve_hanger_order_rejects_quantity_above_three():
+    with pytest.raises(ValueError):
+        resolve_hanger_order(quantity=4, source_page="/products/etendoir-mural")
 
 
 def test_resolve_watches_order_burgundy():

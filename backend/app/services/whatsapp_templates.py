@@ -6,7 +6,7 @@ from typing import Any
 from urllib.parse import quote
 
 from app.services.order_product import OrderProductType, classify_order_product
-from app.services.products import WATCHES_PRODUCT_SLUG
+from app.services.products import HANGER_PRODUCT_NAME
 from app.services.watch_line_items import parse_line_items
 
 NEO_OFFER_LABELS = {
@@ -25,6 +25,7 @@ def _order_product_type(order: dict[str, Any]) -> OrderProductType:
     if explicit in {
         OrderProductType.NEO_TRANSAT.value,
         OrderProductType.WATCHES.value,
+        OrderProductType.ETENDOIR.value,
         OrderProductType.UNKNOWN.value,
     }:
         return OrderProductType(explicit)
@@ -124,10 +125,37 @@ def build_generic_received_whatsapp(
     )
 
 
+def build_etendoir_received_whatsapp(order: dict[str, Any]) -> str:
+    customer_name = order["customer_name"]
+    city = (order.get("city") or order.get("address") or "—").strip() or "—"
+    amount = _format_amount(float(order.get("total_price") or 0))
+    quantity = int(order.get("quantity") or 1)
+    product_label = (order.get("offer_name") or HANGER_PRODUCT_NAME).strip()
+    return (
+        f"السلام عليكم {customer_name} 👋\n\n"
+        "شكراً لاختياركم SHAMANGARO ❤️\n\n"
+        "تم استلام طلبكم بنجاح.\n\n"
+        "سيقوم فريقنا بالاتصال بكم قريباً لتأكيد الطلب والعنوان قبل الشحن.\n\n"
+        "━━━━━━━━━━━━━━━\n\n"
+        "🛒 المنتج:\n"
+        f"{product_label}\n\n"
+        f"📦 الكمية:\n{quantity}\n\n"
+        f"💰 المبلغ:\n{amount} DH\n\n"
+        f"📍 المدينة:\n{city}\n\n"
+        "🚚 التوصيل مجاني\n\n"
+        "💵 الدفع عند الاستلام\n\n"
+        "━━━━━━━━━━━━━━━\n\n"
+        "شكراً لثقتكم.\n\n"
+        "فريق SHAMANGARO"
+    )
+
+
 def build_order_received_whatsapp(order: dict[str, Any]) -> str:
     product = _order_product_type(order)
     if product == OrderProductType.WATCHES:
         return build_watches_confirmation_whatsapp(order)
+    if product == OrderProductType.ETENDOIR:
+        return build_etendoir_received_whatsapp(order)
     if product == OrderProductType.NEO_TRANSAT:
         return build_neo_transat_received_whatsapp(
             order["customer_name"],

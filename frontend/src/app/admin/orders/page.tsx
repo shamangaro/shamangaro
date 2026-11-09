@@ -39,6 +39,7 @@ const PRODUCT_TABS: { value: "" | OrderProductType; label: string }[] = [
   { value: "", label: "الكل" },
   { value: "neo-transat", label: "Neo Transat" },
   { value: "watches", label: "الساعات" },
+  { value: "etendoir-mural", label: "مجفف ملابس جداري" },
 ];
 
 const SORT_COLUMNS = [
@@ -79,6 +80,7 @@ export default function AdminOrdersPage() {
     all: 0,
     neo_transat: 0,
     watches: 0,
+    etendoir: 0,
     unknown: 0,
   });
 
@@ -100,7 +102,11 @@ export default function AdminOrdersPage() {
       setViewMode("archived");
     }
     const product = params.get("product");
-    if (product === "neo-transat" || product === "watches") {
+    if (
+      product === "neo-transat" ||
+      product === "watches" ||
+      product === "etendoir-mural"
+    ) {
       setProductFilter(product);
     }
     const urlSearch = params.get("search");
@@ -333,7 +339,11 @@ export default function AdminOrdersPage() {
                 ? productCounts.all
                 : tab.value === "neo-transat"
                   ? productCounts.neo_transat
-                  : productCounts.watches;
+                  : tab.value === "watches"
+                    ? productCounts.watches
+                    : tab.value === "etendoir-mural"
+                      ? productCounts.etendoir
+                      : productCounts.unknown;
             return (
               <button
                 key={tab.value || "all"}

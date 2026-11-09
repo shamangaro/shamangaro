@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  buildEtendoirPurchaseEvent,
   buildNeoTransatPurchaseEvent,
   buildWatchesPurchaseEvent,
   MetaPurchaseTracker,
@@ -51,6 +52,19 @@ describe("Meta Pixel Purchase", () => {
       content_type: "product",
       content_ids: ["duo"],
       num_items: 2,
+    });
+  });
+
+  it("builds the wall-rack Purchase payload from the backend total", () => {
+    const event = buildEtendoirPurchaseEvent("SH-000220", 349);
+
+    expect(event).toEqual({
+      orderNumber: "SH-000220",
+      value: 349,
+      currency: "MAD",
+      content_type: "product",
+      content_ids: ["etendoir-mural"],
+      num_items: 1,
     });
   });
 

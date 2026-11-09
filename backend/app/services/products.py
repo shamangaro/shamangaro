@@ -90,6 +90,30 @@ def _validate_quantity(quantity: int) -> None:
         raise ValueError("الكمية غير صالحة")
 
 
+HANGER_PRODUCT_SLUG = "etendoir-mural"
+HANGER_PRODUCT_NAME = "مجفف ملابس جداري"
+HANGER_UNIT_PRICE = 349.0
+HANGER_OFFER_TOTALS = {1: 349.0, 2: 599.0, 3: 799.0}
+HANGER_SOURCE_PAGE = "/products/etendoir-mural"
+HANGER_MAX_QUANTITY = 3
+
+
+def resolve_hanger_order(*, quantity: int = 1, source_page: str | None) -> ProductOrder:
+    """Wall rack. Quantity is 1, 2, or 3, with a fixed total for each offer."""
+    if quantity < 1 or quantity > HANGER_MAX_QUANTITY:
+        raise ValueError("الكمية غير صالحة")
+    total_price = HANGER_OFFER_TOTALS[quantity]
+    return ProductOrder(
+        offer_id=HANGER_PRODUCT_SLUG,
+        offer_name=HANGER_PRODUCT_NAME,
+        quantity=quantity,
+        unit_price=HANGER_UNIT_PRICE,
+        total_price=total_price,
+        selected_variant="",
+        source_page=source_page or HANGER_SOURCE_PAGE,
+    )
+
+
 def resolve_watches_order(
     *,
     selected_variant: str,

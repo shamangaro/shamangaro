@@ -8,16 +8,18 @@ from typing import Any
 from sqlalchemy import or_
 
 from app.models.order import Order
-from app.services.products import WATCHES_PRODUCT_SLUG
+from app.services.products import HANGER_PRODUCT_SLUG, WATCHES_PRODUCT_SLUG
 from app.services.watch_line_items import parse_line_items
 
 NEO_OFFER_IDS = frozenset({"solo", "duo", "family"})
 PRODUCT_SLUG_NOTE = f"product_slug={WATCHES_PRODUCT_SLUG}"
+HANGER_SLUG_NOTE = f"product_slug={HANGER_PRODUCT_SLUG}"
 
 
 class OrderProductType(str, Enum):
     NEO_TRANSAT = "neo-transat"
     WATCHES = "watches"
+    ETENDOIR = "etendoir-mural"
     UNKNOWN = "unknown"
 
 
@@ -31,12 +33,16 @@ def classify_order_product(
 
     if normalized_offer == WATCHES_PRODUCT_SLUG:
         return OrderProductType.WATCHES
-
-    if line_items:
-        return OrderProductType.WATCHES
+    if normalized_offer == HANGER_PRODUCT_SLUG:
+        return OrderProductType.ETENDOIR
 
     notes = internal_notes or ""
     if PRODUCT_SLUG_NOTE in notes:
+        return OrderProductType.WATCHES
+    if HANGER_SLUG_NOTE in notes:
+        return OrderProductType.ETENDOIR
+
+    if line_items:
         return OrderProductType.WATCHES
     if "line_items=" in notes and parse_line_items(notes):
         return OrderProductType.WATCHES
@@ -61,6 +67,13 @@ def watches_product_sql_condition():
         Order.offer_id == WATCHES_PRODUCT_SLUG,
         Order.internal_notes.ilike(f"%{PRODUCT_SLUG_NOTE}%"),
         Order.internal_notes.ilike("%line_items=%"),
+    )
+
+
+def etendoir_product_sql_condition():
+    return or_(
+        Order.offer_id == HANGER_PRODUCT_SLUG,
+        Order.internal_notes.ilike(f"%{HANGER_SLUG_NOTE}%"),
     )
 
 

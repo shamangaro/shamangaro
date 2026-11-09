@@ -119,10 +119,36 @@ function buildGenericReceivedWhatsApp(order: OrderWhatsAppContext): string {
   );
 }
 
+export function buildEtendoirReceivedWhatsApp(order: OrderWhatsAppContext): string {
+  const amount = formatAmount(order.total_price);
+  const city = (order.city || order.address || "—").trim() || "—";
+  const productLabel = order.offer_name?.trim() || "مجفف ملابس جداري";
+  return (
+    `السلام عليكم ${order.customer_name} 👋\n\n` +
+    "شكراً لاختياركم SHAMANGARO ❤️\n\n" +
+    "تم استلام طلبكم بنجاح.\n\n" +
+    "سيقوم فريقنا بالاتصال بكم قريباً لتأكيد الطلب والعنوان قبل الشحن.\n\n" +
+    "━━━━━━━━━━━━━━━\n\n" +
+    "🛒 المنتج:\n" +
+    `${productLabel}\n\n` +
+    "📦 الكمية:\n1\n\n" +
+    `💰 المبلغ:\n${amount} DH\n\n` +
+    `📍 المدينة:\n${city}\n\n` +
+    "🚚 التوصيل مجاني\n\n" +
+    "💵 الدفع عند الاستلام\n\n" +
+    "━━━━━━━━━━━━━━━\n\n" +
+    "شكراً لثقتكم.\n\n" +
+    "فريق SHAMANGARO"
+  );
+}
+
 export function buildOrderReceivedWhatsApp(order: OrderWhatsAppContext): string {
   const product = resolveProductType(order);
   if (product === "watches") {
     return buildWatchesConfirmationWhatsApp(order);
+  }
+  if (product === "etendoir-mural") {
+    return buildEtendoirReceivedWhatsApp(order);
   }
   if (product === "neo-transat") {
     return buildNeoTransatReceivedWhatsApp(order);

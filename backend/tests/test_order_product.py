@@ -69,6 +69,23 @@ def test_classify_watches_by_internal_notes():
     ) == OrderProductType.WATCHES
 
 
+def test_classify_etendoir_by_offer_id():
+    assert (
+        classify_order_product(offer_id="etendoir-mural")
+        == OrderProductType.ETENDOIR
+    )
+
+
+def test_classify_etendoir_by_internal_notes():
+    assert (
+        classify_order_product(
+            offer_id="etendoir-mural",
+            internal_notes="product_slug=etendoir-mural; source_page=/products/etendoir-mural",
+        )
+        == OrderProductType.ETENDOIR
+    )
+
+
 def test_classify_unknown_when_unreliable():
     assert classify_order_product(offer_id="mystery-product") == OrderProductType.UNKNOWN
 

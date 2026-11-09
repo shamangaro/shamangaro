@@ -40,6 +40,97 @@ async def test_create_order_invalid_phone(client):
 
 
 @pytest.mark.asyncio
+async def test_create_etendoir_order(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "سلمى بناني",
+            "phone": "0612345678",
+            "city": "الرباط",
+            "product_slug": "etendoir-mural",
+            "product_name": "مجفف ملابس جداري",
+            "quantity": 1,
+            "unit_price": 349.0,
+            "total_amount": 349.0,
+            "source_page": "/products/etendoir-mural",
+        },
+    )
+    assert res.status_code == 201
+    data = res.json()
+    assert data["order_number"].startswith("SH-")
+    assert data["total_price"] == 349.0
+
+    public = await client.get(f"/orders/{data['order_number']}")
+    assert public.status_code == 200
+    body = public.json()
+    assert body["offer_name"] == "مجفف ملابس جداري"
+    assert body["quantity"] == 1
+    assert body["total_price"] == 349.0
+    assert not body.get("line_items")
+
+
+@pytest.mark.asyncio
+async def test_create_etendoir_order_rejects_wrong_price(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "سلمى بناني",
+            "phone": "0612345678",
+            "city": "الرباط",
+            "product_slug": "etendoir-mural",
+            "product_name": "مجفف ملابس جداري",
+            "quantity": 1,
+            "unit_price": 349.0,
+            "total_amount": 199.0,
+            "source_page": "/products/etendoir-mural",
+        },
+    )
+    assert res.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_etendoir_order_quantity_three(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "سلمى بناني",
+            "phone": "0612345678",
+            "city": "الرباط",
+            "product_slug": "etendoir-mural",
+            "product_name": "مجفف ملابس جداري",
+            "quantity": 3,
+            "unit_price": 349.0,
+            "total_amount": 799.0,
+            "source_page": "/products/etendoir-mural",
+        },
+    )
+    assert res.status_code == 201
+    data = res.json()
+    assert data["total_price"] == 799.0
+    public = await client.get(f"/orders/{data['order_number']}")
+    assert public.json()["quantity"] == 3
+
+
+@pytest.mark.asyncio
+async def test_create_etendoir_order_rejects_quantity_four(client):
+    res = await client.post(
+        "/orders",
+        json={
+            "customer_name": "سلمى بناني",
+            "phone": "0612345678",
+            "city": "الرباط",
+            "product_slug": "etendoir-mural",
+            "product_name": "مجفف ملابس جداري",
+            "quantity": 4,
+            "unit_price": 349.0,
+            "total_amount": 1396.0,
+            "source_page": "/products/etendoir-mural",
+        },
+    )
+    assert res.status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_create_order_invalid_offer(client):
     res = await client.post(
         "/orders",

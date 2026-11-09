@@ -6,6 +6,10 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from app.services.phone import is_valid_moroccan_phone, normalize_moroccan_phone
 from app.services.products import (
+    HANGER_OFFER_TOTALS,
+    HANGER_PRODUCT_NAME,
+    HANGER_PRODUCT_SLUG,
+    HANGER_UNIT_PRICE,
     WATCHES_PRODUCT_NAME,
     WATCHES_PRODUCT_SLUG,
     WATCHES_UNIT_PRICE,
@@ -38,7 +42,7 @@ class OrderCreate(BaseModel):
     address: str | None = Field(default=None, max_length=500)
     city: str | None = Field(default=None, max_length=120)
     offer_id: Literal["solo", "duo", "family"] | None = None
-    product_slug: Literal["montres-femmes"] | None = None
+    product_slug: Literal["montres-femmes", "etendoir-mural"] | None = None
     product_name: str | None = None
     selected_variant: str | None = None
     line_items: list[WatchLineItemCreate] | None = None
@@ -74,6 +78,27 @@ class OrderCreate(BaseModel):
         if has_offer:
             if not self.address or len(self.address) < 5:
                 raise ValueError("العنوان مطلوب")
+
+        if has_product and self.product_slug == HANGER_PRODUCT_SLUG:
+            if self.line_items or self.selected_variant:
+                raise ValueError("هذا المنتج ما عندوش طرازات")
+            if self.product_name and self.product_name.strip() != HANGER_PRODUCT_NAME:
+                raise ValueError("اسم المنتج غير صالح")
+            quantity = self.quantity if self.quantity is not None else 1
+            if quantity < 1 or quantity > 3:
+                raise ValueError("الكمية غير صالحة")
+            self.quantity = quantity
+            if not _price_matches(self.unit_price, HANGER_UNIT_PRICE):
+                raise ValueError("سعر الوحدة غير صالح")
+            expected_total = HANGER_OFFER_TOTALS.get(quantity)
+            if expected_total is None or not _price_matches(self.total_amount, expected_total):
+                raise ValueError("المبلغ الإجمالي غير صالح")
+            city = (self.city or "").strip()
+            if not city:
+                raise ValueError("يجب تحديد المدينة")
+            if not self.address:
+                self.address = city
+            return self
 
         if has_product:
             if self.product_slug != WATCHES_PRODUCT_SLUG:
@@ -162,7 +187,7 @@ class OrderAdminResponse(BaseModel):
     status: str
     internal_notes: str | None = None
     line_items: list[WatchLineItemPublic] | None = None
-    product_type: Literal["neo-transat", "watches", "unknown"] = "unknown"
+    product_type: Literal["neo-transat", "watches", "etendoir-mural", "unknown"] = "unknown"
     is_risk: bool = False
     confirmation_agent: str | None = None
     created_at: datetime
@@ -259,6 +284,7 @@ class OrderProductCounts(BaseModel):
     all: int
     neo_transat: int
     watches: int
+    etendoir: int = 0
     unknown: int = 0
 
 

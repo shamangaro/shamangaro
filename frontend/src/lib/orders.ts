@@ -120,6 +120,7 @@ export interface OrderProductCounts {
   all: number;
   neo_transat: number;
   watches: number;
+  etendoir: number;
   unknown: number;
 }
 
