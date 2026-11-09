@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ShoppingCart, Star, Truck } from "lucide-react";
+import { ArrowUp, ShoppingCart, Star, Truck } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Container } from "@/components/shared/Container";
@@ -56,6 +56,7 @@ export function EtendoirLanding() {
   const [lang, setLangState] = useState<EtendoirLang>("fr");
   const [askLang, setAskLang] = useState(false);
   const [stickyVisible, setStickyVisible] = useState(false);
+  const [showTop, setShowTop] = useState(false);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState<EtendoirQuantity>(1);
   const [form, setForm] = useState<FormValues>({ name: "", phone: "", city: "" });
@@ -114,6 +115,7 @@ export function EtendoirLanding() {
     const update = () => {
       const narrow = window.matchMedia("(max-width: 1023px)").matches;
       setStickyVisible(narrow && seen.size === 0 && window.scrollY > 420);
+      setShowTop(window.scrollY > 480);
     };
     const observer = new IntersectionObserver(
       (entries) => {
@@ -673,6 +675,20 @@ export function EtendoirLanding() {
             </div>
           </div>
         </div>
+      ) : null}
+
+      {showTop ? (
+        <button
+          type="button"
+          onClick={scrollToTop}
+          aria-label={copy.scrollTop}
+          className={cn(
+            "fixed end-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#121212]/12 bg-[#E6E4E0]/95 text-[#121212] shadow-sm backdrop-blur-sm transition hover:bg-[#121212] hover:text-white",
+            stickyVisible ? "bottom-24 lg:bottom-6" : "bottom-5 lg:bottom-6"
+          )}
+        >
+          <ArrowUp className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+        </button>
       ) : null}
 
       {stickyVisible ? (

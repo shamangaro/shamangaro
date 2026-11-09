@@ -3,6 +3,7 @@ export type EtendoirLang = "ar" | "fr";
 type Copy = {
   metaTitle: string;
   languageLabel: string;
+  scrollTop: string;
   showroom: string;
   eyebrow: string;
   title: string;
@@ -66,6 +67,7 @@ export const ETENDOIR_COPY: Record<EtendoirLang, Copy> = {
   ar: {
     metaTitle: "مجفف ملابس جداري — 349 درهم | SHAMANGARO",
     languageLabel: "اللغة",
+    scrollTop: "طلّع للفوق",
     showroom: "قاعة البيع",
     eyebrow: "علاقة حائط",
     title: "مجفف ملابس",
@@ -196,6 +198,7 @@ export const ETENDOIR_COPY: Record<EtendoirLang, Copy> = {
   fr: {
     metaTitle: "Étendoir mural pliant — 349 DH | SHAMANGARO",
     languageLabel: "Langue",
+    scrollTop: "Retour en haut",
     showroom: "Salle de vente",
     eyebrow: "Étendoir mural",
     title: "Étendoir mural",
