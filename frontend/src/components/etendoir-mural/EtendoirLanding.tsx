@@ -208,9 +208,9 @@ export function EtendoirLanding() {
     <div dir={dir} lang={lang} className="bg-white text-[#121212]">
       <header
         data-sticky-header
-        className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm"
+        className="sticky top-0 z-30 bg-[#121212] text-white"
       >
-        <Container className="h-[4.75rem]">
+        <Container className="h-16">
           <div className="relative flex h-full items-center justify-between" dir="ltr">
           <a
             href="#etendoir-order"
@@ -219,7 +219,7 @@ export function EtendoirLanding() {
               event.preventDefault();
               goToOrder();
             }}
-            className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full text-[#121212] transition-colors hover:bg-[#DA0037]/10"
+            className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-[#DA0037]"
           >
             <ShoppingCart size={18} strokeWidth={1.75} />
           </a>
@@ -233,10 +233,10 @@ export function EtendoirLanding() {
               className="pointer-events-auto flex flex-col items-center leading-none"
               aria-label="SHAMANGARO"
             >
-              <span className="text-xl font-extrabold tracking-wide text-[#121212] sm:text-2xl">
+              <span className="text-xl font-extrabold tracking-wide text-white sm:text-2xl">
                 SHAMANGARO
               </span>
-              <span className="mt-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#121212]/45 sm:text-xs">
+              <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/55">
                 Premium Brand
               </span>
             </a>
@@ -244,7 +244,7 @@ export function EtendoirLanding() {
           <div
             role="group"
             aria-label={copy.languageLabel}
-            className="relative z-10 flex items-center gap-2 text-[11px] font-medium leading-none"
+            className="relative z-10 flex items-center gap-1 text-[11px] font-bold leading-none"
           >
             {(["fr", "ar"] as const).map((code) => (
               <button
@@ -253,10 +253,8 @@ export function EtendoirLanding() {
                 aria-pressed={lang === code}
                 onClick={() => chooseLanguage(code)}
                 className={cn(
-                  "py-1",
-                  lang === code
-                    ? "text-[#121212] underline decoration-[#DA0037] decoration-2 underline-offset-[5px]"
-                    : "text-[#121212]/35"
+                  "rounded-full px-2.5 py-1.5",
+                  lang === code ? "bg-[#DA0037] text-white" : "text-white/45 hover:text-white"
                 )}
               >
                 {code === "fr" ? "FR" : "دارجة"}
@@ -265,8 +263,8 @@ export function EtendoirLanding() {
           </div>
           </div>
         </Container>
-        <p className="flex items-center justify-center gap-2 bg-[#121212] px-4 py-2 text-center text-[11px] font-semibold tracking-[0.08em] text-[#EEEDE9] sm:text-xs">
-          <Truck className="h-3.5 w-3.5 shrink-0" aria-hidden />
+        <p className="flex items-center justify-center gap-2 border-t border-white/10 px-4 py-2 text-center text-[11px] font-semibold text-[#EEEDE9] sm:text-xs">
+          <Truck className="h-3.5 w-3.5 shrink-0 text-[#DA0037]" aria-hidden />
           {copy.deliveryBand}
         </p>
       </header>
@@ -315,7 +313,7 @@ export function EtendoirLanding() {
               </p>
             </div>
             <div dir={dir} className="order-2 lg:sticky lg:top-28 lg:self-start">
-              <p className="text-sm font-bold leading-relaxed text-[#121212]">{copy.lead}</p>
+              <p className="text-lg font-bold leading-relaxed text-[#121212] sm:text-xl">{copy.lead}</p>
               <ul className="mt-3 grid grid-cols-3 gap-2">
                 {copy.specs.map((spec) => (
                   <li
@@ -600,6 +598,50 @@ export function EtendoirLanding() {
 
         <DeliveryStrip band={copy.deliveryBand} detail={copy.deliveryDetail} />
 
+        <section
+          className="bg-[radial-gradient(ellipse_at_top,_#fff1f4_0%,_#ffffff_62%)] py-10 sm:py-14"
+          aria-labelledby="etendoir-manual"
+        >
+          <Container>
+            <div className="mx-auto max-w-4xl overflow-hidden rounded-[28px] border-2 border-[#121212] bg-white shadow-[5px_5px_0_#DA0037]">
+              <div className="bg-[#121212] px-5 py-4 text-center">
+                <h2 id="etendoir-manual" className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                  {copy.manualTitle}
+                </h2>
+                <span className="mx-auto mt-2 block h-1 w-12 rounded-full bg-[#DA0037]" aria-hidden />
+              </div>
+              <table className="w-full border-collapse text-start">
+                <tbody>
+                  {copy.manual.map((row, index) => (
+                    <tr
+                      key={row.label}
+                      className="block border-b border-[#F3E6E9] last:border-b-0 md:table-row"
+                    >
+                      <th
+                        scope="row"
+                        className={cn(
+                          "block border-s-4 border-[#6B6B6B] px-4 py-3.5 text-start text-base font-extrabold text-[#5C5C5C] md:table-cell md:w-[32%] md:border-s-0 md:border-e md:border-[#E7E2DE] md:py-4 md:text-lg md:align-top",
+                          index % 2 === 0 ? "bg-[#E6E4E0]" : "bg-[#F3F1EE]"
+                        )}
+                      >
+                        {row.label}
+                      </th>
+                      <td
+                        className={cn(
+                          "block select-text px-4 py-3.5 text-start text-base font-medium leading-relaxed text-[#121212] md:table-cell md:px-5 md:py-4 md:text-lg md:align-top",
+                          index % 2 === 1 && "bg-[#FAF8F7]"
+                        )}
+                      >
+                        {row.value}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Container>
+        </section>
+
         <section className="bg-[#FAF8F7] py-10 sm:py-14">
           <Container>
             <div className="mb-4 text-center">
@@ -708,7 +750,7 @@ export function EtendoirLanding() {
 
 function DeliveryStrip({ band, detail }: { band: string; detail: string }) {
   return (
-    <div className="relative overflow-hidden bg-[#DA0037] text-white" role="note" aria-label={band}>
+    <div className="relative overflow-hidden bg-[#121212] text-white" role="note" aria-label={band}>
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/35" aria-hidden />
       <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-3 text-center sm:gap-x-5 sm:py-3.5">
         <span className="flex items-center gap-2 text-sm font-extrabold sm:text-base">

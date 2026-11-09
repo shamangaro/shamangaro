@@ -20,7 +20,10 @@ type Copy = {
   galleryLabel: string;
   galleryPrev: string;
   galleryNext: string;
-  alts: Record<"open" | "in-use" | "hang" | "folded" | "angle" | "line" | "size", string>;
+  alts: Record<
+    "open" | "in-use" | "hang" | "folded" | "angle" | "line" | "size" | "zigzag" | "row" | "closed",
+    string
+  >;
   compareTitle: string;
   compareLead: string;
   compareBefore: string;
@@ -33,6 +36,8 @@ type Copy = {
   steps: { image: "open" | "hang" | "folded"; title: string; body: string }[];
   spacesTitle: string;
   places: string[];
+  manualTitle: string;
+  manual: { label: string; value: string }[];
   faqTitle: string;
   faqs: { q: string; a: string }[];
   orderTitle: string;
@@ -96,6 +101,9 @@ export const ETENDOIR_COPY: Record<EtendoirLang, Copy> = {
       angle: "العلاقة مطوية بزاوية على الحيط، وفيها ملابس معلقة على المناشير",
       line: "العلاقة ممدودة على البلكونة، والملابس معلقة على المناشير",
       size: "مقاسات العلاقة: الطول الكامل 120 سم، ثلاثة طرونصو من 30 سم، وقضيب 24 سم",
+      zigzag: "العلاقة مفتوحة بزاوية، فيها ثلاث قمصان معلقة وفوطة فالطرف",
+      row: "العلاقة ممدودة على الحيط وفيها صف ديال الحوايج معلقة",
+      closed: "العلاقة مطوية قدام الحيط وفيها ثلاث حوايج معلقة",
     },
     compareTitle: "الفرق باين",
     compareLead: "حرك المؤشر وقارن الحبل مع العلاقة.",
@@ -136,8 +144,42 @@ export const ETENDOIR_COPY: Record<EtendoirLang, Copy> = {
         body: "منين تسالي، طويها للحيط. ما كاتاخدش بلاصة، ومزيانة للبلايص الصغيرة.",
       },
     ],
-    spacesTitle: "فين كتتركب",
+    spacesTitle: "كتتركب على الحيط، فين البلاصة ضيقة",
     places: ["البلكونة", "الحمام", "بيت الغسيل", "بيت النعاس"],
+    manualTitle: "معلومات المنتج",
+    manual: [
+      { label: "المادة", value: "سبيكة الألومنيوم." },
+      {
+        label: "القياسات المذكورة",
+        value: "قاعدة الحائط 6.5 × 9 سم؛ الذراع الرئيسي 30 سم؛ الامتداد التلسكوبي 24 سم.",
+      },
+      { label: "الحمولة القصوى المذكورة", value: "30 كلغ، مع توزيع الوزن بالتساوي." },
+      {
+        label: "الخطّافات",
+        value: "الخطّافات قابلة للتوجيه، والعارضة الأفقية تقدر تستعملها حتى لتعليق الحوايج.",
+      },
+      {
+        label: "التثبيت",
+        value: "بالبراغي على حيط مناسب للثقب، أو بالقاعدة اللاصقة المرفقة فوق سطح مناسب.",
+      },
+      { label: "من بعد التركيب باللاصق", value: "تسنّى 72 ساعة قبل الاستعمال." },
+      {
+        label: "الاستعمال",
+        value: "داخل الدار، فبلاصة ناشفة ومستوية. ما تستعملهاش فالخارج ولا فبلاصة مبللة أو غير مستوية.",
+      },
+      {
+        label: "السلامة",
+        value: "ما تجلسش، ما تنقزش وما تطلعش فوق الحمالة. حيد الحوايج قبل ما تحركها أو تعدلها، وخلي الأطفال بعيدين عليها.",
+      },
+      {
+        label: "التنظيف",
+        value: "مسحها بثوب نقي؛ للبقع الصعيبة استعمل منظف محايد. ما تستعملش الكحول ولا المذيبات.",
+      },
+      {
+        label: "إلا بان فيها ضرر",
+        value: "وقف الاستعمال وراجع التثبيت. ما تصلحهاش وما تبدلش فيها بوحدك.",
+      },
+    ],
     faqTitle: "أسئلة",
     faqs: [
       {
@@ -228,6 +270,9 @@ export const ETENDOIR_COPY: Record<EtendoirLang, Copy> = {
       angle: "Étendoir replié en angle sur le mur, avec des vêtements suspendus aux crochets",
       line: "Étendoir déployé au balcon, avec des vêtements suspendus aux crochets",
       size: "Cotes de l’étendoir : longueur totale 120 cm, trois tronçons de 30 cm et une tige de 24 cm",
+      zigzag: "Étendoir ouvert en angle, avec trois chemises suspendues et une serviette au bout",
+      row: "Étendoir déployé le long du mur, avec une rangée de vêtements suspendus",
+      closed: "Étendoir replié contre le mur, avec trois vêtements suspendus",
     },
     compareTitle: "La différence se voit",
     compareLead: "Faites glisser le curseur et comparez la corde avec l’étendoir.",
@@ -268,8 +313,47 @@ export const ETENDOIR_COPY: Record<EtendoirLang, Copy> = {
         body: "Quand vous avez fini, repliez-le contre le mur. Il ne prend plus de place, et il convient aux petits espaces.",
       },
     ],
-    spacesTitle: "Où le fixer",
+    spacesTitle: "Il se fixe au mur, là où la place manque",
     places: ["Balcon", "Salle de bain", "Buanderie", "Chambre"],
+    manualTitle: "Informations produit",
+    manual: [
+      { label: "Matière", value: "Alliage d’aluminium." },
+      {
+        label: "Dimensions indiquées",
+        value: "Plaque murale 6,5 × 9 cm. Bras principal 30 cm. Extension télescopique 24 cm.",
+      },
+      { label: "Charge maximale indiquée", value: "30 kg, répartis uniformément." },
+      {
+        label: "Crochets",
+        value: "Crochets orientables. La barre horizontale peut aussi servir à suspendre du linge.",
+      },
+      {
+        label: "Fixation",
+        value:
+          "Avec vis sur un mur adapté au perçage, ou avec la base adhésive fournie sur une surface compatible.",
+      },
+      { label: "Après une pose adhésive", value: "Attendre 72 heures avant utilisation." },
+      {
+        label: "Utilisation",
+        value:
+          "À l’intérieur, dans un endroit sec et stable. Ne pas utiliser à l’extérieur ni dans un endroit humide ou irrégulier.",
+      },
+      {
+        label: "Sécurité",
+        value:
+          "Ne pas s’asseoir, sauter ou grimper sur le support. Retirer les vêtements avant de déplacer ou régler le support. Tenir les enfants à l’écart.",
+      },
+      {
+        label: "Entretien",
+        value:
+          "Nettoyer avec un chiffon propre. Pour les taches tenaces, utiliser un détergent neutre. Ne pas utiliser de solvants comme l’alcool ou le diluant.",
+      },
+      {
+        label: "En cas de dommage",
+        value:
+          "En cas de dommage, déformation ou jeu, arrêter l’utilisation et vérifier les fixations. Ne pas réparer ni modifier le produit soi-même.",
+      },
+    ],
     faqTitle: "Questions",
     faqs: [
       {

@@ -7,10 +7,12 @@ import type { EtendoirLang } from "./copy";
 import { ETENDOIR_COPY } from "./copy";
 
 const HERO_IMAGES = [
-  { id: "angle", src: "/images/etendoir-mural/hero-angle.jpg", position: "object-center" },
-  { id: "line", src: "/images/etendoir-mural/hero-line.jpg", position: "object-center" },
-  { id: "in-use", src: "/images/etendoir-mural/in-use.jpg", position: "object-[center_42%]" },
-  { id: "size", src: "/images/etendoir-mural/hero-size.jpg", position: "object-top" },
+  { id: "closed", src: "/images/etendoir-mural/hero-closed.jpg", fit: "object-contain", position: "object-center" },
+  { id: "angle", src: "/images/etendoir-mural/hero-angle.jpg", fit: "object-cover", position: "object-center" },
+  { id: "line", src: "/images/etendoir-mural/hero-line.jpg", fit: "object-cover", position: "object-center" },
+  { id: "in-use", src: "/images/etendoir-mural/in-use.jpg", fit: "object-cover", position: "object-[center_42%]" },
+  { id: "zigzag", src: "/images/etendoir-mural/hero-zigzag.jpg", fit: "object-contain", position: "object-center" },
+  { id: "row", src: "/images/etendoir-mural/hero-row.jpg", fit: "object-contain", position: "object-center" },
 ] as const;
 
 export function ProductGallery({ lang }: { lang: EtendoirLang }) {
@@ -25,7 +27,7 @@ export function ProductGallery({ lang }: { lang: EtendoirLang }) {
 
   return (
     <div id="etendoir-gallery" dir="ltr">
-      <div className="relative aspect-[4/3] w-full overflow-hidden">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-white">
         {HERO_IMAGES.map((image, index) => (
           <Image
             key={image.src}
@@ -36,7 +38,8 @@ export function ProductGallery({ lang }: { lang: EtendoirLang }) {
             sizes="(min-width: 1024px) 540px, 100vw"
             aria-hidden={index !== active}
             className={cn(
-              "object-cover transition-opacity duration-300",
+              "transition-opacity duration-300",
+              image.fit,
               image.position,
               index === active ? "opacity-100" : "opacity-0",
             )}
